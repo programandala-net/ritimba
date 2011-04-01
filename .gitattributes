@@ -1,0 +1,5 @@
+*.bin binary
+*_bas linguist-language=SBASIC
+*_font binary
+*_sbim linguist-language=SBASIC
+boot linguist-language=SBASIC

@@ -1,0 +1,28 @@
+= Ritimba
+:author: Marcos Cruz (programandala.net)
+:revdate: 2017-09-09
+
+In <<en,English>> above.
+
+== [[es]]Español
+
+Ritimba es un proyecto de conversión para QL de la versión española
+del juego de ZX Spectrum _Dictator_ (escrito por Don Priestley en
+1983).
+
+Ritimba está escrito en SBASIC para el sistema operativo
+http://qlwiki.qlforum.co.uk/doku.php?id=qlwiki:operating_systems#smsq_e[SMSQ/E].
+
+Sede del proyecto: http://programandala.net/es.programa.ritimba.html
+
+== [[en]]English
+
+Ritimba is a project to port to QL the Spanish version of Don
+Priestley's ZX Spectrum game _Dictator_ (1983).
+
+Ritimba is written in SBASIC for the
+http://qlwiki.qlforum.co.uk/doku.php?id=qlwiki:operating_systems#smsq_e[SMSQ/E]
+operating system.
+
+Home page (in Spanish):
+http://programandala.net/es.programa.ritimba.html

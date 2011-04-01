@@ -1,0 +1,686 @@
+   1 rem 2011-03-26 código de Dictator traducido por mí, sin tocar todavía para adaptarlo a SBASIC
+   2 rem 2011-04-01 Primeros y muchos cambios en el código. Hay zonas en que el flujo no está claro y no será fácil dividir el código en procedimientos.
+
+   3 rem presentacion _________________________________________
+   4 let bor=1: paper 0: ink 9: cls_ : at 4,2:print  flash 1; bright 1;"dictador";at 8,2;"Escrito por"
+   5 at 10,2:print "Don priestley"
+   6 at 12,0:bright 1: print "[Abierto y traducido c.1985 por:"\"Marcos Cruz (programandala.net)]"
+   7 at 15,2:ink 9:print "Copyright  dktronics  1983"
+   9 ret
+
+  10 defproc fx_war
+  11 enddef
+  
+  70 defproc fx_2
+  71 enddef
+
+  79 rem start _________________________________________________
+
+  81 let s$="                                "
+  82 gosub 4: let hst=0
+  84 let b$="123456789": let c$="987654321"
+ 110 dim d$(49,49): dim g$(8,23)
+ 112 restore 6101
+ 116 for a=1 to 49: read d$(a): endfor a
+ 120 get_key:title
+
+ 130 rem cycle _________________________________________________
+ 140 restore 6150
+ 141 for a=1 to 8: read g$(a)
+ 200 for a=1 to 49: let d$(a,1)="N"
+ 202 let bk=1e3
+ 203 let esc=0
+ 204 let mpy=60
+ 206 let st=4
+ 208 let sw=0
+ 210 let d=10
+ 212 let mth=0
+ 218 let ad=1e3
+ 222 let pc=0
+ 224 let cad=1980
+ 236 let aid=2060
+ 238 let dec=2500
+ 244 let str=10
+ 250 let bor=1: paper 7: cls_
+ 252 at 1,7:paper 5:print  flash 1;"bienvenido al cargo"\\\
+ 254 print "El anterior dictador de nuestra"
+ 256 print "amada patria ritimba tuvo una"
+ 258 print "puntuacion final de ";hst
+ 260 if hst<=0:print \\"Como este es tu primer intento"\"no dudes en hacerlo mejor!"
+ 264 if hst>=1:print \"Intenta al menos acabar con ";hst+1;"!"
+ 266 print \\"Comienza con un informe del"\"tesoro"
+ 268 print "y con un informe de policia."
+ 270 get_key
+ 272 treasure_report: get_key
+ 274 police_report_step_2
+
+ 600 rem audiencias ____________________________________________
+ 601 let c=1
+ 603 let low=int (rnd*3)+2
+ 604 let str=int (rnd*3)+10
+ 610 let mth=mth+1
+ 612 let bor=1: paper 6: cls_
+ 613 at 10,12:paper 5:ink 9:print "mes  "; paper 7; bright 1;mth
+ 614 pause 50
+ 616 plot
+ 618 if bk<0:bankruptcy
+ 620 if bk>0:let bk=bk-mpy:rem logic!!! "else" would work better!!
+ 622 let bor=6: paper 6: cls_
+ 624 print at 0,0; paper 4;s$;s$;s$;s$;s$;at 3,9; bright 1; inverse 1;"una audiencia"
+ 630 let r=int (rnd*24)+1
+ 632 for a=1 to 22: if d$(r,1)="N":goto 648
+ 634 let r=(r-int (r/24)*24)+1: endfor a
+ 640 for a=1 to 24: let d$(a,1)="N": endfor a: goto 630
+ 648 let d$(r,1)="*"
+ 650 let gs=int ((r-1)/8)+1: border gs
+ 652 let t$=g$(gs,6 to code g$(gs,5)-20)
+ 654 let r$=d$(r)
+ 655 rem gosub 410+gs:rem graphics removed!!!
+ 656 at 10,1:print "Peticion de ";t$
+ 662 at 14,1:print "Esta su excelencia conforme en";at 16,0; bright 1;r$(18 to )
+ 666 get_key: border 0: gosub ad
+
+ 670 rem opcion ________________________________________________
+ 684 cls_ : at 1,10:bright 1:print  flash 1;"  decision  "
+ 688 print : print tab (32-(12+len(t$)))/2:paper gs:print "peticion de ";t$
+ 690 at 5,0:bright 1:print r$(18 to ):bright 0:paper 1:print \\s$
+ 694 if not c:goto 730: let a=0
+ 696 gosub cad: print : ink 4:print s$
+ 698 if c=0:goto 730
+ 722 get_key_yes
+ 726 if k$="s":goto 760
+ 728 goto 740
+ 730 cls_ : at 10,1:print "No tiene "; bright 1;"suficientes fondos"; bright 0\\" para";
+ 731 print " pagar esta decision."
+ 732 at 15,4:print "Su respuesta debe ser "; flash 1;"no": pause 250
+ 734 let c=1
+ 740 let x=g$(gs,1)
+ 744 let y=code(r$(gs+3))-77
+ 746 let x=x-y
+ 748 if x<0:let x=0
+ 750 let g$(gs,1)=x
+
+ 751 cls_
+ 752 treasure_report: goto 766
+ 760 treasure_report: money_transfer: treasure_report_details
+ 766 plot: get_key
+ 775 murder: if d=0:the_end
+ 778 war: if d=0 or esc=1:the_end
+ 779 plot
+ 780 police_report: goto dec
+ 781 rem!!!
+
+ 790 defproc treasure_report
+ 792 let bor=4: paper 7: cls_
+ 794 for a=0 to 20: ink 4:print "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$": endfor a
+ 795 treasure_report_details
+ 796 enddef
+
+ 797 defproc treasure_report_details
+ 824 at 8,7:bright 1:print "informe del tesoro"
+ 825 paper 1: ink 9
+ 826 bright 1: at 12,1:print " el tesoro";
+ 828 if int bk>=0:print " tiene $";
+ 830 if bk<0:print " "; flash 1;"debe"; flash 0;" $";
+ 831 print abs int bk;",000 "
+ 832 at 14,1:print " gastos del mes son $";mpy;",000 "
+ 838 if sw>0:at 17,2:print "[En suiza tiene $";sw;",000]"
+ 842 bright 0
+ 843 enddef
+
+ 900 defproc bankruptcy
+ 910 cls_
+ 914 at 5,2:print "El tesoro esta en "; flash 1;"bancarrota"
+ 918 print at 9,0;"Su popularidad con el ejercito y"\\
+ 920 print "con la policia secreta caera!"\\\
+ 922 print "el poder de la policia bajara"\\
+ 924 print "y tu propio poder tambien"
+ 930 if g$(1,1)>"0":let g$(1,1)=g$(1,1)-1
+ 932 if g$(6,1)>"0":let g$(6,1)=g$(6,1)-1
+ 933 if g$(6,2)>"0":let g$(6,2)=g$(6,2)-1
+ 934 if st>0:let st=st-0
+ 940 pause 250: plot: police_report
+ 944 enddef
+
+1000 rem aviso? _______________________________________________
+1002 let bor=1: paper 4: cls_
+1004 for a=0 to 19: print at a,11; flash 1; paper 5;"? aviso ?": endfor a
+1010 get_key_yes: paper 6: cls_
+1014 if k$<>"s":ret
+1022 print at 1,0; inverse 1;d$(r,18 to ): print
+1026 print at 3,0;"Su popularidad con...": print
+1027 for a=1 to 8
+1028 let x=code d$(r,a+3)-77: if x=0:goto 1034
+1029 print tab 2;g$(a,6 to );tab 21;
+1031 if x>0:print "+";
+1032 print x;
+1033 if gs=a and r<25:inverse 1:print  ink gs;"< "
+1034 endfor a
+1036 print \\\"El poder de...": print
+1038 for a=1 to 6
+1039 let x=code d$(r,a+11)-77: if x=0:goto 1048
+1041 print tab 2;g$(a,6 to );tab 21;
+1042 if x>0:print "+";
+1044 print x
+1048 endfor a
+1050 get_key: cls_ : ret
+1300 rem cls __________________________________________________
+1305 defproc cls_
+1310 border bor: cls : print #1; paper bor;s$;s$: beep .1,40: print at 0,0;
+1314 endfn
+
+1400 defproc plot
+
+1410 if mth<=2:ret
+1420 for a=1 to 3: let g$(a,3 to 4)="::"
+1426 if mth<pc:ret
+1430 for a=1 to 3
+1432 if g$(a,1)>low:next a:exit a:rem check!!! goto 1450
+1436 for p=1 to 6
+1438 if a=p or g$(p,1)>low:next p:exit p:rem check the logic!!! goto 1441
+1440 if g$(p,2)+g$(a,2)>=str:exit p:rem check the logic!!! goto 1446
+1441 next p
+1442 let g$(a,3)="A":next a:exit a:rem check the logic!!! goto 1450
+1443 endfor p:rem new!!! but not goot
+1446 let g$(a,3)="R"
+1448 let g$(a,4)=p
+1450 endfor a
+1452 enddef
+
+
+1500 defproc murder
+
+1510 let r=int (rnd*3)+1
+1514 if g$(r,3)<>"A":ret
+
+1516 let bor=0: paper 0: cls_ : at 10,7:print "intento de asesinato"
+1518 print at 20,0;"por uno de ";g$(r,6 to )
+1520 rem for a=60 to 1 step -.5: poke 23886,a: let i=usr 23884: endfor a: poke 23886,70:old!!!
+1522 cls_ : pause 30: fx_2: pause 50
+
+1526 if (g$(1,3)="A" and g$(2,3)="A" and g$(3,3)="A") or not(g$(6,1)>low or g$(6,2)>low or int (rnd*2)):rem check the compacted logic!!!
+1546 let bor=0: paper 0: cls_ : at 12,6:print "Esta usted muerto!"
+1548 beep 3,-40
+1550 let d=0: ret
+1551 else
+
+1554 let bor=0: paper 7: cls_ : at 12,8:print  flash 1; bright 1;" Intento fallido "
+1556 rem poke 23886,50: let a=usr 23842:rem old!!!
+1557 endif
+1560 enddef
+
+1570 defproc tune(m$)
+1572 for a=1 to len(m$) step 2
+1574 if m$(a+1)=" ":pause code(m$(a))/4:next a:exit a
+1576 beep (code(m$(a))-48)/6,code(m$(a+1))-105
+1578 endfor a
+1580 enddef
+
+1600 rem transferencia _________________________________________
+1605 defproc money_transfer
+1610 let d$(r,1)="*"
+1611 money_transfer_
+1612 enddef
+1619 defproc money_transfer_:rem rename!!!
+1620 let t$=d$(r,4 to 11)
+1621 for a=1 to 8
+1622 if t$(a)<>"M":rem maybe "M"
+1624 let x=g$(a,1)+(code(t$(a))-77)
+1626 if x>9:let x=9
+1628 if x<0:let x=0
+1630 let g$(a,1)=x
+1631 endif
+1632 endfor a
+1638 let t$=d$(r,12 to 17)
+1640 for a=1 to 6
+1642 if t$(a)="M":next a:exit a
+1644 let x=g$(a,2)+(code t$(a)-77)
+1646 if x>9:let x=9
+1648 if x<0:let x=0
+1650 let g$(a,2)=x
+1652 endfor a
+1660 let bk=bk+cst
+1662 let mpy=mpy-mcst
+1664 if mpy<0:let mpy=0
+1666 enddef
+
+1700 defproc police_report
+
+1702 let bor=0: paper 0: ink 9: cls_
+1709 at 6,1:bright 1:print "informe de la policia secreta";
+1710 if bk<=0 or g$(6,1)<=low or g$(6,2)<=low:goto 1764
+1713 print flash 1;"?": at 12,8:print "( cuesta $1000 )"
+1714 get_key_yes:if k$<>"s":ret
+1715 let bk=bk-1
+1716 police_report_step_2
+1717 enddef
+
+1718 defproc police_report_step_2
+1719 let bor=0: paper 0: cls_:print "mes ";mth;at 3,0; ink 1; flash 1;s$:police_report_step_3
+1720 enddef
+
+1721 defproc police_report_step_3
+1722 at 3,8:inverse 1:bright 1:print "informe policial"
+1723 at 5,14:inverse 1:print "\j\k\l";at 6,14;"\m\n\o"
+1724 at 6,1:print "popularidad";at 6,21;"poder"
+1725 restore 6200: for a=1 to 8: read k$
+1726 print at 7+a,11; paper 6; flash 0+(g$(a,3)="R");k$
+1728 print at 7+a,10; paper 7; bright 1;a
+1729 if a<=3 and g$(a,3)="R":print at 7+a,21; paper 7;g$(a,4)
+1732 let x=g$(a,1): print at 7+a,10-x; ink 7; paper 4;c$(10-x to )
+1734 if a<=3 and g$(a,3)="A":print at a+7,21; paper 7; flash 1;"A"
+1736 endfor a
+1738 for a=1 to 6: print at 7+a,22; paper 2; ink 7;b$( to g$(a,2)): endfor a
+1742 at 17,1:print "Tu poder es ";st
+1744 at 19,1:print "fuerza para una revolucion :";str
+1750 get_key: let bor=4: paper 4: cls_ : ret
+1764 at 10,9:print "no disponible"\\
+1766 if g$(6,1)<=low:print "Tu popularidad con nosotros es ";g$(6,1)\\
+1768 if g$(6,2)<=low:print tab 3;"El poder de la policia es ";g$(6,2)\\
+1769 if bk<=0:print tab 3;"No puedes obtener un informe"
+1770 rem poke 23886,30: for a=1 to 80: let i=usr 23884: endfor a:rem old!!!
+1772 rem poke 23886,50
+1773 enddef
+
+1800 defproc revolution
+1801 news
+1802 for a=1 to 3: let r=int (rnd*3)+1
+1804 if g$(r,3)="R":goto 1810
+1806 endfor a
+1807 goto 600
+1810 poke 23886,50: ink 0: let bor=2: flash 1: paper 2: cls_ : ink 9: at 10,11:print  flash 0; bright 0;"revolucion"
+1812 for a=1 to 5: beep .5,20: beep .5,10: endfor a
+1814 flash 0: let bor=6: paper 6: cls_
+1816 at 12,8:print "intento de escape?": get_key_yes
+1830 cls_ : if k$<>"s":goto 1850
+1832 if d$(36,1)="*":goto 1842
+1833 at 10,2:print "Tienes que atravesar el";at 12,6;"monte hacia leftoto"
+1834 pause 200: cls_
+
+1836 if int (rnd*((g$(4,2)/3)+.4)):goto 1839
+1837 print at 12,0; flash 1; bright 1;"  Las guerillas no te cojieron  ": rem let i=usr 23842:rem old!!!
+1838 the_end
+
+1839 let bor=0: paper 0: cls_
+1840 let d=0: pause 50: fx_2 : print at 12,0;"Las guerillas estan "; flash 1; bright 1;"celebrandolo": fx_2: the_end
+
+1842 if int (rnd*3)
+1843 at 12,4:print  flash 1; bright 1;"escapas en helicoptero!": the_end: rem let i=usr 23842:rem old!!!
+1844 endif
+
+1845 at 10,2:print "el helicoptero no funciona!"
+1846 pause 150
+1847 cls_ : goto 1833
+1850 let x=g$(r,2)+g$(g$(r,4),2)
+1852 print at 5,0;g$(r,6 to code g$(r,5)-20);" se ha unido a "
+1856 print g$(g$(r,4),6 to )\\
+1857 print "Su fuerza unidos es ";x
+1858 print \\"a quien vas a pedir ayuda?"
+1860 let z=1
+1861 for a=1 to 6
+1862 if g$(a,1)<=low:next a:exit a
+1864 print tab 6;a;" .";g$(a,6 to code g$(a,5)-20);" ?"
+1866 let z=0
+1868 endfor a
+
+1869 if z:goto 1890
+1870 get_key: if k$<"1" or k$>"6":goto 1870
+1878 if g$(k$,1)<=low:goto 1884
+1880 let h=k$: goto 1893
+1884 cls_ : at 12,5:print "Debes estar bromeando!": goto 1846
+
+1890 cls_ : at 8,5:print "estas solo!"
+1892 get_key
+
+1893 cls_
+1894 print at 8,0;"Tu fuerza es ";st
+1895 print \\"La fuerza de ";g$(h,6 to code g$(h,5)-20);" es ";g$(h,2)
+1896 print \\"La de los revolucionarios es ";x
+1898 pause 250
+1900 let bor=7: paper 7: cls_ : at 12,3:print  flash 1; bright 1;"La revolucion ha comenzado"
+1904 fx_war
+1914 if x<=st+g$(h,2)+int (rnd*3)-1:goto 1950
+1922 let bor=0: paper 0: cls_ : at 10,7:print "Has sido derrocado"
+1923 at 12,10:print "y "; flash 1;"liquidado"
+1924 fx_2
+1926 let d=0: pause 50: the_end
+1950 let bor=0: cls_ : at 10,2:bright 1:print  flash 1;"La revuelta ha sido sofocada"
+1952 rem let a=usr 23842
+1954 print at 0,0;: for a=1 to 22: print paper int (rnd*5)+1;s$: endfor a
+1955 print at 10,0; bright 1;"castigas a los revolucionarios? "
+1956 get_key_yes: if k$<>"s":goto 1968
+1960 for n=1 to 3: fx_2: let y=sqr 1: endfor n
+1964 let g$(r,1 to 2)="00"
+1966 let g$(g$(r,4),1 to 2)="00"
+1968 let g$(h,2)="9"
+1969 let pc=mth+2: plot: police_report: goto 600:rem goto old!!!
+1970 enddef
+
+1980 rem cash advice ___________________________________________
+1990 let cst=10*(code d$(r,2)-77)
+1992 let mcst=code d$(r,3)-77
+1994 if not cst and not mcst:goto 2030
+1996 at 9,1:print "Esta decision ": print
+1998 if not cst:goto 2014
+2002 if cst>0:print " daria al";
+2004 if cst<0:print " costaria al";
+2008 print "  tesoro $";abs cst;",000": print
+2010 if not mcst:goto 2020
+2012 print " y": print
+2014 if mcst<0:print " subiria";
+2016 if mcst>0:print " bajaria";
+2018 print " los costos mensuales en $";abs mcst;",000"
+2020 if bk+cst>0:let c=1: ret
+2021 if (cst<0 or mcst<0) and (bk+cst<0 or bk+mcst<0):goto 2034
+2022 let c=1: ret
+2030 let c=1: at 10,7:print "no cuesta dinero": ret
+2034 pause 250: let c=0: cls_
+2037 print at 5,0;d$(r,18 to )
+2039 at 8,2:print "El dinero necesario"
+2040 print : print tab 4;"no esta en el tesoro"\\\
+2042 if d$(38,1)="N":print "Quizas los rusos pueden ayudar?": print
+2044 if d$(39,1)="N":print "Los americanos son un pueblo"\"generoso": print
+2046 pause 350: ret
+2060 rem ayudas ________________________________________________
+2062 let bor=2: paper 6: cls_ : print : paper 2:print "solicitud de prestamo extranjero"
+2064 at 12,13:print  flash 1;"espera": pause 50
+2066 let x=k$-1
+2070 if x: tune "2m1j3f3j3m4r1 2v1t3r3j3l4m":else tune "2g2d3i4d2 2g2d3i4d"
+2088 if mth<int (rnd*5)+3:goto 2138
+2112 if d$(38+x,1)="*":goto 2128
+2113 if g$(7+x,1)<=low:goto 2132
+2114 if not x:print at 12,0;"Los rusos";
+2115 if x:print at 12,0;"Los americanos";
+2116 print " te concederan"
+2117 let y=g$(7+x,1)*30+int (rnd*200)
+2118 at 14,7:print y;",000 dolares"
+2120 let bk=bk+y
+2124 let d$(38+x,1)="*": goto 2140
+2128 at 12,2:print "Lo sentimos, no hay prestamo": goto 2140
+2132 if not x:at 12,12:paper 2:print "no!   "
+2134 if x:at 12,12:paper 1:print """No!"""
+2136 get_key: ret
+2138 at 12,2:print "Es demasiado pronto para dar"\"ayudas economicas"
+2140 get_key: ret
+
+2500 defproc decision
+2506 let bor=1: paper 6: cls_
+2510 for a=0 to 20: inverse 1:ink 2:print "********************************": endfor a
+2522 at 3,5:bright 1:print  flash 1;"decision presidencial"
+2530 ink 9: at 6,1:print "Para..."
+2534 at 8,4:print "1. ayudar a un grupo      "
+2536 at 10,4:print "2. ayudar a todos         "
+2538 at 12,4:print "3. tus negocios           "
+2540 at 14,4:print "4. subir el tesoro        "
+2542 at 16,4:print "5. dar poder a un grupo   "
+2550 get_key: cls_
+2560 if k$<"1" or k$>"5":goto 2746
+2562 if k$="1":let x$="-2"
+2564 if k$="2":let x$="35"
+2566 if k$="3":let x$="69"
+2568 if k$="4":let x$=":<"
+2570 if k$="5":let x$="=?"
+2572 print at (20-(((code x$(2)-20)-(code x$(1)-20))*3))*.5,0
+2574 let y=1: let z=1
+2578 for a=code x$(1)-20 to code x$(2)-20
+2580 if d$(a,1)="*":goto 2592
+2582 let z=0
+2588 print y;".": print d$(a,18 to ): print
+2593 let y=y+1
+2594 endfor a
+2596 if z:goto 2600
+2597 get_key: goto 2620
+2600 at 12,3:bright 1:print  flash 1;"Esta seccion esta agotada"
+2602 pause 150: goto dec
+2628 if k$<"0" or k$>"6":goto dec
+2630 if k$<1 or k$>(code x$(2)-20)+1-(code x$-20):goto dec
+2634 let r=((code x$)-20)+k$-1
+2635 if d$(r,1)="*":goto dec
+2636 if r=38 or r=39:goto 2670
+2642 if r=37:goto 2680
+2644 gosub ad
+2646 print at 4,0; bright 1;d$(r,18 to )
+2648 gosub cad
+2650 if not c:pause 200: goto dec
+2651 print at 4,0; bright 1;d$(r,18 to )
+2652 get_key_yes
+2653 if k$<>"s":goto dec
+2654 if r=35:goto 2674
+2656 treasure_report: money_transfer
+2660 goto 2740
+2670 gosub aid: treasure_report: goto 2741
+2674 let st=st+2: treasure_report
+2676 money_transfer_: goto 2740
+2680 cls_ : print at 3,0; inverse 1;"transferencia a la cuenta suiza"\\\
+2685 let x=int (bk/2): if x<1:goto 2720
+2687 print "El tesoro tenia $";int bk;",000"
+2690 let sw=sw+x: let bk=bk-x
+2692 pause 100
+2694 print : print : print "$";x;",000 han sido transferidos": goto 2736
+2720 at 12,7:print "ninguna transferencia hecha": pause 100
+2740 gosub 825
+2741 plot: get_key
+2746 police_report: revolution
+2447 enddef
+
+2750 defproc news
+2760 if int (rnd*3):ret
+2764 let r=int (rnd*6)+44
+2768 for a=1 to 6
+2770 if not (d$(r,1)="N"):exit a
+2772 let r=r+1: if r=50:let r=44
+2774 next a
+2776 ret
+2777 endfor a
+2780 let bor=1: paper 7: ink 0: flash 1: cls_ : flash 0: at 10,11:bright 1:print "noticias"
+2782 for a=1 to 10: beep .6,30
+2784 cls_ : at 10,11:print  flash 1;"noticias"
+2786 print at 14,0;d$(r,18 to )
+2788 ink 9: pause 100
+2796 money_transfer: plot
+2800 police_report
+2806 enddef
+
+3000 defproc the_end
+
+3004 if d:pause 100: goto 3026
+3010 pause 50
+3012 tune "4d3d1d3d3g1f2f1d2d1d5d"
+
+3026 let x=0
+3027 for a=1 to 8: let x=x+g$(a,1)
+3030 let bor=5: paper 6: cls_
+3035 at 3,1:print "Tu puntuacion como presidente"
+3050 print : print " popularidad final - ";tab 28;x
+3052 print : print " meses en el poder (";mth;"x3) - ";tab 28;mth*3: let x=x+mth*3
+
+3058 if d
+3062 print : print " Por estar vivo - ";tab 28;d
+3068 print : print " Por el ahorro"\"     ($";sw;",000 /10,000) -";tab 28;int (sw/10)
+3070 let x=x+d+int (sw/10)
+3071 endif
+
+3074 print \\\" Tu total es ";tab 28; bright 1;x
+3082 if x>hst:let hst=x
+3084 print : print "[ La mayor puntuacion es ";hst;" ]"
+3086 get_key: cls_
+3090 let bor=0: paper 0: cls_ : at 1,14:print  flash 1;"final"
+3092 police_report_step_3: gosub 4: get_key: cls_ : stop : rem goto 140 old!!! tmp!!!
+3093 enddef
+
+4000 defproc title
+4002 let bor=0: paper 5: ink 9: cls_
+4010 print at 0,0;: flash 1
+4020 for a=1 to 42
+4030 inverse 1:print "dictador"; inverse 0;"dictador";
+4045 beep .01,40-a+rnd*10
+4050 endfor a
+4060 for a=1 to 50: beep .03,a: endfor a
+4070 rem flash 0: for a=8 to 19:rem old!!!
+4080 rem print at a,7; paper 4; ink 2;"\..\..\..\..\..\..\..\..\..\..\..\..\..\..\..\..\..\.."
+4090 rem endfor a
+4100 for a=8 to 19: at a,11:paper 1:print "          ": endfor a
+4110 at 3,0: paper 7:print "pulsa una tecla y seras dictador";at 5,12;" de la "
+4120 paper 4: at 10,10:print "republica de";at 16,12;"ritimban"
+4130 at 12,13:paper 1:ink 6:print "******";at 13,13;"  **  ";at 14,13;"******"
+4140 let t$="KPKKMKIHK\`KMRPOMOP":rem check char code 96 in the string!!!
+4145 rep wait
+4150 for a=1 to len(t$)
+4155 if inkey$<>"":ret
+4160 let x=code t$(a)-80
+4170 if x=16:pause 20:next a:exit a
+4180 beep .5,x
+4190 endfor a
+4192 pause 30
+4193 endrep wait
+4194 enddef
+
+4200 defproc war
+4208 if g$(5,1)>low:ret
+4210 if g$(5,2)<low:ret
+4212 if not int (rnd*3)
+4213 actual_war
+4214 else
+4220 border 5: paper 0: ink 7: flash 1: cls_ : flash 0: ink 9
+4224 at 6,1:print "tratado de guerra con leftoto"
+4226 at 10,3:print "Tu popularidad en ritimba";at 12,11; bright 1;"aumentara"
+4230 rem poke 23886,255: for a=1 to 5: let i=usr 23884: endfor a
+4234 for a=1 to 3: war_ a
+4236 war_ 6
+4237 endif
+4240 enddef
+
+4241 defproc war_ a
+4242 if g$(a,1)<"9":let g$(a,1)=g$(a,1)+1
+4244 enddef
+
+4250 defproc actual_war
+
+4270 paper 2: border 0: cls_ : at 8,7:print  flash 1; bright 1;"leftoto nos invade"
+4276 let rs=0:for a=1 to 3: if g$(a,1)>low:let rs=rs+g$(a,2)
+4280 if g$(6,1)>low:let rs=rs+g$(6,2)
+4282 let rs=rs+st
+4286 at 12,1:print "La Fuerza de Ritimban es ";rs
+4290 let ls=0:for a=1 to 6: if g$(a,1)<=low:let ls=ls+g$(a,2)
+4294 at 14,1:print "La Fuerza de Leftoto es ";ls
+4296 at 18,3:bright 1:inverse 1:print "una corta y decisiva guerra"
+4298 fx_war
+4300 if ls+int (rnd*3-1)<rs:rem Ritimban wins
+
+4310 border 0: cls_ : at 12,7:bright 1:print  flash 1;" leftoto derrotado ": rem let i=usr 23842
+4312 let g$(5,2)="0": ret
+
+4313 else:rem Leftoto wins
+
+4320 let bor=0: paper 0: cls_
+4321 at 7,7:bright 1:print  flash 1;"victoria de leftoto"
+4323 rem poke 23886,255: for a=1 to 5: let i=usr 23884: endfor a
+4324 if not(d$(36,1)="*" and int(rnd*3))
+
+4326 let d=0: if d$(36,1)="*":at 10,0:print "El motor del Helicoptero se para": pause 80
+4327 at 12,4:print "Eres acusado de ser un"\\"  enemigo del pueblo y..."
+4328 pause 30: fx_2: at 18,7:print "Sumarisimamente ejecutado"
+4330 else:rem escape
+
+4340 cls_ : at 12,3:bright 1:print  flash 1;"escapas en helicoptero!": rem poke 23886,70: let i=usr 23842
+4341 let esc=1
+
+4342 endif
+
+4343 endif
+4344 enddef
+
+5000 rem tecla _________________________________________________
+5005 defproc get_key_yes
+5006 at 20,11:paper 7:flash 1: bright 1:print " ""s""= si "
+5007 get_key
+5008 enddef
+5009 defproc get_key
+5010 rep
+5011 if inkey$="":exit
+5012 endrep
+5013 at 0,0:ink 9:paper 2:print #1,s$;"             tecla              ";s$
+5014 for a=1 to 15
+5015 rem if inkey$<>"":goto 5030:rem adapt!!!
+5016 endfor a
+5017 beep .01,30
+
+5018 print #1;at 0,0; ink 9; paper 1;s$;"             tecla              ";s$
+5019 for a=1 to 15
+5020 if inkey$<>"":goto 5030
+5024 endfor a
+5025 beep .01,20
+5026 goto 5013
+
+5030 let k$=inkey$: if k$="":goto 5018
+5034 if k$="s":beep .25,40
+5036 if k$<>"s":beep .25,10
+5037 if k$="#":let bor=7: paper 7: cls_ : goto 7010
+5038 rem if k$="\#226":goto 80
+
+5100 enddef
+
+6000 rem data __________________________________________________
+6101 DATA "NMHQJLMMMMMPKLMMMPONER MILI OBLIGATORIA          "
+6102 DATA "NMMPMJMMMMMNMLMMMREQUISAR TIERRAS PARA TIRO      "
+6103 DATA "NCMPLNMLMLMNMNIMMATACAR LAS BASES DE LA GUERILLA "
+6104 DATA "NEMPLMMIMLMNMNKMMATACAR BASE GUERRILLA EN LEFTOTO"
+6105 DATA "NMMQONMMIMMNMNMMJECHAR AL JEFE DE LA POL.SEC.    "
+6106 DATA "NMMPMMMLMIOMMMMMMECHAR A LOS MILITARES RUSOS     "
+6107 DATA "NMDQMLMMMMMOLLLMMAUMENTAR LA PAGA DE LAS TROPAS  "
+6108 DATA "NAMQLLMLLMMPLLKLMCOMPRAR MAS ARMAS Y MUNICIOMES  "
+6109 DATA "NMMLONMMMMMLMMLMMPARAR LOS ABUSOS DEL EJERCITO   "
+6110 DATA "NMMMQIMNMMMMOLMMMAUMENTAR EL SALARIO MINIMO      "
+6111 DATA "NMPNQOMMIMMNNNNMJACABAR CON LA POLICIA SECRETA   "
+6112 DATA "NMMMPKMKMMMMOKMMMPARAR LA INMIGRACION DE LEFTOTO "
+6113 DATA "NCELQKMOLNMMNLLMMPONER ESCUELA GRATIS PARA TODOS "
+6114 DATA "NMMMQJMNLNMMPJMMLLEGALIZAR LOS SINDICATOS        "
+6115 DATA "NMMLQKMNLMMMOLLMMLIBERAR A SU LIDER ENCARCELADO  "
+6116 DATA "NMSMPLMMMMMMMMLMMINICIAR UNA LOTERIA PUBLICA     "
+6117 DATA "NMMKMPMMMMMLMMMMMPARAR USO MILITAR DE SUS TIERRAS"
+6118 DATA "NMMMIQMLMLMMKONMMBAJAR EL SALARIO MINIMO         "
+6119 DATA "NWHMMPMNMOIMMNMMMNACIONALIZAR NEGOCIOS AMERICANOS"
+6120 DATA "NMRMMPMJMLMMNOMLMTASAR IMPORTACIONES DE LEFTOTO  "
+6121 DATA "NMQNNPMMIMMNMNNMKCORTAR LOS GASTOS DE LA POL.SEC."
+6122 DATA "NMHMMQMMMMMMMOMMMBAJAR IMPUESTO SOBRE LA TIERRA  "
+6123 DATA "NMMKLPMMMMMLLNNMMCEDER TROPA PARA LABRAR TIERRA  "
+6124 DATA "NACNNPMJMONMMPMKMCONSTRUIR UN SISTEMA DE RIEGO   "
+6125 DATA "NMMQLLMMLMMNMMLMLHACER MINISTRO AL JEFE-EJERCITO "
+6126 DATA "NLILQNMOMNMMMMLMMHACER CLINICAS PARA OBREROS     "
+6127 DATA "NMMLKQMMLLMLLOMMLDAR PODERES A LOS TERRATENIENTES"
+6128 DATA "NRMKMMMQMKNLMMLPMVENDER ARMAS U.S.A. A LEFTOTO   "
+6129 DATA "NYMMMLMLMKPMMMMMMVENDER DERECHOS A FIRMAS U.S.A. "
+6130 DATA "NMWKMMMMMPJMMMMNMALQUILAR A RUSIA UNA BASE NAVAL "
+6131 DATA "NMENPPMMMMMLMMLMMBAJAR LOS IMPUESTOS             "
+6132 DATA "NEMPPPMMMMMMMMLMMHACERTE CAMPA#A DE POPULARIDAD  "
+6133 DATA "NMUPPPMMDMMONNNMDQUITAR PODERES A LA POL.SEC.    "
+6134 DATA "NMGJJJMMUMMLLLLMUAUMENTAR PODERES A LA POL.SEC.  "
+6135 DATA "NIMKLLMMLMMKMMMMLAUMENTAR TUS GUARDAESPALDAS    *"
+6136 DATA "NAMIIJMMKMMMMMMMMCOMPRAR UN ESCAPE EN HELICOPTERO"
+6137 DATA "NMMMMMMMMMMMMMMMMTRANSFERENCIA A UN BANCO SUIZO *"
+6138 DATA "NMMMMMMMMMMMMMMMMPEDIR A LOS RUSOS UNA AYUDA     "
+6139 DATA "NMMMMMMMMMMMMMMMMPEDIR A LOS AMERICANOS UNA AYUDA"
+6140 DATA "NZMNNPMGMKMMMMMMMNACIONALIZAR NEGOCIOS DE LEFTOTO"
+6141 DATA "NHMPMMMJMLMRMMKKLCOMPRAR ARMAS PARA EL EJERCITO  "
+6142 DATA "NMMMPLMMLMMMRLPMLPERMITIR ASOCIACIONES CAMPESINAS"
+6143 DATA "NMMLLPMMLMMLLRLMLDAR A TERRATEN. EJERCITO PRIVADO"
+6144 DATA "NMMMMMMMIMMMMMQMIARCHIVOS DE LA POL.SEC. ROBADOS!"
+6145 DATA "NMMMMMMMMMMLMMVMMCUBA ENTRENA A LAS GUERILLAS    "
+6146 DATA "NMMMMMMMMMMIMMOMNBARRACON DEL EJERCITO HA VOLADO "
+6147 DATA "NMMMMMMMMMMMMJMKMPRECIO DE PLATANOS CAE AL 98%   "
+6148 DATA "NMMMMMMMMMMMMOMIMCORONEL GOMEZ SE FUGA A LEFTOTO "
+6149 DATA "NMMMMMMMMMMMILKMMEPIDEMIA ENTRE LOS CAMPESINOS   "
+6150 data "76::$el ejercito"
+6151 data "76::'los campesinos"
+6152 data "76::+los terratenientes"
+6153 data "06--&las guerillas"
+6154 data "76--%los leftotos"
+6155 data "76--+la policia secreta"
+6156 data "7---#los rusos"
+6157 data "7---'los americanos"
+6200 data "ejercito  ","campesinos","terraten. ","guerillas "
+6210 data "leftotos  ","pol.sec.  ","rusos     ","americanos"
+
+7010 defproc s
+7011 save "dos1_sb_ritimban_ritimban_bas"
+7012 enddef
