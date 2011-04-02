@@ -71,7 +71,7 @@
  616 plot
  618 if money<0:bankruptcy
  620 if money>0:let money=money-month_payment:rem logic!!! "else" would work better!!
- 622 let bor=6: paper #ow,yellow: cls_
+ 622 cls yellow,black,yellow
  624 at #ow,0,0:paper #ow,green:print #ow,blank_line$;blank_line$;blank_line$;blank_line$;blank_line$
  625 at #ow,3,9:zx_bright #ow,1: zx_inverse #ow,1:print #ow,"una audiencia"
  630 let r=int(rnd*24)+1
@@ -90,7 +90,7 @@
  666 get_key: zx_border 0: advert
 
  670 rem opcion ________________________________________________
- 684 cls_ : at #ow,1,10:zx_bright #ow,1:flash #ow,1:print #ow,"  decision  "
+ 684 cls #ow: at #ow,1,10:zx_bright #ow,1:flash #ow,1:print #ow,"  decision  "
  688 print #ow,\to (32-(12+len(t$)))/2:paper #ow,gs:print #ow,"peticion de ";t$
  690 at #ow,5,0:zx_bright #ow,1:print #ow,r$(18 to ):zx_bright #ow,0:paper #ow,blue:print #ow,\\blank_line$
  694 if not c:goto 730: let a=0
@@ -99,7 +99,7 @@
  722 get_key_yes
  726 if k$="s":goto 760
  728 goto 740
- 730 cls_ : at #ow,10,1:print #ow,"No tiene ";:zx_bright #ow,1:print #ow,"suficientes fondos":zx_bright #ow,0:print #ow,\\" para";
+ 730 cls #ow : at #ow,10,1:print #ow,"No tiene ";:zx_bright #ow,1:print #ow,"suficientes fondos":zx_bright #ow,0:print #ow,\\" para";
  731 print #ow," pagar esta decision."
  732 at #ow,15,4:print #ow,"Su respuesta debe ser ";:flash #ow,1:print #ow,"no": pause 250
  734 let c=1
@@ -109,7 +109,7 @@
  748 if x<0:let x=0
  750 let group$(gs,1)=x
 
- 751 cls_
+ 751 cls #ow
  752 treasure_report: goto 766
  760 treasure_report: money_transfer: treasure_report_details
  766 plot: get_key
@@ -120,7 +120,7 @@
  781 rem!!!
 
  790 defproc treasure_report
- 792 let bor=4: paper #ow,white: cls_
+ 792 cls_ white,black,green
  794 for a=0 to 20: ink #ow,green:print #ow,"$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$": endfor a
  795 treasure_report_details
  796 enddef
@@ -142,7 +142,7 @@
  843 enddef
 
  900 defproc bankruptcy
- 910 cls_
+ 910 cls #ow
  914 at #ow,5,2:print #ow,"El tesoro esta en ";:flash #ow,1:print #ow,"bancarrota"
  918 at #ow,9,0:print #ow,"Su popularidad con el ejercito y"\\
  920 print #ow,"con la policia secreta caera!"\\\
@@ -156,9 +156,9 @@
  944 enddef
 
 1000 defproc advert
-1002 let bor=1: paper #ow,green: cls_
+1002 cls_ green,black,blue
 1004 for a=0 to 19: at #ow,a,11: flash #ow,1: paper #ow,cyan:print #ow,"? aviso ?"
-1010 get_key_yes: paper #ow,yellow: cls_
+1010 get_key_yes: cls_ yellow
 1014 if k$<>"s":ret
 1022 at #ow,1,0:zx_inverse #ow,1:print #ow,decision$(r,18 to ): print
 1026 at #ow,3,0:print #ow,"Su popularidad con...": print
@@ -176,14 +176,16 @@
 1042 if x>0:print #ow,"+";
 1044 print #ow,x
 1048 endfor a
-1050 get_key: cls_
+1050 get_key: cls #ow
 1051 enddef
 
 1300 rem cls __________________________________________________
-1305 defproc cls_
-1310 zx_border bor: cls #ow
-1311 paper #iw,bor: cls #iw
-1312 zx_beep .1,40
+1305 defproc cls_(paper_color,ink_color,border_color)
+1306 paper #ow,paper_color
+1307 ink #ow,ink_color
+1310 zx_border border_color: cls #ow
+1311 paper #iw,border_color: cls #iw
+1313 zx_beep .1,40
 1315 enddef
 
 1400 defproc plot
@@ -210,18 +212,18 @@
 1510 let r=int(rnd*3)+1
 1514 if group$(r,3)<>"A":ret
 
-1516 let bor=0: paper #ow,black: cls_ : at #ow,10,7:print #ow,"intento de asesinato"
+1516 cls_ black,white,black: at #ow,10,7:print #ow,"intento de asesinato"
 1518 at #ow,20,0:print #ow,"por uno de ";group$(r,6 to )
 1520 rem for a=60 to 1 step -.5: poke 23886,a: let i=usr 23884: endfor a: poke 23886,70:old!!!
-1522 cls_ : pause 30: fx_2: pause 50
+1522 cls #ow : pause 30: fx_2: pause 50
 
 1526 if (group$(1,3)="A" and group$(2,3)="A" and group$(3,3)="A") or not(group$(6,1)>low or group$(6,2)>low or int((rnd*2))):rem check the compacted logic!!!
-1546 let bor=0: paper #ow,black: cls_ : at #ow,12,6:print #ow,"Esta usted muerto!"
+1546 cls_ black,white,black: at #ow,12,6:print #ow,"Esta usted muerto!"
 1548 zx_beep 3,-40
 1550 let alive=0: ret
 1551 else
 
-1554 let bor=0: paper #ow,white: cls_ : at #ow,12,8:flash #ow,1: zx_bright #ow,1:print #ow," Intento fallido "
+1554 cls_ white,black,black: at #ow,12,8:flash #ow,1: zx_bright #ow,1:print #ow," Intento fallido "
 1556 rem poke 23886,50: let a=usr 23842:rem old!!!
 1557 endif
 1560 enddef
@@ -263,7 +265,7 @@
 
 1700 defproc police_report
 
-1702 let bor=0: paper #ow,black: ink #ow,white: cls_
+1702 cls_ black,white,black
 1709 at #ow,6,1:zx_bright #ow,1:print #ow,"informe de la policia secreta";
 1710 if money<=0 or group$(6,1)<=low or group$(6,2)<=low:goto 1764
 1713 flash #ow,1:print #ow,"?": at #ow,12,8:print #ow,"( cuesta $1000 )"
@@ -273,7 +275,7 @@
 1717 enddef
 
 1718 defproc police_report_step_2
-1719 let bor=0: paper #ow,black: cls_:print #ow,"mes ";months:at #ow,3,0: ink #ow,blue: flash #ow,1:print #ow,blank_line$:police_report_step_3
+1719 cls_ black,white,black:print #ow,"mes ";months:at #ow,3,0: ink #ow,blue: flash #ow,1:print #ow,blank_line$:police_report_step_3
 1720 enddef
 
 1721 defproc police_report_step_3
@@ -291,7 +293,7 @@
 1742 at #ow,17,1:print #ow,"Tu poder es ";strength
 1744 at #ow,19,1:print #ow,"fuerza para una revolucion :";revolution_strength
 1750 get_key
-1751 let bor=4: paper #ow,green: cls_
+1751 cls_ green,black,green
 1752 ret
 
 1764 at #ow,10,9:print #ow,"no disponible"\\
@@ -309,21 +311,21 @@
 1804 if group$(r,3)="R":goto 1810
 1806 endfor a
 1807 goto 600
-1810 ink #ow,black: let bor=2: flash #ow,1: paper #ow,red: cls_ 
+1810 flash #ow,1: cls_ red,black,red
 1811 ink #ow,white: at #ow,10,11:flash #ow,0: zx_bright #ow,0:print #ow,"revolucion"
 1812 for a=1 to 5: zx_beep .5,20: zx_beep .5,10: endfor a
-1814 flash #ow,0: let bor=6: paper #ow,yellow: cls_
+1814 flash #ow,0: cls_ yellow,black,yellow
 1816 at #ow,12,8:print #ow,"intento de escape?": get_key_yes
-1830 cls_ : if k$<>"s":goto 1850
+1830 cls #ow : if k$<>"s":goto 1850
 1832 if decision$(36,1)="*":goto 1842
 1833 at #ow,10,2:print #ow,"Tienes que atravesar el";:at #ow,12,6:print #ow,"monte hacia leftoto"
-1834 pause 200: cls_
+1834 pause 200: cls #ow
 
 1836 if int((rnd*((group$(4,2)/3)+.4))):goto 1839
 1837 at #ow,12,0: flash #ow,1: zx_bright #ow,1:print #ow,"  Las guerillas no te cojieron  ": rem let i=usr 23842:rem old!!!
 1838 the_end
 
-1839 let bor=0: paper #ow,black: cls_
+1839 cls_ black,white,black
 1840 let alive=0: pause 50: fx_2 : at #ow,12,0:print #ow,"Las guerillas estan ";:flash #ow,1: zx_bright #ow,1:print #ow,"celebrandolo": fx_2: the_end
 
 1842 if int(rnd*3)
@@ -332,7 +334,7 @@
 
 1845 at #ow,10,2:print #ow,"el helicoptero no funciona!"
 1846 pause 150
-1847 cls_ : goto 1833
+1847 cls #ow : goto 1833
 1850 let x=group$(r,2)+group$(group$(r,4),2)
 1852 at #ow,5,0:print #ow,group$(r,6 to code(group$(r,5))-20);" se ha unido a "
 1856 print #ow,group$(group$(r,4),6 to )\\
@@ -349,24 +351,24 @@
 1870 get_key: if k$<"1" or k$>"6":goto 1870
 1878 if group$(k$,1)<=low:goto 1884
 1880 let h=k$: goto 1893
-1884 cls_ : at #ow,12,5:print #ow,"Debes estar bromeando!": goto 1846
+1884 cls #ow : at #ow,12,5:print #ow,"Debes estar bromeando!": goto 1846
 
-1890 cls_ : at #ow,8,5:print #ow,"estas solo!"
+1890 cls #ow : at #ow,8,5:print #ow,"estas solo!"
 1892 get_key
 
-1893 cls_
+1893 cls #ow
 1894 at #ow,8,0:print #ow,"Tu fuerza es ";strength
 1895 print #ow,\\"La fuerza de ";group$(h,6 to code(group$(h,5))-20);" es ";group$(h,2)
 1896 print #ow,\\"La de los revolucionarios es ";x
 1898 pause 250
-1900 let bor=7: paper #ow,white: cls_ : at #ow,12,3:flash #ow,1: zx_bright #ow,1:print #ow,"La revolucion ha comenzado"
+1900 cls_ white,black,white: at #ow,12,3:flash #ow,1: zx_bright #ow,1:print #ow,"La revolucion ha comenzado"
 1904 fx_war
 1914 if x<=strength+group$(h,2)+int(rnd*3)-1:goto 1950
-1922 let bor=0: paper #ow,black: cls_ : at #ow,10,7:print #ow,"Has sido derrocado"
+1922 cls_ black,white,black: at #ow,10,7:print #ow,"Has sido derrocado"
 1923 at #ow,12,10:print #ow,"y ";: flash #ow,1:print #ow,"liquidado"
 1924 fx_2
 1926 let alive=0: pause 50: the_end
-1950 let bor=0: cls_ : at #ow,10,2:zx_bright #ow,1:flash #ow,1:print #ow,"La revuelta ha sido sofocada"
+1950 cls_ black,white,black : at #ow,10,2:zx_bright #ow,1:flash #ow,1:print #ow,"La revuelta ha sido sofocada"
 1952 rem let a=usr 23842
 1954 at #ow,0,0: for a=1 to 22: paper #ow,int(rnd*5)+1:print #ow,blank_line$
 1955 at #ow,10,0: zx_bright #ow,1:print #ow,"castigas a los revolucionarios? "
@@ -403,7 +405,7 @@
 2021 if (cst<0 or mcst<0) and (money+cst<0 or money+mcst<0):goto 2034
 2022 let c=1: ret
 
-2034 pause 250: let c=0: cls_
+2034 pause 250: let c=0: cls #ow
 2037 at #ow,5,0:print #ow,decision$(r,18 to )
 2039 at #ow,8,2:print #ow,"El dinero necesario"
 2040 print #ow,\to 4;"no esta en el tesoro"\\\
@@ -413,7 +415,7 @@
 2047 enddef
 
 2060 defproc aid
-2062 let bor=2: paper #ow,yellow: cls_ 
+2062 cls_ yellow,black,red
 2063 paper #ow,red:print #ow,\"solicitud de prestamo extranjero"
 2064 at #ow,12,13:flash #ow,1:print #ow,"espera": pause 50
 2066 let x=k$-1
@@ -442,7 +444,7 @@
 2141 enddef
 
 2500 defproc decision
-2506 let bor=1: paper #ow,yellow: cls_
+2506 cls_ yellow,black,blue
 2510 for a=0 to 20: zx_inverse #ow,1:ink #ow,red:print #ow,"********************************": endfor a
 2522 at #ow,3,5:zx_bright #ow,1:flash #ow,1:print #ow,"decision presidencial"
 2530 ink #ow,white: at #ow,6,1:print #ow,"Para..."
@@ -451,7 +453,7 @@
 2538 at #ow,12,4:print #ow,"3. tus negocios           "
 2540 at #ow,14,4:print #ow,"4. subir el tesoro        "
 2542 at #ow,16,4:print #ow,"5. dar poder a un grupo   "
-2550 get_key: cls_
+2550 get_key: cls #ow
 2560 if k$<"1" or k$>"5":goto 2746
 2562 if k$="1":let x$="-2"
 2564 if k$="2":let x$="35"
@@ -490,7 +492,7 @@
 2670 aid: treasure_report: goto 2741
 2674 let strength=strength+2: treasure_report
 2676 money_transfer_: goto 2740
-2680 cls_ : at #ow,3,0:zx_inverse #ow,1:print #ow,"transferencia a la cuenta suiza"\\\
+2680 cls #ow : at #ow,3,0:zx_inverse #ow,1:print #ow,"transferencia a la cuenta suiza"\\\
 2685 let x=int(money/2): if x<1:goto 2720
 2687 print #ow,"El tesoro tenia $";int(money);",000"
 2690 let money_in_switzerland=money_in_switzerland+x: let money=money-x
@@ -513,10 +515,10 @@
 2774 next a
 2776 ret
 2777 endfor a
-2780 let bor=1: paper #ow,white: ink #ow,black: flash #ow,1: cls_
+2780 flash #ow,1: cls_ white,black,blue
 2781 flash #ow,0: at #ow,10,11:zx_bright #ow,1:print #ow,"noticias"
 2782 for a=1 to 10: zx_beep .6,30
-2784 cls_ : at #ow,10,11:flash #ow,1:print #ow,"noticias"
+2784 cls #ow : at #ow,10,11:flash #ow,1:print #ow,"noticias"
 2786 at #ow,14,0:print #ow,decision$(r,18 to )
 2788 ink #ow,white: pause 100
 2796 money_transfer: plot
@@ -531,7 +533,7 @@
 
 3026 let x=0
 3027 for a=1 to 8: let x=x+group$(a,1)
-3030 let bor=5: paper #ow,yellow: cls_
+3030 cls_ yellow,black,cyan
 3035 at #ow,3,1:print #ow,"Tu puntuacion como presidente"
 3050 print #ow,\" popularidad final - ";to 28;x
 3052 print #ow,\" meses en el poder (";months;"x3) - ";to 28;months*3: let x=x+months*3
@@ -545,9 +547,9 @@
 3074 print #ow,\\\" Tu total es ";to 28;:zx_bright #ow,1:print #ow,x
 3082 if x>score:let score=x
 3084 print #ow,\"[ La mayor puntuacion es ";score;" ]"
-3086 get_key: cls_
-3090 let bor=0: paper #ow,black: cls_ : at #ow,1,14:flash #ow,1:print #ow,"final"
-3092 police_report_step_3: credits: get_key: cls_ : stop : rem goto 140 old!!! tmp!!!
+3086 get_key: cls #ow
+3090 cls_ black,white,black: at #ow,1,14:flash #ow,1:print #ow,"final"
+3092 police_report_step_3: credits: get_key: cls #ow : stop : rem goto 140 old!!! tmp!!!
 3093 enddef
 
 3500 defproc national_flag
@@ -581,7 +583,7 @@
 
 4000 defproc title
 4001 loc a
-4002 let bor=0: paper #ow,cyan: ink #ow,black: cls_
+4002 cls_ cyan,black,black
 4054 national_slogan "Ritimba"
 4055 national_flag
 4060 for a=1 to 50: zx_beep .03,a
@@ -616,7 +618,7 @@
 4212 if not int(rnd*3)
 4213 actual_war
 4214 else
-4220 zx_border 5: paper #ow,black: ink #ow,white: flash #ow,1: cls_ : flash #ow,0
+4220 flash #ow,1: cls_ black,white,cyan: flash #ow,0
 4224 at #ow,6,1:print #ow,"tratado de guerra con Leftoto"
 4226 at #ow,10,3:print #ow,"Tu popularidad en Ritimba"
 4227 at #ow,12,11: zx_bright #ow,1:print #ow,"aumentara"
@@ -632,7 +634,7 @@
 
 4250 defproc actual_war
 
-4270 paper #ow,red: zx_border 0: cls_
+4270 cls_ red,black,black
 4271 at #ow,8,7:flash #ow,1:zx_bright #ow,1:print #ow,"leftoto nos invade"
 4276 let rs=0:for a=1 to 3: if group$(a,1)>low:let rs=rs+group$(a,2)
 4280 if group$(6,1)>low:let rs=rs+group$(6,2)
@@ -644,12 +646,12 @@
 4298 fx_war
 4300 if ls+int(rnd*3-1)<rs:rem Ritimban wins
 
-4310 zx_border 0: cls_ : at #ow,12,7:zx_bright #ow,1:flash #ow,1:print #ow," leftoto derrotado ": rem let i=usr 23842
+4310 zx_border black: cls #ow : at #ow,12,7:zx_bright #ow,1:flash #ow,1:print #ow," leftoto derrotado ": rem let i=usr 23842
 4312 let group$(5,2)="0": ret
 
 4313 else:rem Leftoto wins
 
-4320 let bor=0: paper #ow,black: cls_
+4320 cls_ black,white,black
 4321 at #ow,7,7:zx_bright #ow,1:flash #ow,1:print #ow,"victoria de leftoto"
 4323 rem poke 23886,255: for a=1 to 5: let i=usr 23884: endfor a
 4324 if not(decision$(36,1)="*" and int(rnd*3))
@@ -659,7 +661,7 @@
 4328 pause 30: fx_2: at #ow,18,7:print #ow,"Sumarisimamente ejecutado"
 4330 else:rem escape
 
-4340 cls_ : at #ow,12,3:zx_bright #ow,1:flash #ow,1:print #ow,"escapas en helicoptero!": rem poke 23886,70: let i=usr 23842
+4340 cls #ow : at #ow,12,3:zx_bright #ow,1:flash #ow,1:print #ow,"escapas en helicoptero!": rem poke 23886,70: let i=usr 23842
 4341 let escape=1
 
 4342 endif
