@@ -26,7 +26,7 @@
   84 let b$="123456789"
   85 let c$="987654321"
   86 let decisions=49
-  87 let groups=8
+  87 let groups=8:let country_groups=6
   88 let army=1:let peasants=2:let landowners=3:let guerrillas=4:let leftoto=5:let police=6:let russia=7:let usa=8:rem group ids
   89 let popularity=1:let power=2:rem group fields in group$()
  108 let decision_max_len=49:rem todo!!! check on reading
@@ -69,16 +69,33 @@
  274 police_report_step_2
 
  300 rep game
+
  310 audience
- 410 endrep
+ 315 rem moved here from the end of "audience":
+ 320 plot
+ 321 rem get_key:rem useless!!!
+ 325 murder: if not alive:the_end
+ 330 war: if not alive or escape:the_end
+ 335 plot
+ 340 police_report
+
+ 345 decision
+ 350 rem moved here from the end of "decision":
+ 355 plot
+ 360 rem get_key:rem useless!!!
+ 365 police_report
+ 366 news
+ 370 revolution
+
+ 410 endrep game
 
  420 enddef
 
- 599 rem audiencias ____________________________________________
  600 defproc audience
+
  601 let c=1
- 603 let low=int(rnd*3)+2
- 604 let revolution_strength=int(rnd*3)+10
+ 603 let low=rnd(2 to 4)
+ 604 let revolution_strength=rnd(10 to 12)
  610 let months=months+1
  612 cls_ yellow,black,blue
  613 at #ow,10,12:paper #ow,cyan:ink #ow,white:print #ow,"MES  ";:paper #ow,white: ink #ow,black: print #ow,months
@@ -90,12 +107,17 @@
  624 paper #ow,green:print #ow,blank_line$;blank_line$;blank_line$;blank_line$;blank_line$
  625 at #ow,3,9:zx_bright #ow,1: zx_inverse #ow,1:paper #ow,white:ink #ow,black:print #ow,"UNA AUDIENCIA"
 
- 630 let this_decision=int(rnd*24)+1
+ 629 rep choose_decision
+ 630 let this_decision=rnd(1 to 24)
  632 for a=1 to 22
- 633 if decision$(this_decision,1)="N":goto 648
+ 633 if decision$(this_decision,1)="N":exit choose_decision
  634 let this_decision=(this_decision-int(this_decision/24)*24)+1
  635 endfor a
- 640 for a=1 to 24: let decision$(a,1)="N": endfor a: goto 630
+ 640 for a=1 to 24
+ 642 let decision$(a,1)="N"
+ 643 endfor a
+ 644 endrep choose_decision
+
  648 let decision$(this_decision,1)="*"
  650 let gs=int((this_decision-1)/8)+1
  651 zx_border gs
@@ -105,20 +127,21 @@
  656 paper #ow,yellow:ink #ow,black:center #ow,10,"Peticion de "&this_group$&":"
  662 center #ow,14,"Esta su excelencia conforme en"
  663 paper #ow,white:center #ow,16,this_decision$(18 to)
- 666 get_key: zx_border 0: advert
+ 666 get_key: zx_border 0: advert this_decision
 
  670 rem opcion ________________________________________________
  684 cls #ow: paper #ow,white:center #ow,1,"  DECISION  "
  688 paper #ow,gs:ink #ow,contrast_colour(gs):center #ow,3,"Peticion de "&this_group$
  690 paper #ow,yellow:ink #ow,black:center #ow,5,this_decision$(18 to )
  691 paper #ow,blue:print #ow,\blank_line$
- 694 if not c:goto 730: let a=0
- 696 cash_advice: print #ow,: ink #ow,green:print #ow,blank_line$
+ 694 if not c:goto 730
+ 696 cash_advice this_decision: print #ow,: ink #ow,green:print #ow,blank_line$
  698 if c=0:goto 730
  722 get_key_yes
  726 if k$="s":goto 760
 
  728 goto 740
+
  730 cls #ow : at #ow,10,1:print #ow,"No tiene ";:zx_bright #ow,1:print #ow,"suficientes fondos":zx_bright #ow,0:print #ow,\\" para";
  731 print #ow," pagar esta decision."
  732 at #ow,15,4:print #ow,"Su respuesta debe ser ";:flash #ow,1:print #ow,"no": pause 250
@@ -129,15 +152,16 @@
  748 if x<0:let x=0
  750 let group$(gs,popularity)=x
  751 cls #ow
- 752 treasure_report: goto 766
+ 752 treasure_report
 
- 760 treasure_report: money_transfer: treasure_report_details
- 766 plot: get_key
- 775 murder: if alive=0:the_end
- 778 war: if alive=0 or escape=1:the_end
- 779 plot
- 780 police_report: decision
- 781 rem!!!
+ 760 rem treasure_report: take_only_once_decision: treasure_report_details
+
+ 765 rem moved!!! to the main loop
+ 766 rem plot: get_key
+ 775 rem murder: if alive=0:the_end
+ 778 rem war: if alive=0 or escape=1:the_end
+ 779 rem plot
+ 780 rem police_report: decision
  782 enddef
 
  790 defproc treasure_report
@@ -183,23 +207,23 @@
  940 pause 250: plot: police_report
  944 enddef
 
-1000 defproc advert
+1000 defproc advert(decision)
 1002 cls_ green,black,blue
 1004 for a=0 to ow_lines-1: at #ow,a,11: flash #ow,1: paper #ow,cyan:print #ow,"aviso?"
 1010 get_key_yes: cls_ yellow
 1014 if k$<>"s":ret
-1022 at #ow,1,0:paper #ow,black:ink #ow,yellow:print #ow,decision$(this_decision,18 to ):ink #ow,black
+1022 at #ow,1,0:paper #ow,black:ink #ow,yellow:print #ow,decision$(decision,18 to ):ink #ow,black
 1026 at #ow,3,0:paper #ow,white:print #ow,"Su popularidad entre...":paper #ow,yellow
 1027 for a=1 to groups
-1028 let x=code(decision$(this_decision,a+3))-77: if x=0:next a:exit a
+1028 let x=code(decision$(decision,a+3))-77: if x=0:next a:exit a
 1029 print #ow,\to 2;group$(a,6 to );to 21;
 1031 if x>0:print #ow,"+";
 1032 print #ow,x;
-1033 if gs=a and this_decision<25:paper #ow,gs:ink #w,yellow:print #ow,"< ":paper #ow,yellow:ink #ow,black
+1033 if gs=a and decision<25:paper #ow,gs:ink #w,yellow:print #ow,"< ":paper #ow,yellow:ink #ow,black
 1034 endfor a
 1036 paper #ow,white:print #ow,\\\"El poder de...":paper #ow,yellow
-1038 for a=1 to 6
-1039 let x=code(decision$(this_decision,a+11))-77: if x=0:next a:exit a
+1038 for a=1 to country_groups
+1039 let x=code(decision$(decision,a+11))-77: if x=0:next a:exit a
 1041 print #ow,to 2;group$(a,6 to );to 21;
 1042 if x>0:print #ow,"+";
 1044 print #ow,x
@@ -207,7 +231,6 @@
 1050 get_key: cls #ow
 1051 enddef
 
-1300 rem cls __________________________________________________
 1305 defproc cls_(paper_colour,ink_colour,border_colour)
 1306 paper #ow,paper_colour
 1307 ink #ow,ink_colour
@@ -225,7 +248,7 @@
 1426 if months<pc:ret
 1430 for a=1 to 3
 1432 if group$(a,popularity)>low:next a:exit a:rem check!!! goto 1450
-1436 for p=1 to 6
+1436 for p=1 to country_groups
 1438 if a=p or group$(p,popularity)>low:next p:exit p:rem check the logic!!! goto 1441
 1440 if group$(p,power)+group$(a,power)>=revolution_strength:exit p:rem check the logic!!! goto 1446
 1441 next p
@@ -236,11 +259,11 @@
 1450 endfor a
 1452 enddef
 
-
 1500 defproc murder
+
 1505 loc r
 
-1510 let r=int(rnd*3)+1
+1510 let r=rnd(1 to 3)
 1514 if group$(r,3)<>"A":ret
 
 1516 cls_ black,white,black: at #ow,10,7:print #ow,"intento de asesinato"
@@ -248,48 +271,54 @@
 1520 rem for a=60 to 1 step -.5: poke 23886,a: let i=usr 23884: endfor a: poke 23886,70:old!!!
 1522 cls #ow : pause 30: fx_2: pause 50
 
-1526 if (group$(army,3)="A" and group$(peasants,3)="A" and group$(landowners,3)="A") or not(group$(police,popularity)>low or group$(police,power)>low or int((rnd*2))):rem check the compacted logic!!!
-1546 cls_ black,white,black: at #ow,12,6:print #ow,"Esta usted muerto!"
+1526 if ((group$(army,3)="A" and group$(peasants,3)="A" and group$(landowners,3)="A") or not (group$(police,popularity)>low or group$(police,power)>low or rnd(0 to 1))):rem check the compacted logic!!!
+1546 cls_ black,white,black: center #ow,12,"Esta usted muerto!"
 1548 zx_beep 3,-40
-1550 let alive=0: ret
+1550 let alive=0
 1551 else
 
-1554 cls_ white,black,black: at #ow,12,8:flash #ow,1: zx_bright #ow,1:print #ow," Intento fallido "
+1554 cls_ white,black,black: paper #ow,white:ink #ow,black:center #ow,12," Intento fallido "
 1556 rem poke 23886,50: let a=usr 23842:rem old!!!
 1557 endif
 
 1560 enddef
 
 1570 defproc tune(m$)
+
+1571 loc a
+
 1572 for a=1 to len(m$) step 2
 1574 if m$(a+1)=" ":pause code(m$(a))/4:next a:exit a
 1576 zx_beep (code(m$(a))-48)/6,code(m$(a+1))-105
 1578 endfor a
+
 1580 enddef
 
-1600 rem transferencia _________________________________________
-1605 defproc money_transfer
-1610 let decision$(r,1)="*"
-1611 money_transfer_
+1605 defproc take_only_once_decision(decision):rem rename!!!
+1610 let decision$(decision,1)="*"
+1611 take_decision
 1612 enddef
-1619 defproc money_transfer_:rem rename!!!
-1620 let t$=decision$(r,4 to 11)
-1621 for a=1 to 8
-1622 if t$(a)<>"M":rem maybe "M"
+
+1618 defproc take_decision(decision):rem rename!!!
+1619 loc a,t$
+1620 let t$=decision$(decision,4 to 11)
+1621 for a=1 to groups
+1622 if t$(a)<>"M":rem M means 0
 1624 let x=group$(a,popularity)+(code(t$(a))-77)
 1626 if x>9:let x=9
 1628 if x<0:let x=0
 1630 let group$(a,popularity)=x
 1631 endif
 1632 endfor a
-1638 let t$=decision$(r,12 to 17)
-1640 for a=1 to 6
+1638 let t$=decision$(decision,12 to 17)
+1640 for a=1 to country_groups
 1642 if t$(a)="M":next a:exit a
 1644 let x=group$(a,power)+(code(t$(a))-77)
 1646 if x>9:let x=9
 1648 if x<0:let x=0
 1650 let group$(a,power)=x
 1652 endfor a
+1659 rem move:!!! it seems this is month stuff:
 1660 let money=money+cst
 1662 let month_payment=month_payment-mcst
 1664 if month_payment<0:let month_payment=0
@@ -297,12 +326,12 @@
 
 1700 defproc police_report
 
-1702 cls_ black,black,black
-1709 paper #ow,white:center #ow,6,"INFORME DE LA POLICIA SECRETA":paper #ow,black
-1710 if money<=0 or group$(police,popularity)<=low or group$(police,power)<=low
-1711   police_report_not_avalaible
-1712 else
-1713   flash #ow,1:print #ow,"?": at #ow,12,8:print #ow,"( cuesta $1000 )"
+1702 cls_ black,white,black
+1709 if money<=0 or group$(police,popularity)<=low or group$(police,power)<=low
+1710   police_report_not_avalaible
+1711 else
+1712   center #ow,6,"INFORME de la POLICIA SECRETA?"
+1713   center #ow,12,"(cuesta 1.000 $)"
 1714   get_key_yes
 1715   if k$=="s":let money=money-1:police_report_step_2
 1716 endif
@@ -323,7 +352,7 @@
 1732 let x=group$(a,popularity): at #ow,7+a,10-x: ink #ow,white: paper #ow,green:print #ow,c$(10-x to )
 1734 if a<=3 and group$(a,3)="A":at #ow,a+7,21: paper #ow,white: flash #ow,1:print #ow,"A"
 1736 endfor a
-1738 for a=1 to 6: at #ow,7+a,22: paper #ow,red: ink #ow,white:print #ow,b$( to group$(a,power))
+1738 for a=1 to country_groups: at #ow,7+a,22: paper #ow,red: ink #ow,white:print #ow,b$( to group$(a,power))
 1741 paper #ow,black:ink #ow,white
 1742 at #ow,17,0:print #ow,"Tu FUERZA es ";strength
 1744 at #ow,19,0:print #ow,"La FUERZA de la REVOLUCION es ";revolution_strength
@@ -331,22 +360,26 @@
 1751 cls_ green,black,green
 1752 enddef
 
-1765 defproc police_report_not_avalaible
-1764 at #ow,10,9:print #ow,"no disponible"\\
-1766 if group$(police,popularity)<=low:print #ow,"Tu popularidad entre nosotros es ";group$(police,popularity)\\
-1768 if group$(police,power)<=low:print #ow,to 3;"El poder de la policia es ";group$(police,power)\\
-1769 if money<=0:print #ow,to 3;"No puedes obtener un informe"
-1770 rem poke 23886,30: for a=1 to 80: let i=usr 23884: endfor a:rem old!!!
-1772 rem poke 23886,50
+1763 defproc police_report_not_avalaible
+
+1764 center #ow,6,"INFORME de la POLICIA SECRETA"
+1765 center #ow,10,"NO DISPONIBLE"
+1766 if group$(police,popularity)<=low:print #ow,\\"Tu popularidad entre nosotros es ";group$(police,popularity);"."
+1768 if group$(police,power)<=low:print #ow,to 3\\"El poder de la policia es ";group$(police,power);"."
+1769 if money<=0:print #ow,to 3\\"No tienes dinero para pagar un informe."
+1770 rem special effect was here. old!!!
 
 1773 enddef
 
 1800 defproc revolution
-1801 news
-1802 for a=1 to 3: let r=int(rnd*3)+1
-1804 if group$(r,3)="R":goto 1810
-1806 endfor a
-1807 goto 600
+1801 loc a,helping_groups
+1802 for a=1 to 3
+1803 let r=rnd(1 to 3)
+1804 if group$(r,3)="R":exit a
+1806 next a
+1807 ret:rem old: goto 600 (audience)!!!
+1808 endfor a
+
 1810 flash #ow,1: cls_ red,black,red
 1811 ink #ow,white: at #ow,10,11:flash #ow,0: zx_bright #ow,0:print #ow,"revolucion"
 1812 for a=1 to 5: zx_beep .5,20: zx_beep .5,10: endfor a
@@ -364,33 +397,43 @@
 1839 cls_ black,white,black
 1840 let alive=0: pause 50: fx_2 : at #ow,12,0:print #ow,"Las guerillas estan ";:flash #ow,1: zx_bright #ow,1:print #ow,"celebrandolo": fx_2: the_end
 
-1842 if int(rnd*3)
+1842 if rnd(0 to 2)
 1843 at #ow,12,4:flash #ow,1: zx_bright #ow,1:print #ow,"escapas en helicoptero!": the_end: rem let i=usr 23842:rem old!!!
 1844 endif
 
 1845 at #ow,10,2:print #ow,"el helicoptero no funciona!"
-1846 pause 150
-1847 cls #ow : goto 1833
+
+1846 repeat ask_for_help
+1847 pause 150
+1848 cls #ow : goto 1833
 1850 let x=group$(r,power)+group$(group$(r,4),power)
 1852 at #ow,5,0:print #ow,group$(r,6 to code(group$(r,5))-20);" se ha unido a "
 1856 print #ow,group$(group$(r,4),6 to )\\
 1857 print #ow,"Su fuerza unidos es ";x
 1858 print #ow,\\"a quien vas a pedir ayuda?"
-1860 let z=1
-1861 for a=1 to 6
-1862 if group$(a,popularity)<=low:next a:exit a
+1860 let helping_groups=0
+1861 for a=1 to country_groups
+1862 if group$(a,popularity)>low
 1864 print #ow,to 6;a;" .";group$(a,6 to code(group$(a,5))-20);" ?"
-1866 let z=0
+1866 let helping_groups=helping_groups+1
+1867 endif
 1868 endfor a
 
-1869 if z:goto 1890
+1869 if helping_groups
 1870 get_key: if k$<"1" or k$>"6":goto 1870
-1878 if group$(k$,popularity)<=low:goto 1884
-1880 let h=k$: goto 1893
-1884 cls #ow : at #ow,12,5:print #ow,"Debes estar bromeando!": goto 1846
+1878 if group$(k$,popularity)>low
+1879 let h=k$: exit ask_for_help
+1880 else
+1883 cls #ow : center #ow,12,"Debes estar bromeando!": next ask_for_help
+1884 endif
+1885 else
 
-1890 cls #ow : at #ow,8,5:print #ow,"estas solo!"
-1892 get_key
+1888 cls #ow : center #ow,8,"estas solo!"
+1889 get_key
+1890 endif
+1891 exit ask_for_help
+
+1892 endrep ask_for_help
 
 1893 cls #ow
 
@@ -400,27 +443,31 @@
 1898 pause 250
 1900 cls_ white,black,white: at #ow,12,3:flash #ow,1: zx_bright #ow,1:print #ow,"La revolucion ha comenzado"
 1904 fx_war
-1914 if x<=strength+group$(h,power)+int(rnd*3)-1:goto 1950
+1914 if x<=strength+group$(h,power)+rnd(-1 to 1):goto 1950
 1922 cls_ black,white,black: at #ow,10,7:print #ow,"Has sido derrocado"
 1923 at #ow,12,10:print #ow,"y ";: flash #ow,1:print #ow,"liquidado"
 1924 fx_2
 1926 let alive=0: pause 50: the_end
 1950 cls_ black,white,black : at #ow,10,2:zx_bright #ow,1:flash #ow,1:print #ow,"La revuelta ha sido sofocada"
 1952 rem let a=usr 23842
-1954 at #ow,0,0: for a=1 to 22: paper #ow,int(rnd*5)+1:print #ow,blank_line$
+1954 at #ow,0,0: for a=1 to 22: paper #ow,rnd(1 to 5):print #ow,blank_line$
 1955 at #ow,10,0: zx_bright #ow,1:print #ow,"castigas a los revolucionarios? "
 1956 get_key_yes: if k$<>"s":goto 1968
 1960 for n=1 to 3: fx_2: let y=sqrt(1): endfor n
 1964 let group$(r,1 to 2)="00"
 1966 let group$(group$(r,4),1 to 2)="00"
 1968 let group$(h,power)="9"
-1969 let pc=months+2: plot: police_report: goto 600:rem goto old!!!
-1970 enddef
+1969 let pc=months+2
+1970 plot: police_report:rem goto 600 old!!!
+1975 enddef
 
-1980 defproc cash_advice
+1980 defproc cash_advice(decision)
+
+1981 rem todo make it function, return c!!!
+
 1985 paper #ow,yellow:ink #ow,black
-1990 let cst=10*(code(decision$(r,2))-77)
-1992 let mcst=code(decision$(r,3))-77
+1990 let cst=10*(code(decision$(decision,2))-77)
+1992 let mcst=code(decision$(decision,3))-77
 1994 if not cst and not mcst:let c=1: at #ow,10,7:print #ow,"no cuesta dinero": ret
 
 1996 at #ow,9,1:print #ow,"Esta decision ": print
@@ -443,15 +490,16 @@
 2022 let c=1: ret
 
 2034 pause 250: let c=0: cls #ow
-2037 at #ow,5,0:print #ow,decision$(r,18 to )
+2037 center #ow,5,decision$(decision,18 to )
 2039 at #ow,8,2:print #ow,"El dinero necesario"
 2040 print #ow,\to 4;"no esta en el tesoro"\\\
 2042 if decision$(38,1)="N":print #ow,"Quizas los rusos pueden ayudar?": print
 2044 if decision$(39,1)="N":print #ow,"Los americanos son un pueblo"\"generoso": print
 2046 pause 350
+
 2047 enddef
 
-2060 defproc aid
+2060 defproc ask_for_loan
 2062 cls_ yellow,black,red
 2063 paper #ow,red:print #ow,\"solicitud de prestamo extranjero"
 2064 at #ow,12,13:flash #ow,1:print #ow,"espera": pause 50
@@ -480,7 +528,12 @@
 
 2141 enddef
 
-2500 defproc decision
+2499 defproc decision
+
+2500 loc a,chosen_decision,options
+
+2501 rep choose_gratis_decision
+2502 rep choose_decision
 
 2506 cls_ red,yellow,blue
 
@@ -501,58 +554,67 @@
 2568 if k$="4":let x$=":<"
 2570 if k$="5":let x$="=?"
 2572 at #ow,(20-(((code(x$(2))-20)-(code(x$(1))-20))*3))*.5,0
-2574 let y=1: let z=1
+2574 let options=0
 
 2578 for a=code(x$(1))-20 to code(x$(2))-20
 2580 if decision$(a,1)<>"*"
-2582 let z=0
-2588 print #ow,y;".": print #ow,decision$(a,18 to ): print
-2593 let y=y+1
+2583 let options=options+1
+2588 print #ow,options;".": print #ow,decision$(a,18 to ): print
 2594 endif
 2595 endfor a
 
-2596 if z:goto 2600
-2597 get_key: goto 2620
-
+2596 if not options
 2600 at #ow,12,3:zx_bright #ow,1:flash #ow,1:print #ow,"Esta seccion esta agotada"
-2602 pause 150: decision
-2628 if k$<"0" or k$>"6":decision
-2630 if k$<1 or k$>(code(x$(2))-20)+1-(code(x$)-20):decision
-2634 let r=((code(x$))-20)+k$-1
-2635 if decision$(r,1)="*":decision
-2636 if r=38 or r=39:goto 2670
-2642 if r=37:goto 2680
-2644 advert
-2646 at #ow,4,0:zx_bright #ow,1:print #ow,decision$(r,18 to )
-2648 cash_advice
-2650 if not c:pause 200: decision
-2651 at #ow,4,0:zx_bright #ow,1:print #ow,decision$(r,18 to )
+2602 pause 150: next choose_decision
+2603 endif
+
+2604 get_key
+
+2628 if k$<"0" or k$>"6":next choose_decision
+2630 if k$<1 or k$>(code(x$(2))-20)+1-(code(x$)-20):next choose_decision
+2634 let chosen_decision=((code(x$))-20)+k$-1
+2635 if decision$(chosen_decision,1)="*":next choose_decision
+
+2636 if chosen_decision=38 or chosen_decision=39
+2637 ask_for_loan: treasure_report: exit choose_gratis_decision
+2638 endif
+
+2642 if chosen_decision=37:goto 2680
+
+2644 advert chosen_decision
+2646 at #ow,4,0:zx_bright #ow,1:print #ow,decision$(chosen_decision,18 to )
+2648 cash_advice chosen_decision
+2650 if not c:pause 200: next choose_decision
+2651 at #ow,4,0:zx_bright #ow,1:print #ow,decision$(chosen_decision,18 to )
 2652 get_key_yes
-2653 if k$<>"s":decision
-2654 if r=35:goto 2674
-2656 treasure_report: money_transfer
-2660 goto 2740
+2653 if k$<>"s":next choose_decision
 
-2670 aid: treasure_report: goto 2741
-2674 let strength=strength+2: treasure_report
-2676 money_transfer_: goto 2740
-2680 cls #ow : at #ow,3,0:zx_inverse #ow,1:print #ow,"transferencia a la cuenta suiza"\\\
-2685 let x=int(money/2): if x<1:goto 2720
-2687 print #ow,"El tesoro tenia $";int(money);",000"
-2690 let money_in_switzerland=money_in_switzerland+x: let money=money-x
-2692 pause 100
-2694 print #ow,\\"$";x;",000 han sido transferidos": goto 2736
-2720 at #ow,12,7:print #ow,"ninguna transferencia hecha": pause 100
+2654 if chosen_decision=35:goto 2674
 
+2656 treasure_report
+2657 take_only_once_decision chosen_decision
+2660 exit choose_decision
+
+2670 rem ask_for_loan: treasure_report: exit choose_gratis_decision:rem moved!!! up
+
+2674 let strength=strength+2
+2675 treasure_report
+2676 take_decision chosen_decision
+2677 exit choose_decision
+
+2739 endrep choose_decision
 2740 treasure_report_details_2
-2741 plot: get_key
-2746 police_report: revolution
+2742 exit choose_gratis_decision
+2743 endrep choose_gratis_decision
+
+2744 rem plot: get_key:rem moved!!! to the game loop
+2746 rem police_report: revolution:rem moved!!! to the game loop
 
 2747 enddef
 
 2750 defproc news
-2760 if int(rnd*3):ret
-2764 let r=int(rnd*6)+44
+2760 if rnd(0 to 2):ret
+2764 let r=rnd(44 to 49)
 2768 for a=1 to 6
 2770 if not (decision$(r,1)="N"):exit a
 2772 let r=r+1: if r=50:let r=44
@@ -565,9 +627,27 @@
 2784 cls #ow : at #ow,10,11:flash #ow,1:print #ow,"noticias"
 2786 at #ow,14,0:print #ow,decision$(r,18 to )
 2788 ink #ow,white: pause 100
-2796 money_transfer: plot
+2796 take_only_once_decision r: plot
 2800 police_report
 2806 enddef
+
+2970 defproc money_transfer
+
+2975 loc amount
+
+2980 cls #ow : at #ow,3,0:zx_inverse #ow,1:print #ow,"TRANSFERENCIA A LA CUENTA SUIZA"\\\
+
+2985 let amount=int(money/2)
+2986 if amount>=1
+2987 print #ow,"El tesoro tenia $";int(money);",000"
+2990 let money_in_switzerland=money_in_switzerland+amount: let money=money-amount
+2992 pause 100
+2994 print #ow,\\"$";amount;",000 han sido transferidos":exit choose_decision
+2995 else
+
+2997 center #ow,12,"Ninguna transferencia hecha": pause 100
+2997 endif
+2999 enddef
 
 3000 defproc the_end
 
@@ -659,7 +739,7 @@
 4200 defproc war
 4208 if group$(leftoto,popularity)>low:ret
 4210 if group$(leftoto,power)<low:ret
-4212 if not int(rnd*3)
+4212 if not rnd(0 to 3)
 4213 actual_war
 4214 else
 4220 flash #ow,1: cls_ black,white,cyan: flash #ow,0
@@ -688,7 +768,7 @@
 4294 at #ow,14,1:print #ow,"La fuerza de Leftoto es ";ls
 4296 at #ow,18,3:zx_bright #ow,1:zx_inverse #ow,1:print #ow,"Una corta y decisiva guerra"
 4298 fx_war
-4300 if ls+int(rnd*3-1)<rs:rem Ritimba wins
+4300 if ls+rnd(-1 to 1)<rs:rem Ritimba wins
 
 4310 zx_border black: cls #ow : at #ow,12,7:zx_bright #ow,1:flash #ow,1:print #ow," Leftoto derrotado ": rem let i=usr 23842
 4312 let group$(leftoto,power)="0": ret
@@ -698,7 +778,7 @@
 4320 cls_ black,white,black
 4321 at #ow,7,7:zx_bright #ow,1:flash #ow,1:print #ow,"Victoria de Leftoto"
 4323 rem poke 23886,255: for a=1 to 5: let i=usr 23884: endfor a
-4324 if not(decision$(36,1)="*" and int(rnd*3))
+4324 if not(decision$(36,1)="*" and rnd(0 to 2)
 
 4326 let alive=0: if decision$(36,1)="*":at #ow,10,0:print #ow,"El motor del Helicoptero se para": pause 80
 4327 at #ow,12,4:print #ow,"Eres acusado de ser un"\\"  enemigo del pueblo y..."
@@ -713,7 +793,6 @@
 4343 endif
 4344 enddef
 
-5000 rem tecla _________________________________________________
 
 5001 defproc key_prompt(prompt$,paper_colour,ink_colour):rem use RECOL instead!!!
 5002 rem ink #iw,contrast_colour(paper_colour):paper #iw,paper_colour:cls #iw:center #iw,1,prompt$:cursen_home #iw
@@ -754,8 +833,11 @@
 5210 get_key_prompt "TECLA",red,blue
 5220 enddef
 
-
-6000 rem data __________________________________________________
+6089 rem chars:
+6090 rem 01: decision already taken ("N"=no, "*"=yes)
+6091 rem 04-11: +/- popularity for groups 1-8 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
+6092 rem 12-17 +/- power for groups 1-6 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
+6093 rem 18...:   decision or event
 6101 DATA "NMHQJLMMMMMPKLMMMPONER MILI OBLIGATORIA          "
 6102 DATA "NMMPMJMMMMMNMLMMMREQUISAR TIERRAS PARA TIRO      "
 6103 DATA "NCMPLNMLMLMNMNIMMATACAR LAS BASES DE LA GUERILLA "
@@ -817,7 +899,7 @@
 6210 data "leftotos  ","pol.sec.  ","rusos     ","americanos"
 
 7010 defproc s
-7011 save "dos1_sb_ritimba_ritimba_bas"
+7011 rem save "dos1_sb_ritimba_ritimba_bas"
 7012 enddef
 
 10000 rem _________________________________________________
@@ -912,3 +994,5 @@
 14020 init_screen
 14030 init_windows
 14100 enddef
+
+
