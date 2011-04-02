@@ -1,5 +1,5 @@
-   1 rem 2011-03-26 código de Dictator traducido por mí, sin tocar todavía para adaptarlo a SBASIC
-   2 rem 2011-04-01 Primeros y muchos cambios en el código. Hay zonas en que el flujo no está claro y no será fácil dividir el código en procedimientos.
+   1 rem Ritimba
+   2 rem Copyright (C) 2011 Marcos Cruz (programandala.ne)
 
    3 defproc credits
    4 cls_ black,white,blue: at #ow,1,0:print #ow,"RITIMBA"\\"Por:"\"Marcos Cruz (programandala.net),"\"2011"
@@ -19,7 +19,9 @@
 
   79 defproc ritimba
 
-  80 init
+  80 init_once
+
+  81 rep again
 
   82 credits
   83 let score=0
@@ -35,7 +37,7 @@
  111 dim group$(groups,group_max_len):dim group_short_name$(groups,10)
  112 restore
  116 for a=1 to decisions: read decision$(a)
- 120 get_key:title
+ 120 wait_key_press:title
 
  140 rem restore 6150:rem needed?!!!
  141 for a=1 to groups: read group$(a)
@@ -63,9 +65,9 @@
  265 endif
  266 print #ow,\\"Comienza con un informe del"
  267 print #ow,"tesoro y con otro de la policia."
- 270 get_key
+ 270 wait_key_press
  272 treasure_report
- 273 get_key
+ 273 wait_key_press
  274 police_report_step_2
 
  300 rep game
@@ -73,21 +75,25 @@
  310 audience
  315 rem moved here from the end of "audience":
  320 plot
- 321 rem get_key:rem useless!!!
- 325 murder: if not alive:the_end
- 330 war: if not alive or escape:the_end
+ 321 rem wait_key_press:rem useless!!!
+ 325 murder: if not alive:exit game
+ 330 war: if not alive or escape:exit game
  335 plot
  340 police_report
 
  345 decision
  350 rem moved here from the end of "decision":
  355 plot
- 360 rem get_key:rem useless!!!
+ 360 rem wait_key_press:rem useless!!!
  365 police_report
  366 news
  370 revolution
 
  410 endrep game
+
+ 412 the_end
+
+ 415 endrep again
 
  420 enddef
 
@@ -97,7 +103,7 @@
  603 let low=rnd(2 to 4)
  604 let revolution_strength=rnd(10 to 12)
  610 let months=months+1
- 612 cls_ yellow,black,blue
+ 612 cls_ yellow,black,yellow
  613 at #ow,10,12:paper #ow,cyan:ink #ow,white:print #ow,"MES  ";:paper #ow,white: ink #ow,black: print #ow,months
  614 pause 50
  616 plot
@@ -109,13 +115,14 @@
 
  629 rep choose_decision
  630 let this_decision=rnd(1 to 24)
+
  632 for a=1 to 22
  633 if decision$(this_decision,1)="N":exit choose_decision
  634 let this_decision=(this_decision-int(this_decision/24)*24)+1
- 635 endfor a
- 640 for a=1 to 24
- 642 let decision$(a,1)="N"
- 643 endfor a
+ 635 end for a
+
+ 640 for a=1 to 24:let decision$(a,1)="N"
+
  644 endrep choose_decision
 
  648 let decision$(this_decision,1)="*"
@@ -127,7 +134,7 @@
  656 paper #ow,yellow:ink #ow,black:center #ow,10,"Peticion de "&this_group$&":"
  662 center #ow,14,"Esta su excelencia conforme en"
  663 paper #ow,white:center #ow,16,this_decision$(18 to)
- 666 get_key: zx_border 0: advert this_decision
+ 666 wait_key_press: advert this_decision
 
  670 rem opcion ________________________________________________
  684 cls #ow: paper #ow,white:center #ow,1,"  DECISION  "
@@ -137,8 +144,7 @@
  694 if not c:goto 730
  696 cash_advice this_decision: print #ow,: ink #ow,green:print #ow,blank_line$
  698 if c=0:goto 730
- 722 get_key_yes
- 726 if k$="s":goto 760
+ 722 if yes:goto 760
 
  728 goto 740
 
@@ -157,7 +163,7 @@
  760 rem treasure_report: take_only_once_decision: treasure_report_details
 
  765 rem moved!!! to the main loop
- 766 rem plot: get_key
+ 766 rem plot: wait_key_press
  775 rem murder: if alive=0:the_end
  778 rem war: if alive=0 or escape=1:the_end
  779 rem plot
@@ -210,8 +216,8 @@
 1000 defproc advert(decision)
 1002 cls_ green,black,blue
 1004 for a=0 to ow_lines-1: at #ow,a,11: flash #ow,1: paper #ow,cyan:print #ow,"aviso?"
-1010 get_key_yes: cls_ yellow
-1014 if k$<>"s":ret
+1010 if not yes:ret
+1012 cls_ yellow
 1022 at #ow,1,0:paper #ow,black:ink #ow,yellow:print #ow,decision$(decision,18 to ):ink #ow,black
 1026 at #ow,3,0:paper #ow,white:print #ow,"Su popularidad entre...":paper #ow,yellow
 1027 for a=1 to groups
@@ -228,7 +234,7 @@
 1042 if x>0:print #ow,"+";
 1044 print #ow,x
 1048 endfor a
-1050 get_key: cls #ow
+1050 wait_key_press: cls #ow
 1051 enddef
 
 1305 defproc cls_(paper_colour,ink_colour,border_colour)
@@ -237,12 +243,15 @@
 1310 zx_border border_colour: cls #ow
 1311 paper #iw,border_colour: cls #iw
 1312 let prompt_colour_1=border_colour
-1313 let prompt_colour_2=contrast_colour(border_colour)
-1314 zx_beep .1,40
-1315 enddef
+1313 let prompt_colour_2=paper_colour
+1315 if prompt_colour_1=prompt_colour_2
+1317   let prompt_colour_2=contrast_colour(prompt_colour_1)
+1319 endif
+1324 zx_beep .1,40
+1325 enddef
 
 1400 defproc plot
-
+1405 loc a,p
 1410 if months<=2:ret
 1420 for a=1 to 3: let group$(a,3 to 4)="::"
 1426 if months<pc:ret
@@ -332,8 +341,7 @@
 1711 else
 1712   center #ow,6,"INFORME de la POLICIA SECRETA?"
 1713   center #ow,12,"(cuesta 1.000 $)"
-1714   get_key_yes
-1715   if k$=="s":let money=money-1:police_report_step_2
+1715   if yes:let money=money-1:police_report_step_2
 1716 endif
 1717 enddef
 
@@ -356,7 +364,7 @@
 1741 paper #ow,black:ink #ow,white
 1742 at #ow,17,0:print #ow,"Tu FUERZA es ";strength
 1744 at #ow,19,0:print #ow,"La FUERZA de la REVOLUCION es ";revolution_strength
-1750 get_key
+1750 wait_key_press
 1751 cls_ green,black,green
 1752 enddef
 
@@ -384,8 +392,8 @@
 1811 ink #ow,white: at #ow,10,11:flash #ow,0: zx_bright #ow,0:print #ow,"revolucion"
 1812 for a=1 to 5: zx_beep .5,20: zx_beep .5,10: endfor a
 1814 flash #ow,0: cls_ yellow,black,yellow
-1816 at #ow,12,8:print #ow,"intento de escape?": get_key_yes
-1830 cls #ow : if k$<>"s":goto 1850
+1816 at #ow,12,8:print #ow,"intento de escape?": let afirmatie=yes
+1830 cls #ow : if not afirmative:goto 1850
 1832 if decision$(36,1)="*":goto 1842
 1833 at #ow,10,2:print #ow,"Tienes que atravesar el";:at #ow,12,6:print #ow,"monte hacia leftoto"
 1834 pause 200: cls #ow
@@ -403,7 +411,7 @@
 
 1845 at #ow,10,2:print #ow,"el helicoptero no funciona!"
 
-1846 repeat ask_for_help
+1846 rep ask_for_help
 1847 pause 150
 1848 cls #ow : goto 1833
 1850 let x=group$(r,power)+group$(group$(r,4),power)
@@ -420,7 +428,9 @@
 1868 endfor a
 
 1869 if helping_groups
-1870 get_key: if k$<"1" or k$>"6":goto 1870
+1870 rep choose_group
+1871 let k$=get_key$: if k$ instr "123456":exit choose_group
+1872 endrep choose_group
 1878 if group$(k$,popularity)>low
 1879 let h=k$: exit ask_for_help
 1880 else
@@ -429,7 +439,7 @@
 1885 else
 
 1888 cls #ow : center #ow,8,"estas solo!"
-1889 get_key
+1889 wait_key_press
 1890 endif
 1891 exit ask_for_help
 
@@ -452,7 +462,7 @@
 1952 rem let a=usr 23842
 1954 at #ow,0,0: for a=1 to 22: paper #ow,rnd(1 to 5):print #ow,blank_line$
 1955 at #ow,10,0: zx_bright #ow,1:print #ow,"castigas a los revolucionarios? "
-1956 get_key_yes: if k$<>"s":goto 1968
+1956 if not yes:goto 1968
 1960 for n=1 to 3: fx_2: let y=sqrt(1): endfor n
 1964 let group$(r,1 to 2)="00"
 1966 let group$(group$(r,4),1 to 2)="00"
@@ -521,10 +531,10 @@
 
 2132 if not x:at #ow,12,12:paper #ow,red:print #ow,"no!   "
 2134 if x:at #ow,12,12:paper #ow,blue:print #ow,'"No!"'
-2136 get_key: ret
+2136 wait_key_press: ret
 2138 at #ow,12,2:print #ow,"Es demasiado pronto para dar"\"ayudas economicas"
 
-2140 get_key
+2140 wait_key_press
 
 2141 enddef
 
@@ -546,7 +556,7 @@
 2540 at #ow,14,4:print #ow,"4. Aumentar el tesoro    "
 2542 at #ow,16,4:print #ow,"5. Fortalecer a un grupo "
 
-2550 get_key: cls #ow
+2550 let k$=get_key$: cls #ow
 2560 if k$<"1" or k$>"5":goto 2746
 2562 if k$="1":let x$="-2"
 2564 if k$="2":let x$="35"
@@ -568,7 +578,7 @@
 2602 pause 150: next choose_decision
 2603 endif
 
-2604 get_key
+2604 let k$=get_key$
 
 2628 if k$<"0" or k$>"6":next choose_decision
 2630 if k$<1 or k$>(code(x$(2))-20)+1-(code(x$)-20):next choose_decision
@@ -582,12 +592,12 @@
 2642 if chosen_decision=37:goto 2680
 
 2644 advert chosen_decision
+2645 rem restore the screen colors here?!!!
 2646 at #ow,4,0:zx_bright #ow,1:print #ow,decision$(chosen_decision,18 to )
 2648 cash_advice chosen_decision
 2650 if not c:pause 200: next choose_decision
 2651 at #ow,4,0:zx_bright #ow,1:print #ow,decision$(chosen_decision,18 to )
-2652 get_key_yes
-2653 if k$<>"s":next choose_decision
+2653 if not yes:next choose_decision
 
 2654 if chosen_decision=35:goto 2674
 
@@ -607,7 +617,7 @@
 2742 exit choose_gratis_decision
 2743 endrep choose_gratis_decision
 
-2744 rem plot: get_key:rem moved!!! to the game loop
+2744 rem plot: wait_key_press:rem moved!!! to the game loop
 2746 rem police_report: revolution:rem moved!!! to the game loop
 
 2747 enddef
@@ -645,7 +655,7 @@
 2994 print #ow,\\"$";amount;",000 han sido transferidos":exit choose_decision
 2995 else
 
-2997 center #ow,12,"Ninguna transferencia hecha": pause 100
+2996 center #ow,12,"Ninguna transferencia hecha": pause 100
 2997 endif
 2999 enddef
 
@@ -671,9 +681,9 @@
 3074 print #ow,\\\" Tu total es ";to 28;:zx_bright #ow,1:print #ow,x
 3082 if x>score:let score=x
 3084 print #ow,\"[ La mayor puntuacion es ";score;" ]"
-3086 get_key: cls #ow
+3086 wait_key_press: cls #ow
 3090 cls_ black,white,black: at #ow,1,14:flash #ow,1:print #ow,"final"
-3092 police_report_step_3: credits: get_key: cls #ow : stop : rem goto 140 old!!! tmp!!!
+3092 police_report_step_3: wait_key_press
 3093 enddef
 
 3500 defproc national_flag
@@ -778,7 +788,7 @@
 4320 cls_ black,white,black
 4321 at #ow,7,7:zx_bright #ow,1:flash #ow,1:print #ow,"Victoria de Leftoto"
 4323 rem poke 23886,255: for a=1 to 5: let i=usr 23884: endfor a
-4324 if not(decision$(36,1)="*" and rnd(0 to 2)
+4324 if not(decision$(36,1)="*" and rnd(0 to 2))
 
 4326 let alive=0: if decision$(36,1)="*":at #ow,10,0:print #ow,"El motor del Helicoptero se para": pause 80
 4327 at #ow,12,4:print #ow,"Eres acusado de ser un"\\"  enemigo del pueblo y..."
@@ -794,16 +804,13 @@
 4344 enddef
 
 
-5001 defproc key_prompt(prompt$,paper_colour,ink_colour):rem use RECOL instead!!!
-5002 rem ink #iw,contrast_colour(paper_colour):paper #iw,paper_colour:cls #iw:center #iw,1,prompt$:cursen_home #iw
-5003 ink #iw,ink_colour:paper #iw,paper_colour:cls #iw:center #iw,1,prompt$:cursen_home #iw
+5001 defproc key_prompt(prompt$,colour)
+5002 rem ink #iw,contrast_colour(paper_colour):paper #iw,paper_colour:cls #iw:center #iw,1,prompt$:cursen_home #iw:rem old version!!!
+5003 ink #iw,contrast_colour(colour):paper #iw,colour:cls #iw:center #iw,1,prompt$:cursen_home #iw
 5004 enddef
 
-5005 defproc get_key_yes
-5007 get_key_prompt 'TECLA ("S" = SI)'
-5008 enddef
 
-5009 defproc get_key_prompt(prompt$)
+5009 deffn get_key_prompt$(prompt$)
 
 5010 rep dont_press_now
 5011 if inkey$(#iw)="":exit dont_press_now
@@ -811,26 +818,41 @@
 
 5014 rep press_now
 
-5015 key_prompt prompt$,prompt_colour_1,prompt_colour_2
-5018 let k$=inkey$(#iw,50)
-5020 if k$<>"":exit press_now
+5015 key_prompt prompt$,prompt_colour_1
+5018 let key$=inkey$(#iw,50)
+5020 if key$<>"":exit press_now
 5021 zx_beep .01,30
 
-5022 key_prompt prompt$,prompt_colour_2,prompt_colour_1
-5025 let k$=inkey$(#iw,50)
-5027 if k$<>"":exit press_now
+5022 key_prompt prompt$,prompt_colour_2
+5025 let key$=inkey$(#iw,50)
+5027 if key$<>"":exit press_now
 5028 zx_beep .01,20
 
 5029 endrep press_now
 5030 curdis #iw
 
-5034 if k$=="s":zx_beep .25,40:else zx_beep .25,10
-5038 rem if k$="\#226":goto 80:rem ZX "STOP"!!!
+5034 rem if key$=="s":zx_beep .25,40:else zx_beep .25,10
+5038 rem if key$="\#226":goto 80:rem ZX "STOP"!!!
+
+5099 ret key$
 
 5100 enddef
 
-5200 defproc get_key
-5210 get_key_prompt "TECLA",red,blue
+5150 deffn get_key$
+5160 ret get_key_prompt$("TECLA")
+5165 enddef
+
+5166 deffn yes:rem edit!!!
+5168 loc key$,yes
+5170 let key$=get_key_prompt$('TECLA ("S" = SI)')
+5171 let yes=(key$=="s")
+5172 if yes:zx_beep .25,40:else zx_beep .25,10
+5173 ret yes
+5175 enddef
+
+5200 defproc wait_key_press
+5205 loc key$
+5210 let key$=get_key$
 5220 enddef
 
 6089 rem chars:
@@ -939,13 +961,13 @@
 11530 deffn contrast_colour(colour):rem todo!!! make it with a bit mask
 11532 sel on colour
 11534   =black,blue,red,purple:ret white
-11537   =remainder:ret white
+11537   =remainder:ret black
 11538 endsel
 11539 enddef
 
 11550 defproc cursen_home(channel)
 11555 cursen #channel
-11560 if channel=iw:at iw_lines-1,columns-1:else at ow_lines-1,columns-1
+11560 if channel=iw:at# iw,iw_lines-1,columns-1:else at #ow,ow_lines-1,columns-1
 11565 enddef
 
 11600 deffn ow_line_y(line_)
@@ -989,7 +1011,7 @@
 13016 let green=4:let cyan=5:let yellow=6: let white=7
 13050 enddef
 
-14000 defproc init
+14000 defproc init_once
 14010 tk2_ext
 14020 init_screen
 14030 init_windows
