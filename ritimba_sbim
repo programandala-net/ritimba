@@ -2,12 +2,12 @@ rem Ritimba
 
 // XXX UNDER DEVELOPMENT
 
-let version$="0.0.0+20151226"
+let version$="0.0.0+20160122"
 
 // =============================================================
 // Author and license
 
-rem Copyright (C) 2011,2012,2015 Marcos Cruz (programandala.net)
+rem Copyright (C) 2011,2012,2015,2016 Marcos Cruz (programandala.net)
 
 rem You may do whatever you want with this work, so long as you
 rem retain the copyright notice(s) and this license in all
@@ -18,7 +18,7 @@ rem
 // Description
 
 rem Ritimba is a QL port of the Spanish version of Don Priestley's
-rem ZX Spectrum game "DICTATOR" (1983), written in SBASIC for SMSQ.
+rem ZX Spectrum game "DICTATOR" (1983), written in SBASIC for SMSQ/E.
 
 rem Home page (in Spanish):
 rem http://programandala.net/es.programa.ritimba.html
@@ -80,7 +80,7 @@ enddef
 
 defproc credits
   cls_ black,white,blue
-  at #ow,1,0:print #ow,"RITIMBA"\\"Por:"\"Marcos Cruz (programandala.net),"\"2011, 2012, 2015"
+  at #ow,1,0:print #ow,"RITIMBA"\\"Por:"\"Marcos Cruz (programandala.net),"\"2011, 2012, 2015, 2016"
   print #ow,\\"Una versión en SuperBASIC de..."
   print #ow,"DICTADOR, de Don Priestley, 1983"
 enddef
@@ -191,6 +191,7 @@ enddef
 
 defproc print_money(money)
 
+  // XXX FIXME -- remove blanks on the left
   print_using #ow,"###.###.###,",money*1000
   print #ow," RTD"; // XXX temp currency symbol
 
@@ -199,7 +200,7 @@ enddef
 defproc treasure_report_details_2
 
   paper #ow,blue: ink #ow,white
-  at #ow,12,1:print #ow," El tesoro";
+  at #ow,12,1:print #ow,"El tesoro";
   if int(money)>=0
     print #ow," tiene";
   else
@@ -224,9 +225,11 @@ defproc bankruptcy
   print #ow,"El poder de la policía bajará"\\:
   print #ow,"y su propio poder también."
   if group_data$(army,popularity)>"0"
+    // XXX FIXME -- coercion:
     let group_data$(army,popularity)=group_data$(army,popularity)-1
   endif
   if group_data$(police,popularity)>"0"
+    // XXX FIXME -- coercion:
     let group_data$(police,popularity)=group_data$(police,popularity)-1
   endif
   if group_data$(police,power)>"0"
@@ -388,6 +391,7 @@ defproc audience
   let y=code(this_decision_data$(soliciting_group+3))-77
   let x=x-y
   if x<0:let x=0 // XXX use maximum
+  // XXX FIXME -- coercion:
   let group_data$(soliciting_group,popularity)=x
   cls #ow
   treasure_report
@@ -510,6 +514,7 @@ defproc take_decision(decision) // XXX rename
       let x=group_data$(group,popularity)+(code(t$(group))-77)
       if x>9:let x=9 // XXX use maximum and minimum
       if x<0:let x=0
+      // XXX FIXME -- coercion:
       let group_data$(group,popularity)=x
     endif
   endfor group
@@ -884,7 +889,14 @@ defproc ask_for_loan(decision)
     if decision_data$(decision,1)="*"
       at #ow,12,2:print #ow,"Te deniegan un nuevo préstamo."
     else
+
       // XXX FIXME run-time error in this expression:
+      // 2016-01-22: again:
+      // country=0
+      // popularity=1
+      // low=3
+      // group_data$(country,popularity) = character nul
+
       if group_data$(country,popularity)<=low
         at #ow,12,12
         print #ow,'Te dicen que no, sin ninguna explicación.'
@@ -989,6 +1001,7 @@ defproc increase_popularity(group) // XXX rename
   // todo: write a general solution to update the 
   // popularity by any amount, positive or negative.
   let x=group_data$(group,popularity)
+  // XXX FIXME -- coercion:
   let group_data$(group,popularity)=x+(x<9)
 enddef
 
