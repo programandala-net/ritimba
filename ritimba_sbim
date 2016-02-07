@@ -2,7 +2,7 @@ rem Ritimba
 
 // XXX UNDER DEVELOPMENT
 
-let version$="0.0.0+20160122"
+let version$="0.0.0+20160207"
 
 // =============================================================
 // Author and license
@@ -100,9 +100,10 @@ defproc national_flag
     print #ow,"   "
   endfor a
   paper #ow,blue:ink #ow,yellow
-  at #ow,13,13:print #ow,"******"
-  at #ow,14,13:print #ow,"  **  "
-  at #ow,15,13:print #ow,"******"
+  let x=center_for(6)
+  at #ow,13,x:print #ow,"******"
+  at #ow,14,x:print #ow,"  **  "
+  at #ow,15,x:print #ow,"******"
 enddef
 
 defproc tapestry(text$)
@@ -183,6 +184,7 @@ enddef
 
 defproc treasure_report_details
 
+  // XXX FIXME center -- write proc to print titles
   at #ow,8,7
   print #ow,"INFORME DEL TESORO"
   treasure_report_details_2
@@ -351,11 +353,10 @@ defproc audience
   let decision_data$(this_decision,1)="*"
   let soliciting_group=int((this_decision-1)/8)+1
   zx_border soliciting_group
-  let this_group$=group_name$(soliciting_group)
   let this_decision_data$=decision_data$(this_decision)
   let this_decision_name$=decision_name$(this_decision)
   paper #ow,yellow:ink #ow,black
-  center #ow,10,"Petición de "&this_group$&":"
+  center #ow,10,"Petición "&group_genitive_name$(sociting_group)&":"
   paper #ow,white
   at #ow,14,0
   // XXX FIXME convert the first letter of `this_decision_name$` to lowercase:
@@ -367,7 +368,7 @@ defproc audience
   paper #ow,white
   center #ow,1,"  DECISIÓN  "
   paper #ow,soliciting_group:ink #ow,contrast_colour(soliciting_group)
-  center #ow,3,"Petición de "&this_group$
+  center #ow,3,"Petición "&group_genitive_name$(soliciting_group)
   paper #ow,yellow:ink #ow,black
   center #ow,5,this_decision_name$
   paper #ow,blue:print #ow:cls #ow,3
@@ -550,7 +551,7 @@ defproc advert(decision)
     cls_ yellow,yellow,yellow
     paper #ow,black
     at #ow,1,0
-    print #ow,decision_name$(decision)
+    print #ow,decision_name$(decision) // XXX FIXME wrap/justify
     paper #ow,white:ink #ow,black
     at #ow,3,0
     print #ow,"Su popularidad entre..."
@@ -558,7 +559,7 @@ defproc advert(decision)
     for a=1 to groups
       let x=code(decision_data$(decision,a+3))-77
       if x
-        print #ow,\to 2;group_name$(a);to 21;
+        print #ow,\to 2;group_plural_name$(a);to 21;
         if x>0:print #ow,"+";
         print #ow,x;
         if soliciting_group=a and decision<25
@@ -1193,9 +1194,13 @@ defproc init_data
   dim decision_data$(decisions,17)
   dim decision_name$(decisions,decision_name_max_len)
 
-  dim group_data$(groups,4)
-  dim group_name$(groups,18)
-  dim group_short_name$(groups,10)
+  // XXX TODO -- calculate max length
+  dim \
+    group_data$(groups,4),\
+    group_name$(groups,18),\
+    group_short_name$(groups,17),\
+    group_plural_name$(groups,20),\
+    group_genitive_name$(groups,20)
 
   restore
 
@@ -1211,7 +1216,12 @@ defproc init_data
   endfor a
 
   for a=1 to groups
-    read group_data$(a),group_name$(a),group_short_name$(a)
+    read \
+      group_data$(a),\
+      group_name$(a),\
+      group_short_name$(a),\
+      group_plural_name$(a),\
+      group_genitive_name$(a)
   endfor a
 
   // XXX not needed. todo 
@@ -1248,7 +1258,7 @@ data "NMPNQOMMIMMNNNNMJ","Acabar con la policía secreta"
 data "NMMMPKMKMMMMOKMMM","Detener la inmigración de Leftoto"
 data "NCELQKMOLNMMNLLMM","Poner escuela gratis para todos"
 data "NMMMQJMNLNMMPJMML","Legalizar los sindicatos"
-data "NMMLQKMNLMMMOLLMM","Liberar a su lider encarcelado"
+data "NMMLQKMNLMMMOLLMM","Liberar a su líder encarcelado"
 data "NMSMPLMMMMMMMMLMM","Iniciar una lotería pública"
 data "NMMKMPMMMMMLMMMMM","Prohibir el uso militar de sus tierras"
 data "NMMMIQMLMLMMKONMM","Bajar el salario mínimo"
@@ -1284,20 +1294,23 @@ data "NMMMMMMMMMMMMJMKM","El precio de los plátanos ha caído un 98%" // XXX 98?
 data "NMMMMMMMMMMMMOMIM","El jefe del estado mayor del ejército se ha fugado a Leftoto"
 data "NMMMMMMMMMMMILKMM","Se ha declarado una epidemia entre los campesinos"
 
+// data:
+// group_data$(a),group_name$(a),group_short_name$(a)
+
 // chars in group_data$():
 // 1=popularity
 // 2=power
 // 3=unknown // XXX
 // 4=unknown // XXX
 
-data "76::","el ejército","militares"
-data "76::","los campesinos","campesinos"
-data "76::","los terratenientes","terratenientes"
-data "06--","la guerilla","guerrilleros"
-data "76--","Leftoto","leftotanos"
-data "76--","la policía secreta","policías secretos"
-data "7---","Rusia","rusos"
-data "7---","Usamérica","usamericanos"
+data "76::","el ejército","militares","los militares","del ejército"
+data "76::","los campesinos","campesinos","los campesinos","de los campesinos"
+data "76::","los terratenientes","terratenientes","los terratenientes","de los terratenientes"
+data "06--","la guerilla","guerrilleros","los guerrilleros","de la guerrilla"
+data "76--","Leftoto","leftotanos","los leftotanos","de Leftoto"
+data "76--","la policía secreta","policías secretos","los policías secretos","de la policía secreta"
+data "7---","Rusia","rusos","los rusos","de Rusia"
+data "7---","Usamérica","usamericanos","los usamericanos","de Usamérica"
 
 // =============================================================
 // Special effects
@@ -1454,7 +1467,7 @@ enddef
 
 defproc init_windows
 
-  let columns=32
+  let columns=48
   let lines=24
   let csize_width=3
   let csize_height=scr_height<>256
@@ -1487,8 +1500,14 @@ enddef
 defproc init_screen
   mode 8
   if exists("colour_ql"):colour_ql
-  let black=0:let blue=1:let red=2:let purple=3
-  let green=4:let cyan=5:let yellow=6: let white=7
+  let black=0
+  let blue=1
+  let red=2
+  let purple=3
+  let green=4
+  let cyan=5
+  let yellow=6
+  let white=7
   if exists("scr_xlim")
     let scr_width=scr_xlim
     let scr_height=scr_ylim
@@ -1507,6 +1526,11 @@ enddef
 
 // =============================================================
 // Meta
+
+defproc w0
+  window 800,600,0,0
+  csize 3,1
+enddef
 
 defproc debug_(message$)
   if 1
