@@ -2,7 +2,7 @@ rem Ritimba
 
 // XXX UNDER DEVELOPMENT
 
-let version$="0.0.0+20160207"
+let version$="0.0.0+201602110058"
 
 // =============================================================
 // Author and license
@@ -165,7 +165,8 @@ defproc welcome
     tellNL "Para empezar podrás ver un informe del"
     tell "tesoro y otro de la policía secreta."
     wait_key_press
-    treasure_report: wait_key_press
+    treasure_report
+    wait_key_press
     actual_police_report
 
 enddef
@@ -194,8 +195,8 @@ enddef
 defproc print_money(money)
 
   // XXX FIXME -- remove blanks on the left
-  print_using #ow,"###.###.###,",money*1000
-  print #ow," RTD"; // XXX temp currency symbol
+  print_using #ow,"###,###,###.###' RTD'",money*1000;
+  // XXX TODO -- write and ad hoc function
 
 enddef
 
@@ -213,7 +214,7 @@ defproc treasure_report_details_2
   print_money month_payment
   if money_in_switzerland>0
     at #ow,17,2
-    print #ow,"[En Suiza tiene $";:print_money money_in_switzerland:print #ow,"]"
+    print #ow,"[En Suiza tiene ";:print_money money_in_switzerland:print #ow,"]"
   endif
 
 enddef
@@ -412,7 +413,7 @@ defproc decision
       paper #ow,blue:ink #ow,white
       center #ow,3,"DECISIÓN PRESIDENCIAL"
       paper #ow,yellow:ink #ow,black
-      at #ow,6,1:print #ow,"Elige entre:"
+      at #ow,06,1:print #ow,"Elige entre:"
       at #ow,08,4:print #ow,"1. Complacer a un grupo  "
       at #ow,10,4:print #ow,"2. Complacer a todos     "
       at #ow,12,4:print #ow,"3. Tus negocios          "
@@ -545,7 +546,7 @@ defproc advert(decision)
   cls_ green,black,blue
   paper #ow,cyan
   for a=0 to ow_lines-1
-    at #ow,a,11:print #ow,"¿Aviso?"
+    at #ow,a,11:print #ow,"¿Consejo?"
   endfor a
   if yes_key
     cls_ yellow,yellow,yellow
@@ -593,7 +594,7 @@ defproc police_report
     police_report_not_avalaible
   else
     center #ow,6,"¿INFORME de la POLICÍA SECRETA?"
-    center #ow,12,"(Cuesta 1.000 $)"
+    center #ow,12,"(Cuesta 1000 RTD)"
     if yes_key
       let money=money-1
       actual_police_report
@@ -832,14 +833,14 @@ deffn cash_advice(decision)
   if decision_cost
     if decision_cost>0:print #ow," aportaría al";
     if decision_cost<0:print #ow," costaría al";
-    print #ow,"  tesoro ";abs(decision_cost);" 000 $": print
+    print #ow,"  tesoro ";abs(decision_cost);" 000 RTD": print
     if monthly_cost:print #ow," y"
   endif
 
   if decision_monthly_cost
     if decision_monthly_cost<0:print #ow," subiría";
     if decision_monthly_cost>0:print #ow," bajaría";
-    print #ow," los costos mensuales en ";abs(decision_monthly_cost);" 000 $"
+    print #ow," los costos mensuales en ";abs(decision_monthly_cost);" 000 RTD"
   endif
 
   if money+decision_cost>0: ret 1
@@ -924,11 +925,11 @@ defproc money_transfer
 
   let amount=int(money/2)
   if amount>=1
-    print #ow,"El tesoro tenía $";int(money);",000"
+    print #ow,"El tesoro tenía ";int(money);" 000 RTD"
     let money_in_switzerland=money_in_switzerland+amount
     let money=money-amount
     pause 100
-    print #ow,\\"$";amount;",000 han sido transferidos"
+    print #ow,\\amount;" 000 RTD han sido transferidos"
     exit choose_decision
   else
     center #ow,12,"Ninguna transferencia hecha"
@@ -1093,7 +1094,7 @@ defproc the_end
 
   if alive
     print #ow,\" Por estar vivo - ";to 28;alive
-    print #ow,\" Por el ahorro"\"     ($";money_in_switzerland;",000 /10,000) -";to 28;int(money_in_switzerland/10)
+    print #ow,\" Por el ahorro"\"     (";money_in_switzerland;"000 RTD / 10 000) -";to 28;int(money_in_switzerland/10)
     let x=x+alive+int(money_in_switzerland/10)
   endif
 
