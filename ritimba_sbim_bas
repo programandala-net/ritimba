@@ -1,0 +1,1157 @@
+1 rem Ritimba
+2 let version$="0.0.0+201602110058"
+3 rem Copyright (C) 2011,2012,2015,2016 Marcos Cruz (programandala.net)
+4 rem You may do whatever you want with this work, so long as you
+5 rem retain the copyright notice(s) and this license in all
+6 rem redistributed copies and derived works. There is no warranty.
+7 rem
+8 rem Ritimba is a QL port of the Spanish version of Don Priestley's
+9 rem ZX Spectrum game "DICTATOR" (1983), written in SBASIC for SMSQ/E.
+10 rem Home page (in Spanish):
+11 rem http:
+12 rem This source was converted from the SBim format by:
+13 rem http:
+14 rem
+15 sel on machine
+16 =30:rem QPC2
+17 let device$="dos1_"
+18 =20:rem SMSQmulator
+19 let device$="nfa1_"
+20 endsel
+21 let path$=device$&"sb_ritimba_"
+22 lrespr path$&"exists.bin"
+23 defproc ritimba
+24 loc a
+25 init_once
+26 rep again
+27 credits:wait_key_press
+28 init_data
+29 welcome
+30 rep game
+31 new_month
+32 audience
+33 plot
+34 murder:if not alive:exit game
+35 war:if not alive or escape:exit game
+36 plot
+37 police_report
+38 decision
+39 plot
+40 police_report
+41 news
+42 revolution:if not alive or escape:exit game
+43 endrep game
+44 the_end
+45 endrep again
+46 enddef
+47 defproc credits
+48 cls_ black,white,blue
+49 at #ow,1,0:print #ow,"RITIMBA"\\"Por:"\"Marcos Cruz (programandala.net),"\"2011, 2012, 2015, 2016"
+50 print #ow,\\"Una versión en SuperBASIC de..."
+51 print #ow,"DICTADOR, de Don Priestley, 1983"
+52 enddef
+53 defproc national_flag
+54 loc a,height,x,y
+55 let height=11
+56 let x=center_for(18)
+57 let y=8
+58 for a=y to y+height
+59 at #ow,a,x
+60 paper #ow,red
+61 print #ow,"   ";
+62 paper #ow,blue
+63 print #ow,"            ";
+64 paper #ow,green
+65 print #ow,"   "
+66 endfor a
+67 paper #ow,blue:ink #ow,yellow
+68 let x=center_for(6)
+69 at #ow,13,x:print #ow,"******"
+70 at #ow,14,x:print #ow,"  **  "
+71 at #ow,15,x:print #ow,"******"
+72 enddef
+73 defproc tapestry(text$)
+74 loc a,times
+75 let times=columns*ow_lines/len(text$)
+76 for a=1 to times
+77 print #ow,text$;" ";
+78 zx_beep .01,40-a+rnd*10
+79 endfor a
+80 enddef
+81 defproc title
+82 loc a
+83 cls_ cyan,black,black
+84 tapestry "Ritimba"
+85 national_flag
+86 for a=1 to 50: zx_beep .03,a
+87 paper #ow,white:ink #ow,black
+88 center #ow,3," Pulsa una tecla y gobernarás "
+89 center #ow,5," Ritimba "
+90 national_anthem
+91 enddef
+92 defproc national_anthem
+93 loc a,pitch,tune$
+94 let tune$="KPKKMKIHK`KMRPOMOP"
+95 cursen_home #iw
+96 rep listen
+97 for a=1 to len(tune$)
+98 if len(inkey$(#iw)):exit listen
+99 let pitch=code(tune$(a))-80
+100 if pitch=16
+101 else
+102 zx_beep .5,pitch
+103 endif
+104 endfor a
+105 endrep listen
+106 curdis #iw
+107 enddef
+108 defproc welcome
+109 title
+110 cls_ white,black,blue
+111 paper #ow,cyan:center #ow,1,"Bienvenido al cargo"
+112 paper #ow,white
+113 if score>0
+114 tellNL "El anterior líder de nuestra"
+115 tell "amada patria Ritimba"
+116 tell "obtuvo una puntuación final de "&score&"."
+117 tellNL "Te deseamos que logres hacerlo mucho mejor."
+118 else
+119 tellNL "Eres el primer líder de nuestra"
+120 tell "amada patria Ritimba."
+121 tell "Te deseamos que lo hagas bien."
+122 endif
+123 tellNL "Para empezar podrás ver un informe del"
+124 tell "tesoro y otro de la policía secreta."
+125 wait_key_press
+126 treasure_report
+127 wait_key_press
+128 actual_police_report
+129 enddef
+130 defproc treasure_report
+131 cls_ white,green,green
+132 print #ow,fill$("$",columns*ow_lines)
+133 ink #ow,black
+134 treasure_report_details
+135 enddef
+136 defproc treasure_report_details
+137 at #ow,8,7
+138 print #ow,"INFORME DEL TESORO"
+139 treasure_report_details_2
+140 enddef
+141 defproc print_money(money)
+142 print_using #ow,"###,###,###.###' RTD'",money*1000;
+143 enddef
+144 defproc treasure_report_details_2
+145 paper #ow,blue: ink #ow,white
+146 at #ow,12,1:print #ow,"El tesoro";
+147 if int(money)>=0
+148 print #ow," tiene";
+149 else
+150 print #ow," ";:print #ow,"debe";
+151 endif
+152 print_money abs(int(money))
+153 at #ow,14,0:print #ow,"Los gastos mensuales son ";
+154 print_money month_payment
+155 if money_in_switzerland>0
+156 at #ow,17,2
+157 print #ow,"[En Suiza tiene ";:print_money money_in_switzerland:print #ow,"]"
+158 endif
+159 enddef
+160 defproc bankruptcy
+161 cls #ow
+162 center #ow,5,"El tesoro está en bancarrota"
+163 at #ow,9,0:print #ow,"Su popularidad con el ejército y"\\:
+164 print #ow,"con la policía secreta caerán!"\\\:
+165 print #ow,"El poder de la policía bajará"\\:
+166 print #ow,"y su propio poder también."
+167 if group_data$(army,popularity)>"0"
+168 let group_data$(army,popularity)=group_data$(army,popularity)-1
+169 endif
+170 if group_data$(police,popularity)>"0"
+171 let group_data$(police,popularity)=group_data$(police,popularity)-1
+172 endif
+173 if group_data$(police,power)>"0"
+174 let group_data$(police,power)=group_data$(police,power)-1
+175 endif
+176 if strength>0:let strength=strength-0
+177 pause 250
+178 plot
+179 police_report
+180 enddef
+181 defproc new_month
+182 let low=rnd(2 to 4)
+183 let revolution_strength=rnd(10 to 12)
+184 let months=months+1
+185 cls_ yellow,black,yellow
+186 paper #ow,cyan:ink #ow,white
+187 at #ow,10,12:print #ow,"MES  ";
+188 paper #ow,white: ink #ow,black
+189 print #ow,months
+190 pause 50
+191 plot
+192 if money<=0
+193 bankruptcy
+194 else
+195 let money=money-month_payment
+196 endif
+197 enddef
+198 defproc plot
+199 loc a,p
+200 if months<=2 or months<pc:ret
+201 for a=1 to main_groups: let group_data$(a,3 to 4)="::"
+202 for a=1 to main_groups
+203 if group_data$(a,popularity)<=low
+204 for p=1 to local_groups
+205 if not(a=p or group_data$(p,popularity)>low)
+206 if group_data$(p,power)+group_data$(a,power)>=revolution_strength
+207 let group_data$(a,3)="R"
+208 let group_data$(a,4)=p
+209 exit p
+210 endif
+211 endif
+212 next p
+213 let group_data$(a,3)="A"
+214 endfor p
+215 endif
+216 endfor a
+217 enddef
+218 defproc murder
+219 loc group
+220 let group=rnd(1 to 3)
+221 if group_data$(group,3)="A"
+222 cls_ black,white,black
+223 at #ow,10,7:print #ow,"INTENTO DE ASESINATO"
+224 at #ow,20,0:print #ow,"por un miembro de ";group_name$(group)
+225 cls #ow
+226 pause 30: fx_2: pause 50
+227 if ((group_data$(army,3)="A" and group_data$(peasants,3)="A" and group_data$(landowners,3)="A") or not (group_data$(police,popularity)>low or group_data$(police,power)>low or rnd(0 to 1)))
+228 cls_ black,white,black
+229 center #ow,12,"¡Está usted muerto!"
+230 zx_beep 3,-40
+231 let alive=0
+232 else
+233 cls_ white,black,black
+234 paper #ow,white:ink #ow,black
+235 center #ow,12," Intento fallido "
+236 endif
+237 endif
+238 enddef
+239 defproc audience
+240 loc a,c
+241 cls_ yellow,black,yellow
+242 paper #ow,green
+243 at #ow,5,0:cls #ow,1
+244 paper #ow,white:ink #ow,black
+245 center #ow,3,"UNA AUDIENCIA"
+246 rep choose_decision
+247 let this_decision=rnd(1 to 24)
+248 for a=1 to 22
+249 if decision_data$(this_decision,1)="N"
+250 exit choose_decision
+251 endif
+252 let this_decision=(this_decision-int(this_decision/24)*24)+1
+253 end for a
+254 for a=1 to 24:let decision_data$(a,1)="N"
+255 endrep choose_decision
+256 let decision_data$(this_decision,1)="*"
+257 let soliciting_group=int((this_decision-1)/8)+1
+258 zx_border soliciting_group
+259 let this_decision_data$=decision_data$(this_decision)
+260 let this_decision_name$=decision_name$(this_decision)
+261 paper #ow,yellow:ink #ow,black
+262 center #ow,10,"Petición "&group_genitive_name$(sociting_group)&":"
+263 paper #ow,white
+264 at #ow,14,0
+265 tell "¿Está su excelencia conforme con "&this_decision_name$&"?"
+266 wait_key_press
+267 advert this_decision
+268 cls #ow
+269 paper #ow,white
+270 center #ow,1,"  DECISIÓN  "
+271 paper #ow,soliciting_group:ink #ow,contrast_colour(soliciting_group)
+272 center #ow,3,"Petición "&group_genitive_name$(soliciting_group)
+273 paper #ow,yellow:ink #ow,black
+274 center #ow,5,this_decision_name$
+275 paper #ow,blue:print #ow:cls #ow,3
+276 let c=cash_advice(this_decision)
+277 ink #ow,green
+278 if c=0
+279 cls #ow
+280 at #ow,10,1
+281 print #ow,"No hay suficientes fondos"
+282 print #ow,\\" para";
+283 print #ow," pagar esta decisión."
+284 at #ow,15,4:print #ow,"Su respuesta debe ser no."
+285 pause 250
+286 else
+287 if yes_key:ret
+288 endif
+289 let x=group_data$(soliciting_group,popularity)
+290 let y=code(this_decision_data$(soliciting_group+3))-77
+291 let x=x-y
+292 if x<0:let x=0
+293 let group_data$(soliciting_group,popularity)=x
+294 cls #ow
+295 treasure_report
+296 enddef
+297 defproc decision
+298 loc a,c,chosen_decision,key,options
+299 rep choose_gratis_decision
+300 rep choose_decision
+301 cls_ red,yellow,blue
+302 print #ow,fill$("*",columns*ow_lines)
+303 paper #ow,blue:ink #ow,white
+304 center #ow,3,"DECISIÓN PRESIDENCIAL"
+305 paper #ow,yellow:ink #ow,black
+306 at #ow,06,1:print #ow,"Elige entre:"
+307 at #ow,08,4:print #ow,"1. Complacer a un grupo  "
+308 at #ow,10,4:print #ow,"2. Complacer a todos     "
+309 at #ow,12,4:print #ow,"3. Tus negocios          "
+310 at #ow,14,4:print #ow,"4. Aumentar el tesoro    "
+311 at #ow,16,4:print #ow,"5. Fortalecer a un grupo "
+312 let key=code(get_key$): cls #ow
+313 sel on key
+314 =code("1"):let x$="-2"
+315 =code("2"):let x$="35"
+316 =code("3"):let x$="69"
+317 =code("4"):let x$=":<"
+318 =code("5"):let x$="=?"
+319 =remainder:ret
+320 endsel
+321 at #ow,(20-(((code(x$(2))-20)-(code(x$(1))-20))*3))*.5,0
+322 let options=0
+323 for a=code(x$(1))-20 to code(x$(2))-20
+324 if decision_data$(a,1)<>"*"
+325 let options=options+1
+326 tellNL options&". "&decision_name$(a)&"."
+327 endif
+328 endfor a
+329 if not options
+330 at #ow,12,3
+331 print #ow,"Esta sección está agotada"
+332 pause 150
+333 next choose_decision
+334 endif
+335 let k$=get_key$
+336 if not k$ instr "0123456"
+337 next choose_decision
+338 endif
+339 if k$<1 or k$>(code(x$(2))-20)+1-(code(x$)-20)
+340 next choose_decision
+341 endif
+342 let chosen_decision=code(x$)-20+k$-1
+343 if decision_data$(chosen_decision,1)="*"
+344 next choose_decision
+345 endif
+346 sel on chosen_decision
+347 =37
+348 money_transfer
+349 exit choose_decision
+350 =38,39
+351 ask_for_loan chosen_decision
+352 treasure_report
+353 exit choose_gratis_decision
+354 endsel
+355 advert chosen_decision
+356 at #ow,4,0
+357 print #ow,decision_name$(chosen_decision)
+358 let c=cash_advice(chosen_decision)
+359 if not c
+360 pause 200
+361 next choose_decision
+362 endif
+363 at #ow,4,0
+364 print #ow,decision_name$(chosen_decision)
+365 if not yes_key:next choose_decision
+366 if chosen_decision<>35
+367 treasure_report
+368 take_only_once_decision chosen_decision
+369 exit choose_decision
+370 endif
+371 let strength=strength+2
+372 treasure_report
+373 take_decision chosen_decision
+374 exit choose_decision
+375 endrep choose_decision
+376 treasure_report_details_2
+377 exit choose_gratis_decision
+378 endrep choose_gratis_decision
+379 enddef
+380 defproc take_only_once_decision(decision)
+381 let decision_data$(decision,1)="*"
+382 take_decision decision
+383 enddef
+384 defproc take_decision(decision)
+385 loc group,t$,x
+386 let t$=decision_data$(decision,4 to 11)
+387 for group=1 to groups
+388 if t$(group)<>"M"
+389 let x=group_data$(group,popularity)+(code(t$(group))-77)
+390 if x>9:let x=9
+391 if x<0:let x=0
+392 let group_data$(group,popularity)=x
+393 endif
+394 endfor group
+395 let t$=decision_data$(decision,12 to 17)
+396 for group=1 to local_groups
+397 if t$(group)<>"M"
+398 let x=group_data$(group,power)+(code(t$(group))-77)
+399 if x>9:let x=9
+400 if x<0:let x=0
+401 let group_data$(group,power)=x
+402 endif
+403 endfor group
+404 let money=money+decision_cost
+405 let month_payment=month_payment-decision_monthly_cost
+406 if month_payment<0:let month_payment=0
+407 enddef
+408 defproc advert(decision)
+409 loc a,x
+410 cls_ green,black,blue
+411 paper #ow,cyan
+412 for a=0 to ow_lines-1
+413 at #ow,a,11:print #ow,"¿Consejo?"
+414 endfor a
+415 if yes_key
+416 cls_ yellow,yellow,yellow
+417 paper #ow,black
+418 at #ow,1,0
+419 print #ow,decision_name$(decision)
+420 paper #ow,white:ink #ow,black
+421 at #ow,3,0
+422 print #ow,"Su popularidad entre..."
+423 paper #ow,yellow
+424 for a=1 to groups
+425 let x=code(decision_data$(decision,a+3))-77
+426 if x
+427 print #ow,\to 2;group_plural_name$(a);to 21;
+428 if x>0:print #ow,"+";
+429 print #ow,x;
+430 if soliciting_group=a and decision<25
+431 paper #ow,soliciting_group:ink #ow,yellow
+432 print #ow,"< "
+433 paper #ow,yellow:ink #ow,black
+434 endif
+435 endif
+436 endfor a
+437 paper #ow,white
+438 print #ow,\\\"El poder de..."
+439 paper #ow,yellow
+440 for a=1 to local_groups
+441 let x=code(decision_data$(decision,a+11))-77
+442 if x
+443 print #ow,to 2;group_name$(a);to 21;"+"(1 to x>0);x
+444 endif
+445 endfor a
+446 wait_key_press
+447 cls #ow
+448 endif
+449 enddef
+450 defproc police_report
+451 cls_ black,white,black
+452 if money<=0 or group_data$(police,popularity)<=low or group_data$(police,power)<=low
+453 police_report_not_avalaible
+454 else
+455 center #ow,6,"¿INFORME de la POLICÍA SECRETA?"
+456 center #ow,12,"(Cuesta 1000 RTD)"
+457 if yes_key
+458 let money=money-1
+459 actual_police_report
+460 endif
+461 endif
+462 enddef
+463 defproc actual_police_report
+464 cls_ black,white,black
+465 print #ow,"MES ";months
+466 ink #ow,blue
+467 at #ow,3,0:cls #ow,1
+468 police_report_data
+469 enddef
+470 defproc police_report_data
+471 loc group,line_
+472 paper #ow,white:ink #ow,black
+473 center #ow,3,"INFORME DE LA POLICÍA SECRETA"
+474 paper #ow,black:ink #ow,white
+475 at #ow,6,1:print #ow,"POPULARIDAD"
+476 at #ow,6,22:print #ow,"FUERZA"
+477 for group=1 to groups
+478 let line_=7+group
+479 at #ow,line_,11
+480 paper #ow,on_(group_data$(group,3)="R",yellow,red)
+481 ink #ow,black
+482 print #ow,group_short_name$(group)
+483 paper #ow,white
+484 at #ow,line_,10:print #ow,group
+485 if group<=3 and group_data$(group,3)="R"
+486 at #ow,line_,21
+487 print #ow,group_data$(group,4)
+488 endif
+489 let x=group_data$(group,popularity)
+490 if x
+491 paper #ow,green:ink #ow,white
+492 at #ow,line_,10-x
+493 print #ow,"987654321"(10-x to )
+494 endif
+495 if group<=3 and group_data$(group,3)="A"
+496 paper #ow,white
+497 at #ow,group+7,21
+498 print #ow,"A"
+499 endif
+500 if group<=local_groups
+501 at #ow,line_,22
+502 paper #ow,red: ink #ow,white
+503 print #ow,"123456789"(1 to group_data$(group,power))
+504 endif
+505 endfor group
+506 paper #ow,black:ink #ow,white
+507 at #ow,17,0
+508 print #ow,"Tu FUERZA es ";strength
+509 at #ow,19,0
+510 print #ow,"La FUERZA de la REVOLUCIÓN es ";revolution_strength
+511 wait_key_press
+512 cls_ green,black,green
+513 enddef
+514 defproc police_report_not_avalaible
+515 center #ow,6,"INFORME DE LA POLICÍA SECRETA"
+516 center #ow,10,"NO DISPONIBLE"
+517 if group_data$(police,popularity)<=low
+518 print #ow,\\"Tu popularidad entre la policía es ";group_data$(police,popularity);"."
+519 endif
+520 if group_data$(police,power)<=low
+521 print #ow,to 3\\"El poder de la policía es ";group_data$(police,power);"."
+522 endif
+523 if money<=0
+524 print #ow,to 3\\"No tienes dinero para pagar un informe."
+525 endif
+526 enddef
+527 defproc revolution
+528 loc a,helping_group,helping_groups,rebel_group,try_escaping
+529 for a=1 to main_groups
+530 let rebel_group=rnd(1 to 3)
+531 if group_data$(rebel_group,3)="R":exit a
+532 next a
+533 ret
+534 endfor a
+535 cls_ red,black,red
+536 ink #ow,white
+537 center #ow,10,"REVOLUCIÓN"
+538 for a=1 to 5: zx_beep .5,20: zx_beep .5,10
+539 cls_ yellow,black,yellow
+540 center #ow,12,"¿Intento de escape?"
+541 let try_escaping=yes_key
+542 cls #ow
+543 if try_escaping
+544 if decision_data$(36,1)="*"
+545 if rnd(0 to 2)
+546 center #ow,12,"¡Escapas en helicóptero!"
+547 let escape=1
+548 ret
+549 else
+550 center #ow,10,"¡El helicóptero no funciona!"
+551 pause 150
+552 endif
+553 endif
+554 at #ow,10,2:print #ow,"Tienes que atravesar el"
+555 at #ow,12,6:print #ow,"monte hacia Leftoto."
+556 pause 200
+557 cls #ow
+558 if not int((rnd*((group_data$(guerrillas,power)/3)+.4)))
+559 at #ow,12,0: print #ow,"  Las guerillas no te atraparon "
+560 let escape=1
+561 else
+562 cls_ black,white,black
+563 pause 50: fx_2
+564 at #ow,12,0:print #ow,"Las guerillas están celebrándolo"
+565 fx_2
+566 let alive=0
+567 endif
+568 ret
+569 endif
+570 rep ask_for_help
+571 pause 150
+572 cls #ow 
+573 let x=group_data$(rebel_group,power)+group_data$(group_data$(rebel_group,4),power)
+574 at #ow,5,0:print #ow,group_name$(rebel_group);" se ha unido a "
+575 print #ow,group_name$(group_data$(rebel_group,4))\\:
+576 print #ow,"Su fuerza conjunta es ";x
+577 print #ow,\\"¿A quién vas a pedir ayuda?"
+578 let helping_groups=0
+579 for a=1 to local_groups
+580 if group_data$(a,popularity)>low
+581 print #ow,to 6;a;" .";group_name$(a);" ?"
+582 let helping_groups=helping_groups+1
+583 endif
+584 endfor a
+585 if helping_groups
+586 rep choose_group
+587 let k$=get_key$
+588 if k$ instr "123456":exit choose_group
+589 endrep choose_group
+590 if group_data$(k$,popularity)>low
+591 let helping_group=k$: exit ask_for_help
+592 else
+593 cls #ow
+594 center #ow,12,"¡Debes de estar bromeando!"
+595 next ask_for_help
+596 endif
+597 else
+598 cls #ow
+599 center #ow,8,"¡Estás solo!"
+600 wait_key_press
+601 endif
+602 exit ask_for_help
+603 endrep ask_for_help
+604 cls #ow
+605 at #ow,8,0:print #ow,"Tu fuerza es ";strength
+606 print #ow,\\"La fuerza de ";group_name$(helping_group);" es ";group_data$(helping_group,power)
+607 print #ow,\\"La de los revolucionarios es ";x
+608 pause 250
+609 cls_ white,black,white
+610 at #ow,12,3:print #ow,"La revolución ha comenzado"
+611 fx_war
+612 if not(x<=strength+group_data$(helping_group,power)+rnd(-1 to 1))
+613 cls_ black,white,black
+614 at #ow,10,7:print #ow,"Has sido derrocado"
+615 at #ow,12,10:print #ow,"y ";: print #ow,"liquidado."
+616 fx_2
+617 let alive=0:ret
+618 endif
+619 cls_ black,white,black
+620 at #ow,10,2:print #ow,"La revuelta ha sido sofocada."
+621 at #ow,0,0
+622 for a=1 to ow_lines-1
+623 paper #ow,rnd(1 to 5)
+624 print #ow,blank_line$
+625 endfor a
+626 at #ow,10,0: print #ow,"¿Castigas a los revolucionarios?"
+627 if yes_key
+628 for n=1 to 3: fx_2: pause .1
+629 let group_data$(rebel_group,1 to 2)="00"
+630 let group_data$(group_data$(rebel_group,4),1 to 2)="00"
+631 endif
+632 let group_data$(helping_group,power)="9"
+633 let pc=months+2
+634 plot
+635 police_report
+636 enddef
+637 deffn cash_advice(decision)
+638 paper #ow,yellow:ink #ow,black
+639 let decision_cost=10*(code(decision_data$(decision,cost))-77)
+640 let decision_monthly_cost=code(decision_data$(decision,monthly_cost))-77
+641 if not decision_cost and not decision_monthly_cost:at #ow,10,7:print #ow,"No cuesta dinero.": ret 1
+642 at #ow,9,1:print #ow,"Esta decisión ": print
+643 if decision_cost
+644 if decision_cost>0:print #ow," aportaría al";
+645 if decision_cost<0:print #ow," costaría al";
+646 print #ow,"  tesoro ";abs(decision_cost);" 000 RTD": print
+647 if monthly_cost:print #ow," y"
+648 endif
+649 if decision_monthly_cost
+650 if decision_monthly_cost<0:print #ow," subiría";
+651 if decision_monthly_cost>0:print #ow," bajaría";
+652 print #ow," los costos mensuales en ";abs(decision_monthly_cost);" 000 RTD"
+653 endif
+654 if money+decision_cost>0: ret 1
+655 if not((decision_cost<0 or decision_monthly_cost<0) and (money+decision_cost<0 or money+decision_monthly_cost<0)): ret 1
+656 pause 250: cls #ow
+657 center #ow,5,decision_name$(decision)
+658 at #ow,8,2:print #ow,"El dinero necesario"
+659 print #ow,\to 4;"no está en el tesoro"\\\:
+660 if decision_data$(38,1)="N":print #ow,"Quizá los rusos pueden ayudar.": print
+661 if decision_data$(39,1)="N":print #ow,"Los usamericanos son un pueblo generoso": print
+662 pause 350
+663 ret 0
+664 enddef
+665 defproc ask_for_loan(decision)
+666 loc country,loan
+667 sel on decision
+668 =38:let country=russian
+669 =39:let country=usa
+670 endsel
+671 cls_ yellow,black,red
+672 paper #ow,red
+673 print #ow,\"SOLICITUD DE PRÉSTAMO EXTRANJERO"
+674 center #ow,12,"ESPERA"
+675 pause 50
+676 if country=usa
+677 tune "2m1j3f3j3m4r1 2v1t3r3j3l4m"
+678 else
+679 tune "2g2d3i4d2 2g2d3i4d"
+680 endif
+681 at #ow,12,0
+682 if country=usa
+683 print #ow,"Los usamericanos";
+684 else
+685 print #ow,"Los rusos";
+686 endif
+687 if months<int(rnd*5)+3
+688 at #ow,12,2:print #ow,"opinan que es demasiado pronto para conceder ayudas ecónomicas."
+689 else
+690 if decision_data$(decision,1)="*"
+691 at #ow,12,2:print #ow,"Te deniegan un nuevo préstamo."
+692 else
+693 if group_data$(country,popularity)<=low
+694 at #ow,12,12
+695 print #ow,'Te dicen que no, sin ninguna explicación.'
+696 else
+697 print #ow," te concederán"
+698 let loan=group_data$(7+x,popularity)*30+rnd(0 to 200)
+699 at #ow,14,7:print #ow,y;",000 dólares"
+700 let money=money+loan
+701 let decision_data$(38+x,1)="*"
+702 endif
+703 endif
+704 endif
+705 wait_key_press
+706 enddef
+707 defproc money_transfer
+708 loc amount
+709 cls #ow
+710 at #ow,3,0
+711 print #ow,"TRANSFERENCIA A LA CUENTA SUIZA"\\\:
+712 let amount=int(money/2)
+713 if amount>=1
+714 print #ow,"El tesoro tenía ";int(money);" 000 RTD"
+715 let money_in_switzerland=money_in_switzerland+amount
+716 let money=money-amount
+717 pause 100
+718 print #ow,\\amount;" 000 RTD han sido transferidos"
+719 exit choose_decision
+720 else
+721 center #ow,12,"Ninguna transferencia hecha"
+722 pause 100
+723 endif
+724 enddef
+725 defproc news
+726 loc i,random_event,first_event,last_event
+727 let first_event=44
+728 let last_event=49
+729 let events=last_event-first_event+1
+730 if not rnd(0 to 2)
+731 let random_event=rnd(first_event to last_event)
+732 for i=1 to events
+733 if not (decision_data$(random_event,1)="N"):exit i
+734 let random_event=random_event+1
+735 if random_event>last_event:let random_event=first_event
+736 next i
+737 ret
+738 endfor i
+739 cls_ white,black,white
+740 center #ow,10,"NOTICIA DE ÚLTIMA HORA"
+741 for i=1 to 10: zx_beep .6,30
+742 cls #ow
+743 center #ow,10,"NOTICIA DE ÚLTIMA HORA"
+744 at #ow,14,0:print #ow,decision_name$(random_event)
+745 ink #ow,white
+746 pause 100
+747 take_only_once_decision random_event
+748 plot
+749 police_report
+750 endif
+751 enddef
+752 defproc war
+753 loc i
+754 if group_data$(leftoto,popularity)>low:ret
+755 if group_data$(leftoto,power)<low:ret
+756 if not rnd(0 to 3)
+757 actual_war
+758 else
+759 cls_ black,white,cyan
+760 at #ow,6,1:print #ow,"Tratado de guerra con Leftoto"
+761 at #ow,10,3:print #ow,"Tu popularidad en Ritimba"
+762 at #ow,12,11: print #ow,"aumentará"
+763 for i=1 to main_groups,police: increase_popularity i
+764 endif
+765 enddef
+766 defproc increase_popularity(group)
+767 local x
+768 let x=group_data$(group,popularity)
+769 let group_data$(group,popularity)=x+(x<9)
+770 enddef
+771 defproc actual_war
+772 cls_ red,black,black
+773 center #ow,8,"Leftoto nos invade"
+774 let rs=0
+775 for a=1 to main_groups
+776 if group_data$(a,popularity)>low:let rs=rs+group_data$(a,power)
+777 endfor a
+778 if group_data$(police,popularity)>low
+779 let rs=rs+group_data$(police,power)
+780 endif
+781 let rs=rs+strength
+782 at #ow,12,1:print #ow,"La fuerza de Ritimba es ";rs
+783 let ls=0
+784 for a=1 to 6
+785 if group_data$(a,popularity)<=low:let ls=ls+group_data$(a,power)
+786 endfor a
+787 at #ow,14,1:print #ow,"La fuerza de Leftoto es ";ls
+788 at #ow,18,3:print #ow,"Una corta y decisiva guerra"
+789 fx_war
+790 if ls+rnd(-1 to 1)<rs
+791 zx_border black
+792 cls #ow
+793 at #ow,12,7
+794 print #ow," Leftoto derrotado ": 
+795 let group_data$(leftoto,power)="0"
+796 else
+797 cls_ black,white,black
+798 at #ow,7,7
+799 print #ow,"Victoria de Leftoto"
+800 if not(decision_data$(36,1)="*" and rnd(0 to 2))
+801 let alive=0
+802 if decision_data$(36,1)="*"
+803 at #ow,10,0
+804 print #ow,"El motor del helicóptero se para"
+805 pause 80
+806 endif
+807 at #ow,12,4
+808 print #ow,"Eres acusado de ser un enemigo del pueblo y..."
+809 pause 30: fx_2
+810 at #ow,18,7:print #ow,"sumarísimamente ejecutado."
+811 else
+812 cls #ow 
+813 at #ow,12,3:print #ow,"¡Escapas en helicóptero!"
+814 let escape=1
+815 endif
+816 endif
+817 enddef
+818 defproc the_end
+819 loc a,x
+820 if alive
+821 pause 100
+822 else
+823 pause 50
+824 tune "4d3d1d3d3g1f2f1d2d1d5d"
+825 endif
+826 let x=0
+827 for a=1 to 8: let x=x+group_data$(a,popularity)
+828 cls_ yellow,black,cyan
+829 at #ow,3,1:print #ow,"Tu puntuación como presidente"
+830 print #ow,\" popularidad final";to 28;x
+831 print #ow,\" por el tiempo en el poder (";months;" meses) - ";to 28;months*3: let x=x+months*3
+832 if alive
+833 print #ow,\" Por estar vivo - ";to 28;alive
+834 print #ow,\" Por el ahorro"\"     (";money_in_switzerland;"000 RTD / 10 000) -";to 28;int(money_in_switzerland/10)
+835 let x=x+alive+int(money_in_switzerland/10)
+836 endif
+837 print #ow,\\\" Tu total es ";to 28;:print #ow,x
+838 if x>score:let score=x
+839 print #ow,\"[ La mayor puntuación es ";score;" ]"
+840 wait_key_press: cls #ow
+841 cls_ black,white,black
+842 at #ow,1,14:print #ow,"final"
+843 police_report_data: wait_key_press
+844 enddef
+845 defproc key_prompt(prompt$,colour)
+846 paper #iw,colour
+847 ink #iw,contrast_colour(colour)
+848 cls #iw
+849 center #iw,1,prompt$
+850 cursen_home #iw
+851 enddef
+852 deffn get_key_prompt$(prompt$)
+853 rep dont_press_now
+854 if inkey$(#iw)="":exit dont_press_now
+855 endrep dont_press_now
+856 rep press_now
+857 key_prompt prompt$,prompt_colour_1
+858 let key$=inkey$(#iw,50)
+859 if key$<>"":exit press_now
+860 zx_beep .01,30
+861 key_prompt prompt$,prompt_colour_2
+862 let key$=inkey$(#iw,50)
+863 if key$<>"":exit press_now
+864 zx_beep .01,20
+865 endrep press_now
+866 curdis #iw
+867 ret key$
+868 enddef
+869 deffn get_key$
+870 ret get_key_prompt$("TECLA")
+871 enddef
+872 deffn yes_key
+873 loc yes
+874 let yes = "s"==get_key_prompt$('TECLA ("S" = SÍ)')
+875 zx_beep .25,10+40*yes
+876 ret yes
+877 enddef
+878 defproc wait_key_press
+879 loc key$
+880 let key$=get_key$
+881 enddef
+882 defproc init_data
+883 loc x$
+884 let score=0
+885 let decisions=49
+886 let groups=8
+887 let local_groups=6
+888 let main_groups=3
+889 let army=1
+890 let peasants=2
+891 let landowners=3
+892 let guerrillas=4
+893 let leftoto=5
+894 let police=6
+895 let russia=7
+896 let usa=8
+897 let popularity=1
+898 let power=2
+899 let cost=2
+900 let monthly_cost=3
+901 let decision_name_max_len=70
+902 dim decision_data$(decisions,17)
+903 dim decision_name$(decisions,decision_name_max_len)
+904 dim group_data$(groups,4),group_name$(groups,18),group_short_name$(groups,17),group_plural_name$(groups,20),group_genitive_name$(groups,20)
+905 restore
+906 for a=1 to decisions:
+907 read decision_data$(a),x$
+908 if len(x$)>decision_name_max_len
+909 print "ERROR: decision name too long:"\x$
+910 stop
+911 else
+912 let decision_name$(a)=x$
+913 endif
+914 endfor a
+915 for a=1 to groups
+916 read group_data$(a),group_name$(a),group_short_name$(a),group_plural_name$(a),group_genitive_name$(a)
+917 endfor a
+918 let money=1000
+919 let escape=0
+920 let month_payment=60
+921 let strength=4
+922 let money_in_switzerland=0
+923 let alive=1
+924 let months=0
+925 let pc=0
+926 let revolution_strength=10
+927 enddef
+928 data "NMHQJLMMMMMPKLMMM","Instaurar el servicio militar obligatorio"
+929 data "NMMPMJMMMMMNMLMMM","Requisar tierras para construir un polígono de tiro"
+930 data "NCMPLNMLMLMNMNIMM","Atacar las bases de la guerilla"
+931 data "NEMPLMMIMLMNMNKMM","Atacar la base de la guerrilla en Leftoto"
+932 data "NMMQONMMIMMNMNMMJ","Destituir al jefe de la policía secreta"
+933 data "NMMPMMMLMIOMMMMMM","Echar a los militares rusos"
+934 data "NMDQMLMMMMMOLLLMM","Aumentar la paga de las tropas"
+935 data "NAMQLLMLLMMPLLKLM","Comprar más armas y municiomes"
+936 data "NMMLONMMMMMLMMLMM","Poner freno a los abusos del ejército"
+937 data "NMMMQIMNMMMMOLMMM","Aumentar el salario mínimo"
+938 data "NMPNQOMMIMMNNNNMJ","Acabar con la policía secreta"
+939 data "NMMMPKMKMMMMOKMMM","Detener la inmigración de Leftoto"
+940 data "NCELQKMOLNMMNLLMM","Poner escuela gratis para todos"
+941 data "NMMMQJMNLNMMPJMML","Legalizar los sindicatos"
+942 data "NMMLQKMNLMMMOLLMM","Liberar a su líder encarcelado"
+943 data "NMSMPLMMMMMMMMLMM","Iniciar una lotería pública"
+944 data "NMMKMPMMMMMLMMMMM","Prohibir el uso militar de sus tierras"
+945 data "NMMMIQMLMLMMKONMM","Bajar el salario mínimo"
+946 data "NWHMMPMNMOIMMNMMM","Nacionalizar las empresas usamericanas"
+947 data "NMRMMPMJMLMMNOMLM","Tasar las importaciones de leftoto"
+948 data "NMQNNPMMIMMNMNNMK","Cortar los gastos de la policía secreta"
+949 data "NMHMMQMMMMMMMOMMM","Bajar el impuesto sobre la tierra"
+950 data "NMMKLPMMMMMLLNNMM","Ceder tropa para labrar tierra"
+951 data "NACNNPMJMONMMPMKM","Construir un sistema de riego"
+952 data "NMMQLLMMLMMNMMLML","Nombrar ministro al jefe del ejército"
+953 data "NLILQNMOMNMMMMLMM","Construir hospitales para los trabajadores"
+954 data "NMMLKQMMLLMLLOMML","Dar poderes a los terratenientes"
+955 data "NRMKMMMQMKNLMMLPM","Vender armas usamericanas a Leftoto"
+956 data "NYMMMLMLMKPMMMMMM","Vender derechos a empresas usamericanas"
+957 data "NMWKMMMMMPJMMMMNM","Alquilar a Rusia una base naval"
+958 data "NMENPPMMMMMLMMLMM","Bajar los impuestos"
+959 data "NEMPPPMMMMMMMMLMM","Hacer una campaña de imagen presidencial"
+960 data "NMUPPPMMDMMONNNMD","Reducir el poder de la policía secreta"
+961 data "NMGJJJMMUMMLLLLMU","Aumentar el poder de la policía secreta"
+962 data "NIMKLLMMLMMKMMMML","Aumentar el número de guardaespaldas (*)"
+963 data "NAMIIJMMKMMMMMMMM","Comprar un helicóptero para una posible huida del país"
+964 data "NMMMMMMMMMMMMMMMM","Hacer una transferencia a la cuenta presidencial en un banco suizo (*)"
+965 data "NMMMMMMMMMMMMMMMM","Solicitar un préstamo a los rusos"
+966 data "NMMMMMMMMMMMMMMMM","Solicitar un préstamo a los usamericanos"
+967 data "NZMNNPMGMKMMMMMMM","Nacionalizar las empresas de Leftoto"
+968 data "NHMPMMMJMLMRMMKKL","Comprar armas para el ejercito"
+969 data "NMMMPLMMLMMMRLPML","Legalizar las asociaciones campesinas"
+970 data "NMMLLPMMLMMLLRLML","Permitir que los terratenientes tengan ejércitos privados"
+971 data "NMMMMMMMIMMMMMQMI","Los archivos de la policía secreta han sido robados"
+972 data "NMMMMMMMMMMLMMVMM","Cuba está entrenando a las guerillas"
+973 data "NMMMMMMMMMMIMMOMN","Un barracón del ejército ha explotado"
+974 data "NMMMMMMMMMMMMJMKM","El precio de los plátanos ha caído un 98%"
+975 data "NMMMMMMMMMMMMOMIM","El jefe del estado mayor del ejército se ha fugado a Leftoto"
+976 data "NMMMMMMMMMMMILKMM","Se ha declarado una epidemia entre los campesinos"
+977 data "76::","el ejército","militares","los militares","del ejército"
+978 data "76::","los campesinos","campesinos","los campesinos","de los campesinos"
+979 data "76::","los terratenientes","terratenientes","los terratenientes","de los terratenientes"
+980 data "06--","la guerilla","guerrilleros","los guerrilleros","de la guerrilla"
+981 data "76--","Leftoto","leftotanos","los leftotanos","de Leftoto"
+982 data "76--","la policía secreta","policías secretos","los policías secretos","de la policía secreta"
+983 data "7---","Rusia","rusos","los rusos","de Rusia"
+984 data "7---","Usamérica","usamericanos","los usamericanos","de Usamérica"
+985 defproc zx_border(colour)
+986 enddef
+987 defproc zx_beep(duration,pitch)
+988 enddef
+989 defproc fx_war
+990 enddef
+991 defproc fx_2
+992 enddef
+993 defproc tune(m$)
+994 loc note
+995 for note=1 to len(m$) step 2
+996 if m$(note+1)=" "
+997 pause code(m$(note))/4
+998 next note:exit note
+999 endif
+1000 zx_beep (code(m$(note))-48)/6,code(m$(note+1))-105
+1001 endfor note
+1002 enddef
+1003 deffn on_(flag,result_if_false,result_if_true)
+1004 if flag:ret result_if_true:else:ret result_if_false
+1005 enddef
+1006 defproc cls_(paper_colour,ink_colour,border_colour)
+1007 paper #ow,paper_colour
+1008 ink #ow,ink_colour
+1009 zx_border border_colour: cls #ow
+1010 paper #iw,border_colour: cls #iw
+1011 let prompt_colour_1=border_colour
+1012 let prompt_colour_2=paper_colour
+1013 if prompt_colour_1=prompt_colour_2
+1014 let prompt_colour_2=contrast_colour(prompt_colour_1)
+1015 endif
+1016 zx_beep .1,40
+1017 enddef
+1018 deffn center_for(width_in_chars)
+1019 ret (columns-width_in_chars)/2
+1020 enddef
+1021 defproc center(channel,line_,text$)
+1022 loc length
+1023 let length=len(text$)
+1024 if length>columns
+1025 at #ow,line_,0:tell text$
+1026 else
+1027 at #channel,line_,center_for(length)
+1028 print #channel,text$
+1029 endif
+1030 enddef 
+1031 defproc tell(txt$)
+1032 local text$,first,last
+1033 if len(txt$)
+1034 let text$=txt$&" "
+1035 let first=1
+1036 for last=1 to len(text$)
+1037 if text$(last)=" "
+1038 print #ow,!text$(first to last-1);
+1039 let first=last+1
+1040 endif
+1041 endfor last
+1042 endif
+1043 enddef
+1044 defproc tellNL(text$)
+1045 print #ow,\" ";:tell(text$)
+1046 enddef
+1047 deffn csize_width_pixels(w)
+1048 sel on w
+1049 =0:ret 6
+1050 =1:ret 8
+1051 =2:ret 12
+1052 =3:ret 16
+1053 endsel
+1054 enddef
+1055 deffn csize_height_pixels(h)
+1056 ret h*10+10
+1057 enddef
+1058 deffn contrast_colour(colour)
+1059 sel on colour
+1060 =black,blue,red,purple:ret white
+1061 =remainder:ret black
+1062 endsel
+1063 enddef
+1064 defproc cursen_home(channel)
+1065 cursen #channel
+1066 if channel=iw:at# iw,iw_lines-1,columns-1:else at #ow,ow_lines-1,columns-1
+1067 enddef
+1068 deffn ow_line_y(line_)
+1069 ret char_height_pixels*line_
+1070 enddef
+1071 deffn ow_column_x(column)
+1072 ret char_width_pixels*column
+1073 enddef
+1074 defproc fonts(font_address)
+1075 char_use#iw,font_address,0 
+1076 char_use#ow,font_address,0 
+1077 enddef
+1078 defproc iso_font
+1079 fonts font_address
+1080 enddef
+1081 defproc ql_font
+1082 fonts 0
+1083 enddef
+1084 defproc init_font
+1085 let font$=path$&"iso_8859-1_font"
+1086 font_length=flen(\font$)
+1087 font_address=alchp(font_length)
+1088 lbytes font$,font_address
+1089 iso_font
+1090 enddef
+1091 defproc init_windows
+1092 let columns=32
+1093 let lines=24
+1094 let csize_width=3
+1095 let csize_height=scr_height<>256
+1096 let iw_lines=3
+1097 let ow_lines=lines-iw_lines
+1098 let ow=fopen("scr_")
+1099 csize #ow,csize_width,csize_height
+1100 let char_width_pixels=csize_width_pixels(csize_width)
+1101 let char_height_pixels=csize_height_pixels(csize_height)
+1102 let ow_width=columns*char_width_pixels
+1103 let ow_x=(scr_width-ow_width)/2
+1104 let ow_height=ow_lines*char_height_pixels
+1105 let ow_y=(scr_height-(lines*char_height_pixels))/2
+1106 window #ow,ow_width,ow_height,ow_x,ow_y
+1107 let iw=fopen("con_")
+1108 csize #iw,csize_width,csize_height
+1109 let iw_width=ow_width
+1110 let iw_height=iw_lines*char_height_pixels
+1111 let iw_x=ow_x
+1112 let iw_y=ow_y+ow_lines*char_height_pixels
+1113 window #iw,iw_width,iw_height,iw_x,iw_y
+1114 let blank_line$=fill$(" ",columns)
+1115 enddef
+1116 defproc init_screen
+1117 mode 8
+1118 if exists("colour_ql"):colour_ql
+1119 let black=0
+1120 let blue=1
+1121 let red=2
+1122 let purple=3
+1123 let green=4
+1124 let cyan=5
+1125 let yellow=6
+1126 let white=7
+1127 if exists("scr_xlim")
+1128 let scr_width=scr_xlim
+1129 let scr_height=scr_ylim
+1130 else
+1131 let scr_width=512
+1132 let scr_height=256
+1133 endif
+1134 enddef
+1135 defproc init_once
+1136 tk2_ext
+1137 init_screen
+1138 init_windows
+1139 init_font
+1140 enddef
+1141 defproc w0
+1142 window 800,600,0,0
+1143 csize 3,1
+1144 enddef
+1145 defproc debug_(message$)
+1146 if 1
+1147 print #ow,message$
+1148 pause
+1149 endif
+1150 enddef
+1151 defproc finish
+1152 close
+1153 ql_font
+1154 rechp font_address
+1155 enddef
+1156 ritimba
+

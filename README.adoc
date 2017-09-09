@@ -6,19 +6,47 @@ In <<en,English>> above.
 
 == [[es]]Español
 
-Ritimba es un proyecto de conversión para QL de la versión española
-del juego de ZX Spectrum _Dictator_ (escrito por Don Priestley en
-1983).
+=== Descripción
+
+Ritimba es un proyecto de conversión para
+http://qlwiki.qlforum.co.uk/doku.php?id=qlwiki:sinclair_ql_home_computer[Sinclair
+QL] de la versión española del juego de ZX Spectrum _Dictator_
+(escrito por Don Priestley en 1983).
 
 Ritimba está escrito en SBASIC para el sistema operativo
 http://qlwiki.qlforum.co.uk/doku.php?id=qlwiki:operating_systems#smsq_e[SMSQ/E].
 
 Sede del proyecto: http://programandala.net/es.programa.ritimba.html
 
+=== Herramientas de desarrollo
+
+- Editor http://www.vim.org[Vim]
+- Preprocesador de S*BASIC
+  http://programandala.net/es.programa.sbim.html[SBim]
+- http://programandala.net/es.programa.transfonter.html[Transfonter],
+  una herramienta para crear un juego de caracteres ISO 8859-1 para QL
+- Emulador http://www.wlenerz.com/SMSQmulator/[SMSQmulator]
+
+=== Historia y estado actual
+
+El proyecto comenzó en 2011-04-01.  En 2012-01 las fuentes fueron
+convertidas al formato del preprocesador
+http://programandala.net/es.programa.sbim.html[SBim].  En 2016-02 la
+mayoría de las funciones del juego original ya funcionaban, pero el
+proyecto fue puesto en estado _durmiente_.
+
+En 2017-09-09 se creó un repositorio de Git a partir de las copias de
+respaldo, con el fin de preservar la evolución del código y retomar su
+desarrollo en el futuro.
+
 == [[en]]English
 
-Ritimba is a project to port to QL the Spanish version of Don
-Priestley's ZX Spectrum game _Dictator_ (1983).
+=== Description
+
+Ritimba is a project to port to
+http://qlwiki.qlforum.co.uk/doku.php?id=qlwiki:sinclair_ql_home_computer[Sinclair
+QL] the Spanish version of Don Priestley's ZX Spectrum game _Dictator_
+(1983).
 
 Ritimba is written in SBASIC for the
 http://qlwiki.qlforum.co.uk/doku.php?id=qlwiki:operating_systems#smsq_e[SMSQ/E]
@@ -26,3 +54,24 @@ operating system.
 
 Home page (in Spanish):
 http://programandala.net/es.programa.ritimba.html
+
+=== Development tools
+
+- http://www.vim.org[Vim] editor
+- http://programandala.net/es.programa.sbim.html[SBim] S*BASIC
+  preprocessor
+- http://programandala.net/en.program.transfonter.html[Transfonter], a
+  tool for making an ISO 8859-1 QL character set
+- http://www.wlenerz.com/SMSQmulator/[SMSQmulator] emulator
+
+=== History and current status
+
+The project started on 2011-04-01.  In 2012-01 the sources were
+converted to the format of the
+http://programandala.net/es.programa.sbim.html[SBim] preprocessor.  In
+2016-02 the main functions of the original game worked fine, but the
+project was set to standby mode.
+
+On 2017-09-09 a Git repository was created from the development
+backups in order to preserve the evolution of the project and resume
+its development in the future.

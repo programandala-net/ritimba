@@ -2,7 +2,7 @@ rem Ritimba
 
 // XXX UNDER DEVELOPMENT
 
-let version$="0.0.0+201602110058"
+let version$="0.0.0+201606030008"
 
 // =============================================================
 // Author and license
@@ -1468,7 +1468,7 @@ enddef
 
 defproc init_windows
 
-  let columns=48
+  let columns=32
   let lines=24
   let csize_width=3
   let csize_height=scr_height<>256
