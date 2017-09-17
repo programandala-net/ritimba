@@ -1,0 +1,13 @@
+= Ritimba
+:author: Marcos Cruz (programandala.net)
+:revdate: 2017-09-17
+
+== 2017-09-17
+
+Replace isolated `print` with SBASIC printing modifier `\`.
+
+Move all `at` to their own lines.
+
+Make all numeric variables integer.
+
+Remove the traces of SuperBASIC compatibility. Write only for SBASIC.
