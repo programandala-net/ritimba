@@ -1,8 +1,6 @@
 rem Ritimba
 
-// XXX UNDER DEVELOPMENT
-
-let version$="0.0.0+201709171941"
+version$="0.0.0+201709171949"
 
 // =============================================================
 // Author and license
@@ -29,20 +27,13 @@ rem http://programandala.net/es.programa.sbim.html
 rem
 
 // =============================================================
-// Device and path
-
-sel on machine
-  =30:rem QPC2
-  let device$="dos1_"
-  =20:rem SMSQmulator
-  let device$="nfa1_"
-endsel
-let path$=device$&"sb_ritimba_"
-
-// =============================================================
 // Extensions needed
 
-lrespr path$&"ext_exists_code" // EXISTS, by Phil Borman
+let dev$=device$("ritimba_bas","flpmdvdevsubwinnfados")
+
+lrespr dev$&"ext_exists_code" // EXISTS, by Phil Borman
+
+#include device.bas
 
 // =============================================================
 // Main loop
@@ -1459,7 +1450,7 @@ enddef
 // Init
 
 defproc init_font
-  let font$=path$&"iso8859-1_font" // XXX tmp
+  let font$=dev$&"iso8859-1_font" // XXX tmp
   font_length=flen(\font$)
   font_address=alchp(font_length)
   lbytes font$,font_address
