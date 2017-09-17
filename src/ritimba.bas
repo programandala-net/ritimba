@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.0.0+201709171949"
+version$="0.1.0-dev.1+201709172020"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -25,11 +25,9 @@ rem http://programandala.net/es.programa.ritimba.html
 ' http://programandala.net/es.programa.sbim.html
 
 ' ==============================================================
-' Extensions needed {{{1
+' Files {{{1
 
 let dev$=device$("ritimba_bas","flpmdvdevsubwinnfados")
-
-lrespr dev$&"ext_exists_code" ' EXISTS, by Phil Borman
 
 #include device.bas
 
@@ -64,14 +62,19 @@ defproc ritimba
 
 enddef
 
+ritimba
+
 ' ==============================================================
 ' Presentation {{{1
 
 defproc credits
   cls_ black,white,blue
-  at #ow,1,0:print #ow,"RITIMBA"\\"Por:"\"Marcos Cruz (programandala.net),"\"2011, 2012, 2015, 2016"
-  print #ow,\\"Una versión en SuperBASIC de..."
-  print #ow,"DICTADOR, de Don Priestley, 1983"
+  at #ow,1,0
+  print #ow,"Ritimba"
+  print #ow,\\"Por:"\"Marcos Cruz (programandala.net),"
+  print #ow,\"2011, 2012, 2015, 2016, 2017"
+  print #ow,\\"Una versión en SBASIC de"
+  print #ow,"Dictador, de Don Priestley, 1983"
 enddef
 
 defproc national_flag
@@ -203,7 +206,9 @@ defproc treasure_report_details_2
   print_money month_payment
   if money_in_switzerland>0
     at #ow,17,2
-    print #ow,"[En Suiza tiene ";:print_money money_in_switzerland:print #ow,"]"
+    print #ow,"[En Suiza tiene ";
+    print_money money_in_switzerland
+    print #ow,"]"
   endif
 
 enddef
@@ -222,7 +227,8 @@ defproc bankruptcy
   endif
   if group_data$(police,popularity)>"0"
     ' XXX FIXME -- coercion:
-    let group_data$(police,popularity)=group_data$(police,popularity)-1
+    let group_data$(police,popularity)=\
+      group_data$(police,popularity)-1
   endif
   if group_data$(police,power)>"0"
     let group_data$(police,power)=group_data$(police,power)-1
@@ -260,8 +266,8 @@ enddef
 
 defproc plot
 
-  ' XXX TODO -- How this works and what is the meaning of fields 3 and 4 of
-  ' group_data$()?
+  ' XXX TODO -- How this works and what is the meaning of fields 3 and
+  ' 4 of group_data$()?
 
   loc a,p
 
@@ -273,7 +279,8 @@ defproc plot
     if group_data$(a,popularity)<=low
       for p=1 to local_groups
         if not(a=p or group_data$(p,popularity)>low)
-          if group_data$(p,power)+group_data$(a,power)>=revolution_strength
+          if group_data$(p,power)+group_data$(a,power)\
+             >=revolution_strength
             let group_data$(a,3)="R"
             let group_data$(a,4)=p
             exit p
@@ -295,12 +302,20 @@ defproc murder
   if group_data$(group,3)="A"
 
     cls_ black,white,black
-    at #ow,10,7:print #ow,"INTENTO DE ASESINATO"
-    at #ow,20,0:print #ow,"por un miembro de ";group_name$(group) ' XXX TODO special individual names for this case
+    at #ow,10,7
+    print #ow,"INTENTO DE ASESINATO"
+    at #ow,20,0
+    print #ow,"por un miembro de ";group_name$(group)
+      ' XXX TODO special individual names for this case
     cls #ow
     pause 30: fx_2: pause 50
 
-    if ((group_data$(army,3)="A" and group_data$(peasants,3)="A" and group_data$(landowners,3)="A") or not (group_data$(police,popularity)>low or group_data$(police,power)>low or rnd(0 to 1)))
+    if ((group_data$(army,3)="A" \
+      and group_data$(peasants,3)="A" \
+      and group_data$(landowners,3)="A") \
+      or not (group_data$(police,popularity)>low \
+      or group_data$(police,power)>low \
+      or rnd(0 to 1)))
       ' XXX check the compacted logic above
       cls_ black,white,black
       center #ow,12,"¡Está usted muerto!" ' XXX no sense 2º person
@@ -349,7 +364,8 @@ defproc audience
   center #ow,10,"Petición "&group_genitive_name$(sociting_group)&":"
   paper #ow,white
   at #ow,14,0
-  ' XXX FIXME convert the first letter of `this_decision_name$` to lowercase:
+  ' XXX FIXME convert the first letter of `this_decision_name$` to
+  ' lowercase:
   tell "¿Está su excelencia conforme con "&this_decision_name$&"?"
   wait_key_press
   advert this_decision
@@ -357,7 +373,8 @@ defproc audience
   cls #ow
   paper #ow,white
   center #ow,1,"  DECISIÓN  "
-  paper #ow,soliciting_group:ink #ow,contrast_colour(soliciting_group)
+  paper #ow,soliciting_group
+  ink #ow,contrast_colour(soliciting_group)
   center #ow,3,"Petición "&group_genitive_name$(soliciting_group)
   paper #ow,yellow:ink #ow,black
   center #ow,5,this_decision_name$
@@ -579,16 +596,24 @@ enddef
 defproc police_report
 
   cls_ black,white,black
-  if money<=0 or group_data$(police,popularity)<=low or group_data$(police,power)<=low
+
+  if money<=0 \
+    or group_data$(police,popularity)<=low \
+    or group_data$(police,power)<=low
+
     police_report_not_avalaible
+
   else
+
     center #ow,6,"¿INFORME de la POLICÍA SECRETA?"
     center #ow,12,"(Cuesta 1000 RTD)"
     if yes_key
       let money=money-1
       actual_police_report
     endif
+
   endif
+
 enddef
 
 defproc actual_police_report
@@ -662,11 +687,16 @@ defproc police_report_not_avalaible
   center #ow,10,"NO DISPONIBLE"
 
   if group_data$(police,popularity)<=low
-    print #ow,\\"Tu popularidad entre la policía es ";group_data$(police,popularity);"."
+    print #ow,\\"Tu popularidad entre la policía es ";\
+      group_data$(police,popularity);"."
   endif
+
   if group_data$(police,power)<=low
-    print #ow,to 3\\"El poder de la policía es ";group_data$(police,power);"." ' todo prevent "policía" twice.
+    print #ow,to 3\\"El poder de la policía es ";\
+      group_data$(police,power);"."
+        ' XXX TODO -- prevent "policía" twice.
   endif
+
   if money<=0
     print #ow,to 3\\"No tienes dinero para pagar un informe."
   endif
@@ -734,8 +764,11 @@ defproc revolution
     pause 150
     cls #ow 
 
-    let x=group_data$(rebel_group,power)+group_data$(group_data$(rebel_group,4),power)
-    at #ow,5,0:print #ow,group_name$(rebel_group);" se ha unido a "
+    let x=\
+      group_data$(rebel_group,power)\
+      +group_data$(group_data$(rebel_group,4),power)
+    at #ow,5,0
+    print #ow,group_name$(rebel_group);" se ha unido a "
     print #ow,group_name$(group_data$(rebel_group,4))\\:
     print #ow,"Su fuerza conjunta es ";x
     print #ow,\\"¿A quién vas a pedir ayuda?"
@@ -770,8 +803,11 @@ defproc revolution
 
   cls #ow
 
-  at #ow,8,0:print #ow,"Tu fuerza es ";strength
-  print #ow,\\"La fuerza de ";group_name$(helping_group);" es ";group_data$(helping_group,power)
+  at #ow,8,0
+  print #ow,"Tu fuerza es ";strength
+  print #ow,\\"La fuerza de ";\
+    group_name$(helping_group);" es ";\
+    group_data$(helping_group,power)
   print #ow,\\"La de los revolucionarios es ";x
   pause 250
   cls_ white,black,white
@@ -814,8 +850,14 @@ deffn cash_advice(decision)
 
   paper #ow,yellow:ink #ow,black
   let decision_cost=10*(code(decision_data$(decision,cost))-77)
-  let decision_monthly_cost=code(decision_data$(decision,monthly_cost))-77
-  if not decision_cost and not decision_monthly_cost:at #ow,10,7:print #ow,"No cuesta dinero.": ret 1
+  let decision_monthly_cost=\
+    code(decision_data$(decision,monthly_cost))-77
+
+  if not decision_cost and not decision_monthly_cost
+    at #ow,10,7
+    print #ow,"No cuesta dinero."
+    ret 1
+  endif
 
   at #ow,9,1:print #ow,"Esta decisión ": print
 
@@ -829,19 +871,31 @@ deffn cash_advice(decision)
   if decision_monthly_cost
     if decision_monthly_cost<0:print #ow," subiría";
     if decision_monthly_cost>0:print #ow," bajaría";
-    print #ow," los costos mensuales en ";abs(decision_monthly_cost);" 000 RTD"
+    print #ow," los costos mensuales en ";\
+      abs(decision_monthly_cost);" 000 RTD"
   endif
 
-  if money+decision_cost>0: ret 1
-  if not((decision_cost<0 or decision_monthly_cost<0) and (money+decision_cost<0 or money+decision_monthly_cost<0)): ret 1
+  if money+decision_cost>0:\
+    ret 1
+
+  if not((decision_cost<0 or decision_monthly_cost<0) \
+    and (money+decision_cost<0 or money+decision_monthly_cost<0)):\
+    ret 1
 
   pause 250: cls #ow
   center #ow,5,decision_name$(decision)
   at #ow,8,2:print #ow,"El dinero necesario"
   print #ow,\to 4;"no está en el tesoro"\\\:
 
-  if decision_data$(38,1)="N":print #ow,"Quizá los rusos pueden ayudar.": print
-  if decision_data$(39,1)="N":print #ow,"Los usamericanos son un pueblo generoso": print
+  if decision_data$(38,1)="N"
+    print #ow,"Quizá los rusos pueden ayudar."
+    print
+  endif
+
+  if decision_data$(39,1)="N"
+    print #ow,"Los usamericanos son un pueblo generoso"
+    print
+  endif
 
   pause 350
   ret 0
@@ -875,10 +929,13 @@ defproc ask_for_loan(decision)
   endif
 
   if months<int(rnd*5)+3
-    at #ow,12,2:print #ow,"opinan que es demasiado pronto para conceder ayudas ecónomicas."
+    at #ow,12,2
+    print #ow,"opinan que es demasiado pronto \
+      para conceder ayudas ecónomicas."
   else
     if decision_data$(decision,1)="*"
-      at #ow,12,2:print #ow,"Te deniegan un nuevo préstamo."
+      at #ow,12,2
+      print #ow,"Te deniegan un nuevo préstamo."
     else
 
       ' XXX FIXME run-time error in this expression:
@@ -1079,11 +1136,14 @@ defproc the_end
   cls_ yellow,black,cyan
   at #ow,3,1:print #ow,"Tu puntuación como presidente"
   print #ow,\" popularidad final";to 28;x
-  print #ow,\" por el tiempo en el poder (";months;" meses) - ";to 28;months*3: let x=x+months*3
+  print #ow,\" por el tiempo en el poder (";months;" meses) - ";\
+    to 28;months*3: let x=x+months*3
 
   if alive
     print #ow,\" Por estar vivo - ";to 28;alive
-    print #ow,\" Por el ahorro"\"     (";money_in_switzerland;"000 RTD / 10 000) -";to 28;int(money_in_switzerland/10)
+    print #ow,\" Por el ahorro"\"     (";\
+      money_in_switzerland;\
+      "000 RTD / 10 000) -";to 28;int(money_in_switzerland/10)
     let x=x+alive+int(money_in_switzerland/10)
   endif
 
@@ -1234,55 +1294,105 @@ enddef
 ' 04-11: +/- popularity for groups 1-8 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
 ' 12-17 +/- power for groups 1-6 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
 
-data "NMHQJLMMMMMPKLMMM","Instaurar el servicio militar obligatorio"
-data "NMMPMJMMMMMNMLMMM","Requisar tierras para construir un polígono de tiro"
-data "NCMPLNMLMLMNMNIMM","Atacar las bases de la guerilla"
-data "NEMPLMMIMLMNMNKMM","Atacar la base de la guerrilla en Leftoto"
-data "NMMQONMMIMMNMNMMJ","Destituir al jefe de la policía secreta"
-data "NMMPMMMLMIOMMMMMM","Echar a los militares rusos"
-data "NMDQMLMMMMMOLLLMM","Aumentar la paga de las tropas"
-data "NAMQLLMLLMMPLLKLM","Comprar más armas y municiomes"
-data "NMMLONMMMMMLMMLMM","Poner freno a los abusos del ejército"
-data "NMMMQIMNMMMMOLMMM","Aumentar el salario mínimo"
-data "NMPNQOMMIMMNNNNMJ","Acabar con la policía secreta"
-data "NMMMPKMKMMMMOKMMM","Detener la inmigración de Leftoto"
-data "NCELQKMOLNMMNLLMM","Poner escuela gratis para todos"
-data "NMMMQJMNLNMMPJMML","Legalizar los sindicatos"
-data "NMMLQKMNLMMMOLLMM","Liberar a su líder encarcelado"
-data "NMSMPLMMMMMMMMLMM","Iniciar una lotería pública"
-data "NMMKMPMMMMMLMMMMM","Prohibir el uso militar de sus tierras"
-data "NMMMIQMLMLMMKONMM","Bajar el salario mínimo"
-data "NWHMMPMNMOIMMNMMM","Nacionalizar las empresas usamericanas"
-data "NMRMMPMJMLMMNOMLM","Tasar las importaciones de leftoto"
-data "NMQNNPMMIMMNMNNMK","Cortar los gastos de la policía secreta"
-data "NMHMMQMMMMMMMOMMM","Bajar el impuesto sobre la tierra"
-data "NMMKLPMMMMMLLNNMM","Ceder tropa para labrar tierra"
-data "NACNNPMJMONMMPMKM","Construir un sistema de riego"
-data "NMMQLLMMLMMNMMLML","Nombrar ministro al jefe del ejército"
-data "NLILQNMOMNMMMMLMM","Construir hospitales para los trabajadores"
-data "NMMLKQMMLLMLLOMML","Dar poderes a los terratenientes"
-data "NRMKMMMQMKNLMMLPM","Vender armas usamericanas a Leftoto"
-data "NYMMMLMLMKPMMMMMM","Vender derechos a empresas usamericanas"
-data "NMWKMMMMMPJMMMMNM","Alquilar a Rusia una base naval"
-data "NMENPPMMMMMLMMLMM","Bajar los impuestos"
-data "NEMPPPMMMMMMMMLMM","Hacer una campaña de imagen presidencial"
-data "NMUPPPMMDMMONNNMD","Reducir el poder de la policía secreta"
-data "NMGJJJMMUMMLLLLMU","Aumentar el poder de la policía secreta"
-data "NIMKLLMMLMMKMMMML","Aumentar el número de guardaespaldas (*)"
-data "NAMIIJMMKMMMMMMMM","Comprar un helicóptero para una posible huida del país"
-data "NMMMMMMMMMMMMMMMM","Hacer una transferencia a la cuenta presidencial en un banco suizo (*)"
-data "NMMMMMMMMMMMMMMMM","Solicitar un préstamo a los rusos"
-data "NMMMMMMMMMMMMMMMM","Solicitar un préstamo a los usamericanos"
-data "NZMNNPMGMKMMMMMMM","Nacionalizar las empresas de Leftoto"
-data "NHMPMMMJMLMRMMKKL","Comprar armas para el ejercito"
-data "NMMMPLMMLMMMRLPML","Legalizar las asociaciones campesinas"
-data "NMMLLPMMLMMLLRLML","Permitir que los terratenientes tengan ejércitos privados"
-data "NMMMMMMMIMMMMMQMI","Los archivos de la policía secreta han sido robados"
-data "NMMMMMMMMMMLMMVMM","Cuba está entrenando a las guerillas"
-data "NMMMMMMMMMMIMMOMN","Un barracón del ejército ha explotado"
-data "NMMMMMMMMMMMMJMKM","El precio de los plátanos ha caído un 98%" ' XXX 98?
-data "NMMMMMMMMMMMMOMIM","El jefe del estado mayor del ejército se ha fugado a Leftoto"
-data "NMMMMMMMMMMMILKMM","Se ha declarado una epidemia entre los campesinos"
+data "NMHQJLMMMMMPKLMMM",\
+     "Instaurar el servicio militar obligatorio"
+data "NMMPMJMMMMMNMLMMM",\
+     "Requisar tierras para construir un polígono de tiro"
+data "NCMPLNMLMLMNMNIMM",\
+     "Atacar las bases de la guerilla"
+data "NEMPLMMIMLMNMNKMM",\
+     "Atacar la base de la guerrilla en Leftoto"
+data "NMMQONMMIMMNMNMMJ",\
+     "Destituir al jefe de la policía secreta"
+data "NMMPMMMLMIOMMMMMM",\
+     "Echar a los militares rusos"
+data "NMDQMLMMMMMOLLLMM",\
+     "Aumentar la paga de las tropas"
+data "NAMQLLMLLMMPLLKLM",\
+     "Comprar más armas y municiomes"
+data "NMMLONMMMMMLMMLMM",\
+     "Poner freno a los abusos del ejército"
+data "NMMMQIMNMMMMOLMMM",\
+     "Aumentar el salario mínimo"
+data "NMPNQOMMIMMNNNNMJ",\
+     "Acabar con la policía secreta"
+data "NMMMPKMKMMMMOKMMM",\
+     "Detener la inmigración de Leftoto"
+data "NCELQKMOLNMMNLLMM",\
+     "Poner escuela gratis para todos"
+data "NMMMQJMNLNMMPJMML",\
+     "Legalizar los sindicatos"
+data "NMMLQKMNLMMMOLLMM",\
+     "Liberar a su líder encarcelado"
+data "NMSMPLMMMMMMMMLMM",\
+     "Iniciar una lotería pública"
+data "NMMKMPMMMMMLMMMMM",\
+     "Prohibir el uso militar de sus tierras"
+data "NMMMIQMLMLMMKONMM",\
+     "Bajar el salario mínimo"
+data "NWHMMPMNMOIMMNMMM",\
+     "Nacionalizar las empresas usamericanas"
+data "NMRMMPMJMLMMNOMLM",\
+     "Tasar las importaciones de leftoto"
+data "NMQNNPMMIMMNMNNMK",\
+     "Cortar los gastos de la policía secreta"
+data "NMHMMQMMMMMMMOMMM",\
+     "Bajar el impuesto sobre la tierra"
+data "NMMKLPMMMMMLLNNMM",\
+     "Ceder tropa para labrar tierra"
+data "NACNNPMJMONMMPMKM",\
+     "Construir un sistema de riego"
+data "NMMQLLMMLMMNMMLML",\
+     "Nombrar ministro al jefe del ejército"
+data "NLILQNMOMNMMMMLMM",\
+     "Construir hospitales para los trabajadores"
+data "NMMLKQMMLLMLLOMML",\
+     "Dar poderes a los terratenientes"
+data "NRMKMMMQMKNLMMLPM",\
+     "Vender armas usamericanas a Leftoto"
+data "NYMMMLMLMKPMMMMMM",\
+     "Vender derechos a empresas usamericanas"
+data "NMWKMMMMMPJMMMMNM",\
+     "Alquilar a Rusia una base naval"
+data "NMENPPMMMMMLMMLMM",\
+     "Bajar los impuestos"
+data "NEMPPPMMMMMMMMLMM",\
+     "Hacer una campaña de imagen presidencial"
+data "NMUPPPMMDMMONNNMD",\
+     "Reducir el poder de la policía secreta"
+data "NMGJJJMMUMMLLLLMU",\
+     "Aumentar el poder de la policía secreta"
+data "NIMKLLMMLMMKMMMML",\
+     "Aumentar el número de guardaespaldas (*)"
+data "NAMIIJMMKMMMMMMMM",\
+     "Comprar un helicóptero para una posible huida del país"
+data "NMMMMMMMMMMMMMMMM",\
+     "Hacer una transferencia a la cuenta presidencial \
+     en un banco suizo (*)"
+data "NMMMMMMMMMMMMMMMM",\
+     "Solicitar un préstamo a los rusos"
+data "NMMMMMMMMMMMMMMMM",\
+     "Solicitar un préstamo a los usamericanos"
+data "NZMNNPMGMKMMMMMMM",\
+     "Nacionalizar las empresas de Leftoto"
+data "NHMPMMMJMLMRMMKKL",\
+     "Comprar armas para el ejercito"
+data "NMMMPLMMLMMMRLPML",\
+     "Legalizar las asociaciones campesinas"
+data "NMMLLPMMLMMLLRLML",\
+     "Permitir que los terratenientes tengan ejércitos privados"
+data "NMMMMMMMIMMMMMQMI",\
+     "Los archivos de la policía secreta han sido robados"
+data "NMMMMMMMMMMLMMVMM",\
+     "Cuba está entrenando a las guerillas"
+data "NMMMMMMMMMMIMMOMN",\
+     "Un barracón del ejército ha explotado"
+data "NMMMMMMMMMMMMJMKM",\
+     "El precio de los plátanos ha caído un 98%"
+data "NMMMMMMMMMMMMOMIM",\
+     "El jefe del estado mayor del ejército se ha fugado a Leftoto"
+data "NMMMMMMMMMMMILKMM",\
+     "Se ha declarado una epidemia entre los campesinos"
 
 ' data:
 ' group_data$(a),group_name$(a),group_short_name$(a)
@@ -1293,14 +1403,46 @@ data "NMMMMMMMMMMMILKMM","Se ha declarado una epidemia entre los campesinos"
 ' 3=unknown ' XXX
 ' 4=unknown ' XXX
 
-data "76::","el ejército","militares","los militares","del ejército"
-data "76::","los campesinos","campesinos","los campesinos","de los campesinos"
-data "76::","los terratenientes","terratenientes","los terratenientes","de los terratenientes"
-data "06--","la guerilla","guerrilleros","los guerrilleros","de la guerrilla"
-data "76--","Leftoto","leftotanos","los leftotanos","de Leftoto"
-data "76--","la policía secreta","policías secretos","los policías secretos","de la policía secreta"
-data "7---","Rusia","rusos","los rusos","de Rusia"
-data "7---","Usamérica","usamericanos","los usamericanos","de Usamérica"
+data "76::",\
+     "el ejército",\
+     "militares",\
+     "los militares",\
+     "del ejército"
+data "76::",\
+     "los campesinos",\
+     "campesinos",\
+     "los campesinos",\
+     "de los campesinos"
+data "76::",\
+     "los terratenientes",\
+     "terratenientes",\
+     "los terratenientes",\
+     "de los terratenientes"
+data "06--",\
+     "la guerilla",\
+     "guerrilleros",\
+     "los guerrilleros",\
+     "de la guerrilla"
+data "76--",\
+     "Leftoto",\
+     "leftotanos",\
+     "los leftotanos",\
+     "de Leftoto"
+data "76--",\
+     "la policía secreta",\
+     "policías secretos",\
+     "los policías secretos",\
+     "de la policía secreta"
+data "7---",\
+     "Rusia",\
+     "rusos",\
+     "los rusos",\
+     "de Rusia"
+data "7---",\
+     "Usamérica",\
+     "usamericanos",\
+     "los usamericanos",\
+     "de Usamérica"
 
 ' ==============================================================
 ' Special effects {{{1
@@ -1418,7 +1560,10 @@ enddef
 
 defproc cursen_home(channel)
   cursen #channel
-  if channel=iw:at# iw,iw_lines-1,columns-1:else at #ow,ow_lines-1,columns-1
+  if channel=iw:\
+    at# iw,iw_lines-1,columns-1:\
+  else \
+    at #ow,ow_lines-1,columns-1
 enddef
 
 deffn ow_line_y(line_)
@@ -1448,7 +1593,7 @@ enddef
 ' Init {{{1
 
 defproc init_font
-  let font$=dev$&"iso8859-1_font" ' XXX tmp
+  let font$=dev$&"iso8859-1_font"
   font_length=flen(\font$)
   font_address=alchp(font_length)
   lbytes font$,font_address
@@ -1489,7 +1634,7 @@ enddef
 
 defproc init_screen
   mode 8
-  if exists("colour_ql"):colour_ql
+  colour_ql
   let black=0
   let blue=1
   let red=2
@@ -1498,13 +1643,8 @@ defproc init_screen
   let cyan=5
   let yellow=6
   let white=7
-  if exists("scr_xlim")
-    let scr_width=scr_xlim
-    let scr_height=scr_ylim
-  else
-    let scr_width=512
-    let scr_height=256
-  endif
+  let scr_width=scr_xlim
+  let scr_height=scr_ylim
 enddef
 
 defproc init_once
@@ -1535,9 +1675,4 @@ defproc finish ' XXX tmp
   rechp font_address
 enddef
 
-' ==============================================================
-' Boot {{{1
-
-ritimba
-
-' vim: filetype=sbim
+' vim: filetype=sbim textwidth=70
