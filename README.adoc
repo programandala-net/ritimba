@@ -23,8 +23,10 @@ Sede del proyecto: http://programandala.net/es.programa.ritimba.html
 - Editor http://www.vim.org[Vim]
 - Preprocesador de S*BASIC
   http://programandala.net/es.programa.sbim.html[SBim]
-- http://programandala.net/es.programa.transfonter.html[Transfonter],
-  una herramienta para crear un juego de caracteres ISO 8859-1 para QL
+- Emulador http://terdina.net/ql/q-emulator.html[Q-emuLator],
+  corriendo en GNU/Linux con https://www.winehq.org/[Wine]
+- Emulador http://www.kilgus.net/qpc/[QPC2] corriendo en GNU/Linux con
+  Wine
 - Emulador http://www.wlenerz.com/SMSQmulator/[SMSQmulator]
 
 === Historia y estado actual
