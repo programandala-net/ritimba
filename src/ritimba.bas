@@ -2,8 +2,8 @@ rem Ritimba
 
 version$="0.0.0+201709171949"
 
-// =============================================================
-// Author and license
+' ==============================================================
+' Author and license {{{1
 
 rem Copyright (C) 2011,2012,2015,2016,2017 Marcos Cruz (programandala.net)
 
@@ -12,8 +12,8 @@ rem retain the copyright notice(s) and this license in all
 rem redistributed copies and derived works. There is no warranty.
 rem
 
-// =============================================================
-// Description
+' ==============================================================
+' Description {{{1
 
 rem Ritimba is a QL port of the Spanish version of Don Priestley's
 rem ZX Spectrum game "DICTATOR" (1983), written in SBASIC for SMSQ/E.
@@ -21,22 +21,20 @@ rem ZX Spectrum game "DICTATOR" (1983), written in SBASIC for SMSQ/E.
 rem Home page (in Spanish):
 rem http://programandala.net/es.programa.ritimba.html
 
-// This source is written using the SBim format of S*BASIC.
-rem This source was converted from the SBim format by:
-rem http://programandala.net/es.programa.sbim.html
-rem
+' This source is written in the SBim format of S*BASIC.
+' http://programandala.net/es.programa.sbim.html
 
-// =============================================================
-// Extensions needed
+' ==============================================================
+' Extensions needed {{{1
 
 let dev$=device$("ritimba_bas","flpmdvdevsubwinnfados")
 
-lrespr dev$&"ext_exists_code" // EXISTS, by Phil Borman
+lrespr dev$&"ext_exists_code" ' EXISTS, by Phil Borman
 
 #include device.bas
 
-// =============================================================
-// Main loop
+' ==============================================================
+' Main loop {{{1
 
 defproc ritimba
 
@@ -66,8 +64,8 @@ defproc ritimba
 
 enddef
 
-// =============================================================
-// Presentation
+' ==============================================================
+' Presentation {{{1
 
 defproc credits
   cls_ black,white,blue
@@ -127,12 +125,12 @@ defproc national_anthem
       if len(inkey$(#iw)):exit listen
       let pitch=code(tune$(a))-80
       if pitch=16
-        // pause 20 // XXX FIXME -- this makes INKEY$ fail in QPC2
+        ' pause 20 ' XXX FIXME -- this makes INKEY$ fail in QPC2
       else
         zx_beep .5,pitch
       endif
     endfor a
-    // pause 30 // XXX FIXME -- this makes INKEY$ fail in QPC2
+    ' pause 30 ' XXX FIXME -- this makes INKEY$ fail in QPC2
   endrep listen
   curdis #iw
 enddef
@@ -162,8 +160,8 @@ defproc welcome
 
 enddef
 
-// =============================================================
-// Treasure
+' ==============================================================
+' Treasure {{{1
 
 defproc treasure_report
 
@@ -176,7 +174,7 @@ enddef
 
 defproc treasure_report_details
 
-  // XXX FIXME center -- write proc to print titles
+  ' XXX FIXME center -- write proc to print titles
   at #ow,8,7
   print #ow,"INFORME DEL TESORO"
   treasure_report_details_2
@@ -185,9 +183,9 @@ enddef
 
 defproc print_money(money)
 
-  // XXX FIXME -- remove blanks on the left
+  ' XXX FIXME -- remove blanks on the left
   print_using #ow,"###,###,###.###' RTD'",money*1000;
-  // XXX TODO -- write and ad hoc function
+  ' XXX TODO -- write and ad hoc function
 
 enddef
 
@@ -219,11 +217,11 @@ defproc bankruptcy
   print #ow,"El poder de la policía bajará"\\:
   print #ow,"y su propio poder también."
   if group_data$(army,popularity)>"0"
-    // XXX FIXME -- coercion:
+    ' XXX FIXME -- coercion:
     let group_data$(army,popularity)=group_data$(army,popularity)-1
   endif
   if group_data$(police,popularity)>"0"
-    // XXX FIXME -- coercion:
+    ' XXX FIXME -- coercion:
     let group_data$(police,popularity)=group_data$(police,popularity)-1
   endif
   if group_data$(police,power)>"0"
@@ -236,8 +234,8 @@ defproc bankruptcy
 
 enddef
 
-// =============================================================
-// Plot
+' ==============================================================
+' Plot {{{1
 
 defproc new_month
 
@@ -262,8 +260,8 @@ enddef
 
 defproc plot
 
-  // XXX TODO -- How this works and what is the meaning of fields 3 and 4 of
-  // group_data$()?
+  ' XXX TODO -- How this works and what is the meaning of fields 3 and 4 of
+  ' group_data$()?
 
   loc a,p
 
@@ -298,14 +296,14 @@ defproc murder
 
     cls_ black,white,black
     at #ow,10,7:print #ow,"INTENTO DE ASESINATO"
-    at #ow,20,0:print #ow,"por un miembro de ";group_name$(group) // XXX TODO special individual names for this case
+    at #ow,20,0:print #ow,"por un miembro de ";group_name$(group) ' XXX TODO special individual names for this case
     cls #ow
     pause 30: fx_2: pause 50
 
     if ((group_data$(army,3)="A" and group_data$(peasants,3)="A" and group_data$(landowners,3)="A") or not (group_data$(police,popularity)>low or group_data$(police,power)>low or rnd(0 to 1)))
-      // XXX check the compacted logic above
+      ' XXX check the compacted logic above
       cls_ black,white,black
-      center #ow,12,"¡Está usted muerto!" // XXX no sense 2º person
+      center #ow,12,"¡Está usted muerto!" ' XXX no sense 2º person
       zx_beep 3,-40
       let alive=0
     else
@@ -318,8 +316,8 @@ defproc murder
 
 enddef
 
-// =============================================================
-// Decisions
+' ==============================================================
+' Decisions {{{1
 
 defproc audience
 
@@ -351,7 +349,7 @@ defproc audience
   center #ow,10,"Petición "&group_genitive_name$(sociting_group)&":"
   paper #ow,white
   at #ow,14,0
-  // XXX FIXME convert the first letter of `this_decision_name$` to lowercase:
+  ' XXX FIXME convert the first letter of `this_decision_name$` to lowercase:
   tell "¿Está su excelencia conforme con "&this_decision_name$&"?"
   wait_key_press
   advert this_decision
@@ -367,7 +365,7 @@ defproc audience
 
   let c=cash_advice(this_decision)
   ink #ow,green
-  // print #ow,blank_line$ // XXX ?
+  ' print #ow,blank_line$ ' XXX ?
   if c=0
     cls #ow
     at #ow,10,1
@@ -383,8 +381,8 @@ defproc audience
   let x=group_data$(soliciting_group,popularity)
   let y=code(this_decision_data$(soliciting_group+3))-77
   let x=x-y
-  if x<0:let x=0 // XXX use maximum
-  // XXX FIXME -- coercion:
+  if x<0:let x=0 ' XXX use maximum
+  ' XXX FIXME -- coercion:
   let group_data$(soliciting_group,popularity)=x
   cls #ow
   treasure_report
@@ -461,7 +459,7 @@ defproc decision
       endsel
 
       advert chosen_decision
-      // XXX restore the screen colors here?
+      ' XXX restore the screen colors here?
       at #ow,4,0
       print #ow,decision_name$(chosen_decision)
       let c=cash_advice(chosen_decision)
@@ -491,23 +489,23 @@ defproc decision
 
 enddef
 
-defproc take_only_once_decision(decision) // XXX rename
+defproc take_only_once_decision(decision) ' XXX rename
   let decision_data$(decision,1)="*"
   take_decision decision
 enddef
 
-defproc take_decision(decision) // XXX rename
+defproc take_decision(decision) ' XXX rename
 
   loc group,t$,x
 
   let t$=decision_data$(decision,4 to 11)
   for group=1 to groups
     if t$(group)<>"M"
-      // M means 0 above
+      ' M means 0 above
       let x=group_data$(group,popularity)+(code(t$(group))-77)
-      if x>9:let x=9 // XXX use maximum and minimum
+      if x>9:let x=9 ' XXX use maximum and minimum
       if x<0:let x=0
-      // XXX FIXME -- coercion:
+      ' XXX FIXME -- coercion:
       let group_data$(group,popularity)=x
     endif
   endfor group
@@ -515,7 +513,7 @@ defproc take_decision(decision) // XXX rename
   let t$=decision_data$(decision,12 to 17)
   for group=1 to local_groups
     if t$(group)<>"M"
-      // M means 0 above
+      ' M means 0 above
       let x=group_data$(group,power)+(code(t$(group))-77)
       if x>9:let x=9
       if x<0:let x=0
@@ -523,7 +521,7 @@ defproc take_decision(decision) // XXX rename
     endif
   endfor group
 
-  // XXX move: it seems this is month stuff:
+  ' XXX move: it seems this is month stuff:
   let money=money+decision_cost
   let month_payment=month_payment-decision_monthly_cost
   if month_payment<0:let month_payment=0
@@ -543,7 +541,7 @@ defproc advert(decision)
     cls_ yellow,yellow,yellow
     paper #ow,black
     at #ow,1,0
-    print #ow,decision_name$(decision) // XXX FIXME wrap/justify
+    print #ow,decision_name$(decision) ' XXX FIXME wrap/justify
     paper #ow,white:ink #ow,black
     at #ow,3,0
     print #ow,"Su popularidad entre..."
@@ -575,8 +573,8 @@ defproc advert(decision)
   endif
 enddef
 
-// =============================================================
-// Secret police report
+' ==============================================================
+' Secret police report {{{1
 
 defproc police_report
 
@@ -624,7 +622,7 @@ defproc police_report_data
 
     if group<=3 and group_data$(group,3)="R"
       at #ow,line_,21
-      print #ow,group_data$(group,4) // XXX what does it mean?
+      print #ow,group_data$(group,4) ' XXX what does it mean?
     endif
 
     let x=group_data$(group,popularity)
@@ -667,7 +665,7 @@ defproc police_report_not_avalaible
     print #ow,\\"Tu popularidad entre la policía es ";group_data$(police,popularity);"."
   endif
   if group_data$(police,power)<=low
-    print #ow,to 3\\"El poder de la policía es ";group_data$(police,power);"." // todo prevent "policía" twice.
+    print #ow,to 3\\"El poder de la policía es ";group_data$(police,power);"." ' todo prevent "policía" twice.
   endif
   if money<=0
     print #ow,to 3\\"No tienes dinero para pagar un informe."
@@ -675,8 +673,8 @@ defproc police_report_not_avalaible
 
 enddef
 
-// =============================================================
-// Revolution
+' ==============================================================
+' Revolution {{{1
 
 defproc revolution
 
@@ -701,7 +699,7 @@ defproc revolution
   if try_escaping
 
     if decision_data$(36,1)="*"
-      // the helicopter was bought before
+      ' the helicopter was bought before
       if rnd(0 to 2)
         center #ow,12,"¡Escapas en helicóptero!"
         let escape=1
@@ -729,7 +727,7 @@ defproc revolution
     endif
     ret
 
-  endif // escape
+  endif ' escape
 
   rep ask_for_help
 
@@ -807,12 +805,12 @@ defproc revolution
 
 enddef
 
-// =============================================================
-// Treasure
+' ==============================================================
+' Treasure {{{1
 
 deffn cash_advice(decision)
 
-  // loc decision_cost
+  ' loc decision_cost
 
   paper #ow,yellow:ink #ow,black
   let decision_cost=10*(code(decision_data$(decision,cost))-77)
@@ -854,7 +852,7 @@ defproc ask_for_loan(decision)
 
   loc country,loan
 
-  sel on decision // XXX tmp make it better
+  sel on decision ' XXX tmp make it better
     =38:let country=russian
     =39:let country=usa
   endsel
@@ -883,12 +881,12 @@ defproc ask_for_loan(decision)
       at #ow,12,2:print #ow,"Te deniegan un nuevo préstamo."
     else
 
-      // XXX FIXME run-time error in this expression:
-      // 2016-01-22: again:
-      // country=0
-      // popularity=1
-      // low=3
-      // group_data$(country,popularity) = character nul
+      ' XXX FIXME run-time error in this expression:
+      ' 2016-01-22: again:
+      ' country=0
+      ' popularity=1
+      ' low=3
+      ' group_data$(country,popularity) = character nul
 
       if group_data$(country,popularity)<=low
         at #ow,12,12
@@ -929,8 +927,8 @@ defproc money_transfer
 
 enddef
 
-// =============================================================
-// News
+' ==============================================================
+' News {{{1
 
 defproc news
 
@@ -967,8 +965,8 @@ defproc news
 
 enddef
 
-// =============================================================
-// War
+' ==============================================================
+' War {{{1
 
 defproc war
 
@@ -989,12 +987,12 @@ defproc war
 
 enddef
 
-defproc increase_popularity(group) // XXX rename
+defproc increase_popularity(group) ' XXX rename
   local x
-  // todo: write a general solution to update the 
-  // popularity by any amount, positive or negative.
+  ' todo: write a general solution to update the 
+  ' popularity by any amount, positive or negative.
   let x=group_data$(group,popularity)
-  // XXX FIXME -- coercion:
+  ' XXX FIXME -- coercion:
   let group_data$(group,popularity)=x+(x<9)
 enddef
 
@@ -1022,7 +1020,7 @@ defproc actual_war
 
   if ls+rnd(-1 to 1)<rs
 
-    // Ritimba wins
+    ' Ritimba wins
 
     zx_border black
     cls #ow
@@ -1032,7 +1030,7 @@ defproc actual_war
 
   else
 
-    // Leftoto wins
+    ' Leftoto wins
 
     cls_ black,white,black
     at #ow,7,7
@@ -1051,7 +1049,7 @@ defproc actual_war
       pause 30: fx_2
       at #ow,18,7:print #ow,"sumarísimamente ejecutado."
     else
-      // Escape
+      ' Escape
       cls #ow 
       at #ow,12,3:print #ow,"¡Escapas en helicóptero!"
       let escape=1
@@ -1062,8 +1060,8 @@ defproc actual_war
 
 enddef
 
-// =============================================================
-// The end
+' ==============================================================
+' The end {{{1
 
 defproc the_end
 
@@ -1098,8 +1096,8 @@ defproc the_end
   police_report_data: wait_key_press
 enddef
 
-// =============================================================
-// Input
+' ==============================================================
+' Input {{{1
 
 defproc key_prompt(prompt$,colour)
   paper #iw,colour
@@ -1150,8 +1148,8 @@ defproc wait_key_press
   let key$=get_key$
 enddef
 
-// =============================================================
-// Data
+' ==============================================================
+' Data {{{1
 
 defproc init_data
 
@@ -1160,10 +1158,10 @@ defproc init_data
   let score=0
   let decisions=49
   let groups=8
-  let local_groups=6 // all but Russia and USA
-  let main_groups=3 // only the groups that can rebel.
+  let local_groups=6 ' all but Russia and USA
+  let main_groups=3 ' only the groups that can rebel.
 
-  // Group ids
+  ' Group ids
   let army=1
   let peasants=2
   let landowners=3
@@ -1173,12 +1171,12 @@ defproc init_data
   let russia=7
   let usa=8
 
-  // Group fields in group_data$()
+  ' Group fields in group_data$()
   let popularity=1
   let power=2
-  // XXX the goal of fields 3 and 4 is unknown so far
+  ' XXX the goal of fields 3 and 4 is unknown so far
 
-  // Decision fields in decision_data$()
+  ' Decision fields in decision_data$()
   let cost=2
   let monthly_cost=3
 
@@ -1186,7 +1184,7 @@ defproc init_data
   dim decision_data$(decisions,17)
   dim decision_name$(decisions,decision_name_max_len)
 
-  // XXX TODO -- calculate max length
+  ' XXX TODO -- calculate max length
   dim \
     group_data$(groups,4),\
     group_name$(groups,18),\
@@ -1199,7 +1197,7 @@ defproc init_data
   for a=1 to decisions:
     read decision_data$(a),x$
     if len(x$)>decision_name_max_len
-      // XXX tmp
+      ' XXX tmp
       print "ERROR: decision name too long:"\x$
       stop
     else
@@ -1216,8 +1214,8 @@ defproc init_data
       group_genitive_name$(a)
   endfor a
 
-  // XXX not needed. todo 
-  // for a=1 to decisions: let decision_data$(a,1)="N"
+  ' XXX not needed. todo 
+  ' for a=1 to decisions: let decision_data$(a,1)="N"
 
   let money=1000
   let escape=0
@@ -1226,15 +1224,15 @@ defproc init_data
   let money_in_switzerland=0
   let alive=1
   let months=0
-  let pc=0 // XXX what for?
+  let pc=0 ' XXX what for?
   let revolution_strength=10
 
 enddef
 
-// chars in decision_data$():
-// 01: decision already taken ("N"=no, "*"=yes)
-// 04-11: +/- popularity for groups 1-8 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
-// 12-17 +/- power for groups 1-6 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
+' chars in decision_data$():
+' 01: decision already taken ("N"=no, "*"=yes)
+' 04-11: +/- popularity for groups 1-8 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
+' 12-17 +/- power for groups 1-6 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
 
 data "NMHQJLMMMMMPKLMMM","Instaurar el servicio militar obligatorio"
 data "NMMPMJMMMMMNMLMMM","Requisar tierras para construir un polígono de tiro"
@@ -1282,18 +1280,18 @@ data "NMMLLPMMLMMLLRLML","Permitir que los terratenientes tengan ejércitos priv
 data "NMMMMMMMIMMMMMQMI","Los archivos de la policía secreta han sido robados"
 data "NMMMMMMMMMMLMMVMM","Cuba está entrenando a las guerillas"
 data "NMMMMMMMMMMIMMOMN","Un barracón del ejército ha explotado"
-data "NMMMMMMMMMMMMJMKM","El precio de los plátanos ha caído un 98%" // XXX 98?
+data "NMMMMMMMMMMMMJMKM","El precio de los plátanos ha caído un 98%" ' XXX 98?
 data "NMMMMMMMMMMMMOMIM","El jefe del estado mayor del ejército se ha fugado a Leftoto"
 data "NMMMMMMMMMMMILKMM","Se ha declarado una epidemia entre los campesinos"
 
-// data:
-// group_data$(a),group_name$(a),group_short_name$(a)
+' data:
+' group_data$(a),group_name$(a),group_short_name$(a)
 
-// chars in group_data$():
-// 1=popularity
-// 2=power
-// 3=unknown // XXX
-// 4=unknown // XXX
+' chars in group_data$():
+' 1=popularity
+' 2=power
+' 3=unknown ' XXX
+' 4=unknown ' XXX
 
 data "76::","el ejército","militares","los militares","del ejército"
 data "76::","los campesinos","campesinos","los campesinos","de los campesinos"
@@ -1304,16 +1302,16 @@ data "76--","la policía secreta","policías secretos","los policías secretos",
 data "7---","Rusia","rusos","los rusos","de Rusia"
 data "7---","Usamérica","usamericanos","los usamericanos","de Usamérica"
 
-// =============================================================
-// Special effects
+' ==============================================================
+' Special effects {{{1
 
-defproc zx_border(colour) // XXX tmp
+defproc zx_border(colour) ' XXX tmp
 enddef
 
-defproc zx_beep(duration,pitch) // XXX TODO
+defproc zx_beep(duration,pitch) ' XXX TODO
 enddef
 
-defproc fx_war // XXX TODO
+defproc fx_war ' XXX TODO
 enddef
 
 defproc fx_2
@@ -1333,15 +1331,15 @@ defproc tune(m$)
 
 enddef
 
-// =============================================================
-// Stock code
+' ==============================================================
+' Stock code {{{1
 
 deffn on_(flag,result_if_false,result_if_true)
   if flag:ret result_if_true:else:ret result_if_false
 enddef
 
-// =============================================================
-// Text output
+' ==============================================================
+' Text output {{{1
 
 defproc cls_(paper_colour,ink_colour,border_colour)
 
@@ -1389,13 +1387,13 @@ enddef
 
 defproc tellNL(text$)
   print #ow,\" ";:tell(text$)
-  // XXX little bug here:
-  // an extra blank line is created if the 
-  // previous line occupied the whole width.
+  ' XXX little bug here:
+  ' an extra blank line is created if the 
+  ' previous line occupied the whole width.
 enddef
 
-// =============================================================
-// Screen
+' ==============================================================
+' Screen {{{1
 
 deffn csize_width_pixels(w)
   sel on w
@@ -1411,7 +1409,7 @@ deffn csize_height_pixels(h)
 enddef
 
 deffn contrast_colour(colour)
-  // XXX TODO make it with a bit mask
+  ' XXX TODO make it with a bit mask
   sel on colour
     =black,blue,red,purple:ret white
     =remainder:ret black
@@ -1424,12 +1422,12 @@ defproc cursen_home(channel)
 enddef
 
 deffn ow_line_y(line_)
-  // Return the y pixel coord of the given line in #ow.
+  ' Return the y pixel coord of the given line in #ow.
   ret char_height_pixels*line_
 enddef
 
 deffn ow_column_x(column)
-  // Return the x pixel coord of the given column in #ow.
+  ' Return the x pixel coord of the given column in #ow.
   ret char_width_pixels*column
 enddef
 
@@ -1446,11 +1444,11 @@ defproc ql_font
   fonts 0
 enddef
 
-// =============================================================
-// Init
+' ==============================================================
+' Init {{{1
 
 defproc init_font
-  let font$=dev$&"iso8859-1_font" // XXX tmp
+  let font$=dev$&"iso8859-1_font" ' XXX tmp
   font_length=flen(\font$)
   font_address=alchp(font_length)
   lbytes font$,font_address
@@ -1464,10 +1462,10 @@ defproc init_windows
   let csize_width=3
   let csize_height=scr_height<>256
 
-  let iw_lines=3 // input window lines
-  let ow_lines=lines-iw_lines // output window lines
+  let iw_lines=3 ' input window lines
+  let ow_lines=lines-iw_lines ' output window lines
 
-  let ow=fopen("scr_") // output window
+  let ow=fopen("scr_") ' output window
   csize #ow,csize_width,csize_height
   let char_width_pixels=csize_width_pixels(csize_width)
   let char_height_pixels=csize_height_pixels(csize_height)
@@ -1477,7 +1475,7 @@ defproc init_windows
   let ow_y=(scr_height-(lines*char_height_pixels))/2
   window #ow,ow_width,ow_height,ow_x,ow_y
 
-  let iw=fopen("con_") // input window
+  let iw=fopen("con_") ' input window
   csize #iw,csize_width,csize_height
   let iw_width=ow_width
   let iw_height=iw_lines*char_height_pixels
@@ -1516,8 +1514,8 @@ defproc init_once
   init_font
 enddef
 
-// =============================================================
-// Meta
+' ==============================================================
+' Meta {{{1
 
 defproc w0
   window 800,600,0,0
@@ -1531,15 +1529,15 @@ defproc debug_(message$)
   endif
 enddef
 
-defproc finish // XXX tmp
+defproc finish ' XXX tmp
   close
   ql_font
   rechp font_address
 enddef
 
-// =============================================================
-// Boot
+' ==============================================================
+' Boot {{{1
 
 ritimba
 
-// vim: filetype=sbim
+' vim: filetype=sbim
