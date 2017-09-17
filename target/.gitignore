@@ -1,4 +1,16 @@
-# Do not ignore this file, just in case the directory is empty:
-!.gitignore
+# Ignore the emulator SMSQmulator:
+target/SMSQ*
+target/lib/
+
+# But not its config file:
+!target/SMSQemulator.ini
+
+# Ignore the generated sources
+target/boot
+target/*_bas
+
+# Ignore the S*BASIC extensions and font
+ext/
+*_font
 
 # vim: filetype=config
