@@ -2,12 +2,12 @@ rem Ritimba
 
 // XXX UNDER DEVELOPMENT
 
-let version$="0.0.0+201606030008"
+let version$="0.0.0+201709171939"
 
 // =============================================================
 // Author and license
 
-rem Copyright (C) 2011,2012,2015,2016 Marcos Cruz (programandala.net)
+rem Copyright (C) 2011,2012,2015,2016,2017 Marcos Cruz (programandala.net)
 
 rem You may do whatever you want with this work, so long as you
 rem retain the copyright notice(s) and this license in all
@@ -42,7 +42,7 @@ let path$=device$&"sb_ritimba_"
 // =============================================================
 // Extensions needed
 
-lrespr path$&"exists.bin" // EXISTS, by Phil Borman
+lrespr path$&"ext_exists_code" // EXISTS, by Phil Borman
 
 // =============================================================
 // Main loop
@@ -1459,7 +1459,7 @@ enddef
 // Init
 
 defproc init_font
-  let font$=path$&"iso_8859-1_font" // XXX tmp
+  let font$=path$&"iso8859-1_font" // XXX tmp
   font_length=flen(\font$)
   font_address=alchp(font_length)
   lbytes font$,font_address
