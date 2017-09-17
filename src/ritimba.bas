@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.1+201709172020"
+version$="0.1.0-dev.2+201709172125"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -47,15 +47,21 @@ defproc ritimba
       new_month
       audience
       plot
-      murder:if not alive:exit game
-      war:if not alive or escape:exit game
+      murder
+      if not alive:\
+        exit game
+      war
+      if not alive or escape:\
+        exit game
       plot
       police_report
       decision
       plot
       police_report
       news
-      revolution:if not alive or escape:exit game
+      revolution
+      if not alive or escape:\
+        exit game
     endrep game
     the_end
   endrep again
@@ -112,7 +118,8 @@ defproc title
   cls_ cyan,black,black
   tapestry "Ritimba"
   national_flag
-  for a=1 to 50: zx_beep .03,a
+  for a=1 to 50:
+    zx_beep .03,a
   paper #ow,white:ink #ow,black
   center #ow,3," Pulsa una tecla y gobernarás "
   center #ow,5," Ritimba "
@@ -125,15 +132,16 @@ defproc national_anthem
   cursen_home #iw
   rep listen
     for a=1 to len(tune$)
-      if len(inkey$(#iw)):exit listen
+      if len(inkey$(#iw)):\
+        exit listen
       let pitch=code(tune$(a))-80
       if pitch=16
-        ' pause 20 ' XXX FIXME -- this makes INKEY$ fail in QPC2
+        pause 20 ' XXX FIXME -- this made INKEY$ fail in QPC2
       else
         zx_beep .5,pitch
       endif
     endfor a
-    ' pause 30 ' XXX FIXME -- this makes INKEY$ fail in QPC2
+    pause 30 ' XXX FIXME -- this made INKEY$ fail in QPC2
   endrep listen
   curdis #iw
 enddef
@@ -233,7 +241,8 @@ defproc bankruptcy
   if group_data$(police,power)>"0"
     let group_data$(police,power)=group_data$(police,power)-1
   endif
-  if strength>0:let strength=strength-0
+  if strength>0:\
+    let strength=strength-0
   pause 250
   plot
   police_report
@@ -271,9 +280,11 @@ defproc plot
 
   loc a,p
 
-  if months<=2 or months<pc:ret
+  if months<=2 or months<pc:\
+    ret
 
-  for a=1 to main_groups: let group_data$(a,3 to 4)="::"
+  for a=1 to main_groups:\
+    let group_data$(a,3 to 4)="::"
 
   for a=1 to main_groups
     if group_data$(a,popularity)<=low
@@ -392,13 +403,15 @@ defproc audience
     at #ow,15,4:print #ow,"Su respuesta debe ser no."
     pause 250
   else
-    if yes_key:ret
+    if yes_key:\
+      ret
   endif
 
   let x=group_data$(soliciting_group,popularity)
   let y=code(this_decision_data$(soliciting_group+3))-77
   let x=x-y
-  if x<0:let x=0 ' XXX use maximum
+  if x<0:\
+    let x=0 ' XXX TODO -- use `maximum`
   ' XXX FIXME -- coercion:
   let group_data$(soliciting_group,popularity)=x
   cls #ow
@@ -486,7 +499,8 @@ defproc decision
       endif
       at #ow,4,0
       print #ow,decision_name$(chosen_decision)
-      if not yes_key:next choose_decision
+      if not yes_key:\
+        next choose_decision
 
       if chosen_decision<>35
         treasure_report
@@ -520,8 +534,10 @@ defproc take_decision(decision) ' XXX rename
     if t$(group)<>"M"
       ' M means 0 above
       let x=group_data$(group,popularity)+(code(t$(group))-77)
-      if x>9:let x=9 ' XXX use maximum and minimum
-      if x<0:let x=0
+      if x>9:\
+        let x=9 ' XXX use `maximum` and `minimum`
+      if x<0:\
+        let x=0
       ' XXX FIXME -- coercion:
       let group_data$(group,popularity)=x
     endif
@@ -532,8 +548,10 @@ defproc take_decision(decision) ' XXX rename
     if t$(group)<>"M"
       ' M means 0 above
       let x=group_data$(group,power)+(code(t$(group))-77)
-      if x>9:let x=9
-      if x<0:let x=0
+      if x>9:\
+        let x=9 ' XXX use `maximum` and `minimum`
+      if x<0:\
+        let x=0
       let group_data$(group,power)=x
     endif
   endfor group
@@ -541,7 +559,8 @@ defproc take_decision(decision) ' XXX rename
   ' XXX move: it seems this is month stuff:
   let money=money+decision_cost
   let month_payment=month_payment-decision_monthly_cost
-  if month_payment<0:let month_payment=0
+  if month_payment<0:\
+    let month_payment=0
 
 enddef
 
@@ -567,7 +586,8 @@ defproc advert(decision)
       let x=code(decision_data$(decision,a+3))-77
       if x
         print #ow,\to 2;group_plural_name$(a);to 21;
-        if x>0:print #ow,"+";
+        if x>0:\
+          print #ow,"+";
         print #ow,x;
         if soliciting_group=a and decision<25
           paper #ow,soliciting_group:ink #ow,yellow
@@ -712,7 +732,8 @@ defproc revolution
 
   for a=1 to main_groups
     let rebel_group=rnd(1 to 3)
-    if group_data$(rebel_group,3)="R":exit a
+    if group_data$(rebel_group,3)="R":\
+      exit a
   next a
     ret
   endfor a
@@ -720,7 +741,9 @@ defproc revolution
   cls_ red,black,red
   ink #ow,white
   center #ow,10,"REVOLUCIÓN"
-  for a=1 to 5: zx_beep .5,20: zx_beep .5,10
+  for a=1 to 5:\
+    zx_beep .5,20:\
+    zx_beep .5,10
   cls_ yellow,black,yellow
 
   center #ow,12,"¿Intento de escape?"
@@ -762,7 +785,7 @@ defproc revolution
   rep ask_for_help
 
     pause 150
-    cls #ow 
+    cls #ow
 
     let x=\
       group_data$(rebel_group,power)\
@@ -783,10 +806,12 @@ defproc revolution
     if helping_groups
       rep choose_group
         let k$=get_key$
-        if k$ instr "123456":exit choose_group
+        if k$ instr "123456":\
+          exit choose_group
       endrep choose_group
       if group_data$(k$,popularity)>low
-        let helping_group=k$: exit ask_for_help
+        let helping_group=k$:\
+        exit ask_for_help
       else
         cls #ow
         center #ow,12,"¡Debes de estar bromeando!"
@@ -862,15 +887,20 @@ deffn cash_advice(decision)
   at #ow,9,1:print #ow,"Esta decisión ": print
 
   if decision_cost
-    if decision_cost>0:print #ow," aportaría al";
-    if decision_cost<0:print #ow," costaría al";
+    if decision_cost>0:\
+      print #ow," aportaría al";
+    if decision_cost<0:\
+      print #ow," costaría al";
     print #ow,"  tesoro ";abs(decision_cost);" 000 RTD": print
-    if monthly_cost:print #ow," y"
+    if monthly_cost:\
+      print #ow," y"
   endif
 
   if decision_monthly_cost
-    if decision_monthly_cost<0:print #ow," subiría";
-    if decision_monthly_cost>0:print #ow," bajaría";
+    if decision_monthly_cost<0:\
+      print #ow," subiría";
+    if decision_monthly_cost>0:\
+      print #ow," bajaría";
     print #ow," los costos mensuales en ";\
       abs(decision_monthly_cost);" 000 RTD"
   endif
@@ -999,16 +1029,19 @@ defproc news
 
     let random_event=rnd(first_event to last_event)
     for i=1 to events
-      if not (decision_data$(random_event,1)="N"):exit i
+      if not (decision_data$(random_event,1)="N"):\
+        exit i
       let random_event=random_event+1
-      if random_event>last_event:let random_event=first_event
+      if random_event>last_event:\
+        let random_event=first_event
     next i
       ret
     endfor i
 
     cls_ white,black,white
     center #ow,10,"NOTICIA DE ÚLTIMA HORA"
-    for i=1 to 10: zx_beep .6,30
+    for i=1 to 10:\
+      zx_beep .6,30
     cls #ow
     center #ow,10,"NOTICIA DE ÚLTIMA HORA"
     at #ow,14,0:print #ow,decision_name$(random_event)
@@ -1029,8 +1062,11 @@ defproc war
 
   loc i
 
-  if group_data$(leftoto,popularity)>low:ret
-  if group_data$(leftoto,power)<low:ret
+  if group_data$(leftoto,popularity)>low:\
+    ret
+
+  if group_data$(leftoto,power)<low:\
+    ret
 
   if not rnd(0 to 3)
     actual_war
@@ -1046,7 +1082,7 @@ enddef
 
 defproc increase_popularity(group) ' XXX rename
   local x
-  ' todo: write a general solution to update the 
+  ' todo: write a general solution to update the
   ' popularity by any amount, positive or negative.
   let x=group_data$(group,popularity)
   ' XXX FIXME -- coercion:
@@ -1059,7 +1095,8 @@ defproc actual_war
   center #ow,8,"Leftoto nos invade"
   let rs=0
   for a=1 to main_groups
-    if group_data$(a,popularity)>low:let rs=rs+group_data$(a,power)
+    if group_data$(a,popularity)>low:\
+      let rs=rs+group_data$(a,power)
   endfor a
   if group_data$(police,popularity)>low
     let rs=rs+group_data$(police,power)
@@ -1068,7 +1105,8 @@ defproc actual_war
   at #ow,12,1:print #ow,"La fuerza de Ritimba es ";rs
   let ls=0
   for a=1 to 6
-    if group_data$(a,popularity)<=low:let ls=ls+group_data$(a,power)
+    if group_data$(a,popularity)<=low:\
+      let ls=ls+group_data$(a,power)
   endfor a
   at #ow,14,1:print #ow,"La fuerza de Leftoto es ";ls
 
@@ -1082,7 +1120,7 @@ defproc actual_war
     zx_border black
     cls #ow
     at #ow,12,7
-    print #ow," Leftoto derrotado ": 
+    print #ow," Leftoto derrotado ":
     let group_data$(leftoto,power)="0"
 
   else
@@ -1107,7 +1145,7 @@ defproc actual_war
       at #ow,18,7:print #ow,"sumarísimamente ejecutado."
     else
       ' Escape
-      cls #ow 
+      cls #ow
       at #ow,12,3:print #ow,"¡Escapas en helicóptero!"
       let escape=1
 
@@ -1148,7 +1186,8 @@ defproc the_end
   endif
 
   print #ow,\\\" Tu total es ";to 28;:print #ow,x
-  if x>score:let score=x
+  if x>score:\
+    let score=x
   print #ow,\"[ La mayor puntuación es ";score;" ]"
   wait_key_press: cls #ow
   cls_ black,white,black
@@ -1170,19 +1209,22 @@ enddef
 deffn get_key_prompt$(prompt$)
 
   rep dont_press_now
-    if inkey$(#iw)="":exit dont_press_now
+    if inkey$(#iw)="":\
+      exit dont_press_now
   endrep dont_press_now
 
   rep press_now
 
     key_prompt prompt$,prompt_colour_1
     let key$=inkey$(#iw,50)
-    if key$<>"":exit press_now
+    if key$<>"":\
+      exit press_now
     zx_beep .01,30
 
     key_prompt prompt$,prompt_colour_2
     let key$=inkey$(#iw,50)
-    if key$<>"":exit press_now
+    if key$<>"":\
+      exit press_now
     zx_beep .01,20
 
   endrep press_now
@@ -1274,7 +1316,7 @@ defproc init_data
       group_genitive_name$(a)
   endfor a
 
-  ' XXX not needed. todo 
+  ' XXX not needed. todo
   ' for a=1 to decisions: let decision_data$(a,1)="N"
 
   let money=1000
@@ -1447,7 +1489,7 @@ data "7---",\
 ' ==============================================================
 ' Special effects {{{1
 
-defproc zx_border(colour) ' XXX tmp
+defproc zx_border(colour) ' XXX TMP
 enddef
 
 defproc zx_beep(duration,pitch) ' XXX TODO
@@ -1477,7 +1519,10 @@ enddef
 ' Stock code {{{1
 
 deffn on_(flag,result_if_false,result_if_true)
-  if flag:ret result_if_true:else:ret result_if_false
+  if flag:\
+    ret result_if_true:\
+  else:\
+    ret result_if_false
 enddef
 
 ' ==============================================================
@@ -1511,7 +1556,7 @@ defproc center(channel,line_,text$)
     at #channel,line_,center_for(length)
     print #channel,text$
   endif
-enddef 
+enddef
 
 defproc tell(txt$)
   local text$,first,last
@@ -1530,7 +1575,7 @@ enddef
 defproc tellNL(text$)
   print #ow,\" ";:tell(text$)
   ' XXX little bug here:
-  ' an extra blank line is created if the 
+  ' an extra blank line is created if the
   ' previous line occupied the whole width.
 enddef
 
@@ -1577,8 +1622,8 @@ deffn ow_column_x(column)
 enddef
 
 defproc fonts(font_address)
-  char_use#iw,font_address,0 
-  char_use#ow,font_address,0 
+  char_use#iw,font_address,0
+  char_use#ow,font_address,0
 enddef
 
 defproc iso_font
@@ -1633,7 +1678,8 @@ defproc init_windows
 enddef
 
 defproc init_screen
-  mode 8
+  if disp_type<>32:\
+    mode 32
   colour_ql
   let black=0
   let blue=1
@@ -1648,7 +1694,6 @@ defproc init_screen
 enddef
 
 defproc init_once
-  tk2_ext
   init_screen
   init_windows
   init_font
