@@ -1,5 +1,36 @@
-*.bin binary
+# .gitattributes
+
+# This file is part of Ritimba
+# http://programandala.net/es.programa.ritimba.html
+
+# 2017-09-17: Unfortunately, GitHub does not recognize the BASIC
+# language, only a few dialects with their specific filename
+# extensions; even worst, the generic .bas, used by many BASIC
+# dialects, is taken by Visual Basic! Therefore the override here is
+# useless:
+
+# SBASIC sources:
+*.bas linguist-language=BASIC
+*_bas linguist-generated
 *_bas linguist-language=BASIC
-*_font binary
 *_sbim linguist-language=BASIC
-boot linguist-language=BASIC
+
+# S*BASIC extensions:
+*_code binary
+target/ext/* linguist-vendored
+
+# Pictures
+*_scr binary
+*_bmp binary
+*.bmp binary
+
+# Fonts:
+*_font binary
+*_font linguist-vendored
+
+# SMSQmulator:
+target/SMSQ* linguist-vendored
+target/lib/* linguist-vendored
+target/SMSQmulator.ini linguist-vendored=false
+
+# vim: filetype=config

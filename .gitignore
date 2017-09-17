@@ -1,1 +1,3 @@
-ritimba_bas
+target/*
+!target/SMSQmulator.ini
+
