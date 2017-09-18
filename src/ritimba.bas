@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.7+201709190119"
+version$="0.1.0-dev.8+201709190122"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -894,20 +894,20 @@ deffn cash_advice(decision)
     ret 1
   endif
 
-  at #ow,9,1:print #ow,"Esta decisión ": print
+  at #ow,9,1
+  print #ow,"Esta decisión ": print
+  ' XXX TODO -- Create a string and use `tell`.
 
   if decision_cost
     if decision_cost>0:\
-      print #ow," aportaría al";
+      print #ow," aportaría";
     if decision_cost<0:\
-      print #ow," costaría al";
-    print #ow,"  tesoro ";abs(decision_cost);" 000 RTD": print
-    if monthly_cost:\
-      print #ow," y"
-      ' XXX FIXME --
+      print #ow," costaría";
+    print #ow," al tesoro ";abs(decision_cost);" 000 RTD": print
   endif
 
   if decision_monthly_cost
+    print #ow," y"
     if decision_monthly_cost<0:\
       print #ow," subiría";
     if decision_monthly_cost>0:\
