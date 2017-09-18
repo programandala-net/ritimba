@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.6+201709190044"
+version$="0.1.0-dev.7+201709190119"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -729,6 +729,8 @@ enddef
 
 defproc revolution
 
+  ' XXX TODO -- Factor.
+
   loc i%,helping_group,helping_groups,rebel_group,try_escaping
 
   for i%=1 to main_groups
@@ -788,17 +790,18 @@ defproc revolution
     pause 150
     cls #ow
 
-    let x=\
+    let rebels_strength=\
       group_data$(rebel_group,power)\
       +group_data$(group_data$(rebel_group,4),power)
 
     at #ow,5,0
-    print #ow,group_name$(rebel_group);" se ha unido a "
-      ' XXX FIXME -- ha/han
-    print #ow,group_name$(group_data$(rebel_group,4))\\:
-    print #ow,"Su fuerza conjunta es ";x
+    tell \
+      "Se han unido "&\
+      group_name$(rebel_group)&\
+      " y "&\
+      group_name$(group_data$(rebel_group,4))
 
-    print #ow,\\"Su fuerza conjunta es ";x
+    print #ow,\\"Su fuerza conjunta es ";rebels_strength
     print #ow,\\"¿A quién vas a pedir ayuda?"
     let helping_groups=0
     for i%=1 to local_groups
@@ -838,12 +841,14 @@ defproc revolution
   print #ow,\\"La fuerza de ";\
     group_name$(helping_group);" es ";\
     group_data$(helping_group,power)
-  print #ow,\\"La de los revolucionarios es ";x
+  print #ow,\\"La de los revolucionarios es ";rebels_strength
   pause 250
   cls_ white,black,white
   at #ow,12,3:print #ow,"La revolución ha comenzado"
   fx_war
-  if not(x<=strength+group_data$(helping_group,power)+rnd(-1 to 1))
+  if not(rebels_strength<=strength\
+         +group_data$(helping_group,power)\
+         +rnd(-1 to 1))
     cls_ black,white,black
     at #ow,10,7:print #ow,"Has sido derrocado"
     at #ow,12,10:print #ow,"y ";: print #ow,"liquidado."
@@ -899,6 +904,7 @@ deffn cash_advice(decision)
     print #ow,"  tesoro ";abs(decision_cost);" 000 RTD": print
     if monthly_cost:\
       print #ow," y"
+      ' XXX FIXME --
   endif
 
   if decision_monthly_cost
@@ -965,6 +971,10 @@ defproc ask_for_loan(decision)
 
   if months<int(rnd*5)+3
     at #ow,12,2
+
+      ' XXX FIXME -- This position overrides the previous text.
+      ' Concatenate strings and print the result with `tell`.
+
     print #ow,"opinan que es demasiado pronto \
       para conceder ayudas ecónomicas."
   else
