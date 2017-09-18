@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.3+201709180048"
+version$="0.1.0-dev.4+201709181830"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -136,12 +136,12 @@ defproc national_anthem
         exit listen
       let pitch=code(tune$(a))-80
       if pitch=16
-        pause 20
+        beep:pause 20
       else
         zx_beep .5,pitch
       endif
     endfor a
-    pause 30
+    beep:pause 30
   endrep listen
   curdis #iw
 enddef
