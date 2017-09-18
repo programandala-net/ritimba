@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.5+201709182324"
+version$="0.1.0-dev.6+201709190044"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -36,7 +36,7 @@ let dev$=device$("ritimba_bas","flpmdvdevsubwinnfados")
 
 defproc ritimba
 
-  loc a
+  loc i%
 
   init_once
   rep again
@@ -84,19 +84,19 @@ defproc credits
 enddef
 
 defproc national_flag
-  loc a,height,x,y
+  loc i%,height,x,y
   let height=11
   let x=center_for(18)
   let y=8
-  for a=y to y+height
-    at #ow,a,x
+  for i%=y to y+height
+    at #ow,i%,x
     paper #ow,red
     print #ow,"   ";
     paper #ow,blue
     print #ow,"            ";
     paper #ow,green
     print #ow,"   "
-  endfor a
+  endfor i%
   paper #ow,blue:ink #ow,yellow
   let x=center_for(6)
   at #ow,13,x:print #ow,"******"
@@ -105,21 +105,21 @@ defproc national_flag
 enddef
 
 defproc tapestry(text$)
-  loc a,times
+  loc i%,times
   let times=columns*ow_lines/len(text$)
-  for a=1 to times
+  for i%=1 to times
     print #ow,text$;" ";
-    zx_beep .01,40-a+rnd*10
-  endfor a
+    zx_beep .01,40-i%+rnd*10
+  endfor i%
 enddef
 
 defproc title
-  loc a
+  loc i%
   cls_ cyan,black,black
   tapestry "Ritimba"
   national_flag
-  for a=1 to 50:
-    zx_beep .03,a
+  for i%=1 to 50:
+    zx_beep .03,i%
   paper #ow,white:ink #ow,black
   center #ow,3," Pulsa una tecla y gobernarás "
   center #ow,5," Ritimba "
@@ -127,20 +127,20 @@ defproc title
 enddef
 
 defproc national_anthem
-  loc a,pitch,tune$
+  loc i%,pitch,tune$
   let tune$="KPKKMKIHK`KMRPOMOP"
   cursen_home #iw
   rep listen
-    for a=1 to len(tune$)
+    for i%=1 to len(tune$)
       if len(inkey$(#iw)):\
         exit listen
-      let pitch=code(tune$(a))-80
+      let pitch=code(tune$(i%))-80
       if pitch=16
         beep:pause 20
       else
         zx_beep .5,pitch
       endif
-    endfor a
+    endfor i%
     beep:pause 30
   endrep listen
   curdis #iw
@@ -278,30 +278,30 @@ defproc plot
   ' XXX TODO -- How this works and what is the meaning of fields 3 and
   ' 4 of group_data$()?
 
-  loc a,p
+  loc i%,p
 
   if months<=2 or months<pc:\
     ret
 
-  for a=1 to main_groups:\
-    let group_data$(a,3 to 4)="::"
+  for i%=1 to main_groups:\
+    let group_data$(i%,3 to 4)="::"
 
-  for a=1 to main_groups
-    if group_data$(a,popularity)<=low
+  for i%=1 to main_groups
+    if group_data$(i%,popularity)<=low
       for p=1 to local_groups
-        if not(a=p or group_data$(p,popularity)>low)
-          if group_data$(p,power)+group_data$(a,power)\
+        if not(i%=p or group_data$(p,popularity)>low)
+          if group_data$(p,power)+group_data$(i%,power)\
              >=revolution_strength
-            let group_data$(a,3)="R"
-            let group_data$(a,4)=p
+            let group_data$(i%,3)="R"
+            let group_data$(i%,4)=p
             exit p
           endif
         endif
       next p
-        let group_data$(a,3)="A"
+        let group_data$(i%,3)="A"
       endfor p
     endif
-  endfor a
+  endfor i%
 
 enddef
 
@@ -347,7 +347,7 @@ enddef
 
 defproc audience
 
-  loc a,c
+  loc i%,c
 
   cls_ yellow,black,yellow
   paper #ow,green
@@ -357,14 +357,14 @@ defproc audience
 
   rep choose_decision
     let this_decision=rnd(1 to 24)
-    for a=1 to 22
+    for i%=1 to 22
       if decision_data$(this_decision,1)="N"
         exit choose_decision
       endif
       let this_decision=(this_decision-int(this_decision/24)*24)+1
-    end for a
-    for a=1 to 24:\
-      let decision_data$(a,1)="N"
+    end for i%
+    for i%=1 to 24:\
+      let decision_data$(i%,1)="N"
   endrep choose_decision
 
   let decision_data$(this_decision,1)="*"
@@ -422,7 +422,7 @@ enddef
 
 defproc decision
 
-  loc a,c,chosen_decision,key,options
+  loc i%,c,chosen_decision,key,options
 
   rep choose_gratis_decision
     rep choose_decision
@@ -452,12 +452,12 @@ defproc decision
 
       at #ow,(20-(((code(x$(2))-20)-(code(x$(1))-20))*3))*.5,0
       let options=0
-      for a=code(x$(1))-20 to code(x$(2))-20
-        if decision_data$(a,1)<>"*"
+      for i%=code(x$(1))-20 to code(x$(2))-20
+        if decision_data$(i%,1)<>"*"
           let options=options+1
-          tellNL options&". "&decision_name$(a)&"."
+          tellNL options&". "&decision_name$(i%)&"."
         endif
-      endfor a
+      endfor i%
 
       if not options
         at #ow,12,3
@@ -567,13 +567,13 @@ enddef
 
 defproc advert(decision)
 
-  loc a,x
+  loc i%,x
 
   cls_ green,black,blue
   paper #ow,cyan
-  for a=0 to ow_lines-1
-    at #ow,a,11:print #ow,"¿Consejo?"
-  endfor a
+  for i%=0 to ow_lines-1
+    at #ow,i%,11:print #ow,"¿Consejo?"
+  endfor i%
   if yes_key
     cls_ yellow,yellow,yellow
     paper #ow,black
@@ -583,29 +583,29 @@ defproc advert(decision)
     at #ow,3,0
     print #ow,"Su popularidad entre..."
     paper #ow,yellow
-    for a=1 to groups
-      let x=code(decision_data$(decision,a+3))-77
+    for i%=1 to groups
+      let x=code(decision_data$(decision,i%+3))-77
       if x
-        print #ow,\to 2;group_plural_name$(a);to 21;
+        print #ow,\to 2;group_plural_name$(i%);to 21;
         if x>0:\
           print #ow,"+";
         print #ow,x;
-        if soliciting_group=a and decision<25
+        if soliciting_group=i% and decision<25
           paper #ow,soliciting_group:ink #ow,yellow
           print #ow,"< "
           paper #ow,yellow:ink #ow,black
         endif
       endif
-    endfor a
+    endfor i%
     paper #ow,white
     print #ow,\\\"El poder de..."
     paper #ow,yellow
-    for a=1 to local_groups
-      let x=code(decision_data$(decision,a+11))-77
+    for i%=1 to local_groups
+      let x=code(decision_data$(decision,i%+11))-77
       if x
-        print #ow,to 2;group_name$(a);to 21;"+"(1 to x>0);x
+        print #ow,to 2;group_name$(i%);to 21;"+"(1 to x>0);x
       endif
-    endfor a
+    endfor i%
     wait_key_press
     cls #ow
   endif
@@ -729,20 +729,20 @@ enddef
 
 defproc revolution
 
-  loc a,helping_group,helping_groups,rebel_group,try_escaping
+  loc i%,helping_group,helping_groups,rebel_group,try_escaping
 
-  for a=1 to main_groups
+  for i%=1 to main_groups
     let rebel_group=rnd(1 to main_groups)
     if group_data$(rebel_group,3)="R":\
-      exit a
-  next a
+      exit i%
+  next i%
     ret
-  endfor a
+  endfor i%
 
   cls_ red,black,red
   ink #ow,white
   center #ow,10,"REVOLUCIÓN"
-  for a=1 to 5:\
+  for i%=1 to 5:\
     zx_beep .5,20:\
     zx_beep .5,10
   cls_ yellow,black,yellow
@@ -791,18 +791,22 @@ defproc revolution
     let x=\
       group_data$(rebel_group,power)\
       +group_data$(group_data$(rebel_group,4),power)
+
     at #ow,5,0
     print #ow,group_name$(rebel_group);" se ha unido a "
+      ' XXX FIXME -- ha/han
     print #ow,group_name$(group_data$(rebel_group,4))\\:
     print #ow,"Su fuerza conjunta es ";x
+
+    print #ow,\\"Su fuerza conjunta es ";x
     print #ow,\\"¿A quién vas a pedir ayuda?"
     let helping_groups=0
-    for a=1 to local_groups
-      if group_data$(a,popularity)>low
-      print #ow,to 6;a;" .";group_name$(a);" ?"
+    for i%=1 to local_groups
+      if group_data$(i%,popularity)>low
+      print #ow,to 6;i%;" ";group_name$(i%)
       let helping_groups=helping_groups+1
       endif
-    endfor a
+    endfor i%
 
     if helping_groups
       rep choose_group
@@ -850,10 +854,10 @@ defproc revolution
   cls_ black,white,black
   at #ow,10,2:print #ow,"La revuelta ha sido sofocada."
   at #ow,0,0
-  for a=1 to ow_lines-1
+  for i%=1 to ow_lines-1
     paper #ow,rnd(1 to 5)
     print #ow,blank_line$
-  endfor a
+  endfor i%
   at #ow,10,0: print #ow,"¿Castigas a los revolucionarios?"
   if yes_key
     for n=1 to 3: fx_2: pause .1
@@ -1020,7 +1024,7 @@ enddef
 
 defproc news
 
-  loc i,random_event,first_event,last_event
+  loc i%,random_event,first_event,last_event
 
   let first_event=44
   let last_event=49
@@ -1029,19 +1033,19 @@ defproc news
   if not rnd(0 to 2)
 
     let random_event=rnd(first_event to last_event)
-    for i=1 to events
+    for i%=1 to events
       if not (decision_data$(random_event,1)="N"):\
-        exit i
+        exit i%
       let random_event=random_event+1
       if random_event>last_event:\
         let random_event=first_event
-    next i
+    next i%
       ret
-    endfor i
+    endfor i%
 
     cls_ white,black,white
     center #ow,10,"NOTICIA DE ÚLTIMA HORA"
-    for i=1 to 10:\
+    for i%=1 to 10:\
       zx_beep .6,30
     cls #ow
     center #ow,10,"NOTICIA DE ÚLTIMA HORA"
@@ -1061,7 +1065,7 @@ enddef
 
 defproc war
 
-  loc i
+  loc i%
 
   if group_data$(leftoto,popularity)>low:\
     ret
@@ -1076,39 +1080,50 @@ defproc war
     at #ow,6,1:print #ow,"Tratado de guerra con Leftoto"
     at #ow,10,3:print #ow,"Tu popularidad en Ritimba"
     at #ow,12,11: print #ow,"aumentará"
-    for i=1 to main_groups,police: increase_popularity i
+    for i%=1 to main_groups,police: increase_popularity i%
   endif
 
 enddef
 
 defproc increase_popularity(group) ' XXX rename
+
   local x
-  ' todo: write a general solution to update the
+
+  ' XXX TODO -- Write a general solution to update the
   ' popularity by any amount, positive or negative.
+
   let x=group_data$(group,popularity)
   ' XXX FIXME -- coercion:
   let group_data$(group,popularity)=x+(x<9)
+
 enddef
 
 defproc actual_war
 
+  loc i%
+
   cls_ red,black,black
   center #ow,8,"Leftoto nos invade"
   let ritimba_strength=0
-  for a=1 to main_groups
-    if group_data$(a,popularity)>low:\
-      let ritimba_strength=ritimba_strength+group_data$(a,power)
-  endfor a
+
+  for i%=1 to main_groups
+    if group_data$(i%,popularity)>low:\
+      let ritimba_strength=ritimba_strength+group_data$(i%,power)
+  endfor i%
+
   if group_data$(police,popularity)>low
     let ritimba_strength=ritimba_strength+group_data$(police,power)
   endif
+
   let ritimba_strength=ritimba_strength+strength
   at #ow,12,1:print #ow,"La fuerza de Ritimba es ";ritimba_strength
   let leftoto_strength=0
-  for a=1 to 6
-    if group_data$(a,popularity)<=low:\
-      let leftoto_strength=leftoto_strength+group_data$(a,power)
-  endfor a
+
+  for i%=1 to 6
+    if group_data$(i%,popularity)<=low:\
+      let leftoto_strength=leftoto_strength+group_data$(i%,power)
+  endfor i%
+
   at #ow,14,1:print #ow,"La fuerza de Leftoto es ";leftoto_strength
 
   at #ow,18,3:print #ow,"Una corta y decisiva guerra"
@@ -1116,6 +1131,7 @@ defproc actual_war
 
   if leftoto_strength+rnd(-1 to 1)<ritimba_strength
 
+    ' XXX TODO -- factor
     ' Ritimba wins
 
     zx_border black
@@ -1126,6 +1142,7 @@ defproc actual_war
 
   else
 
+    ' XXX TODO -- factor
     ' Leftoto wins
 
     cls_ black,white,black
@@ -1161,7 +1178,7 @@ enddef
 
 defproc the_end
 
-  loc a,x
+  loc i%,x
 
   if alive
     pause 100
@@ -1171,7 +1188,7 @@ defproc the_end
   endif
 
   let x=0
-  for a=1 to 8: let x=x+group_data$(a,popularity)
+  for i%=1 to 8: let x=x+group_data$(i%,popularity)
   cls_ yellow,black,cyan
   at #ow,3,1:print #ow,"Tu puntuación como presidente"
   print #ow,\" popularidad final";to 28;x
@@ -1298,28 +1315,28 @@ defproc init_data
 
   restore
 
-  for a=1 to decisions:
-    read decision_data$(a),x$
+  for i%=1 to decisions:
+    read decision_data$(i%),x$
     if len(x$)>decision_name_max_len
       ' XXX tmp
       print "ERROR: decision name too long:"\x$
       stop
     else
-      let decision_name$(a)=x$
+      let decision_name$(i%)=x$
     endif
-  endfor a
+  endfor i%
 
-  for a=1 to groups
+  for i%=1 to groups
     read \
-      group_data$(a),\
-      group_name$(a),\
-      group_short_name$(a),\
-      group_plural_name$(a),\
-      group_genitive_name$(a)
-  endfor a
+      group_data$(i%),\
+      group_name$(i%),\
+      group_short_name$(i%),\
+      group_plural_name$(i%),\
+      group_genitive_name$(i%)
+  endfor i%
 
   ' XXX not needed. todo
-  ' for a=1 to decisions: let decision_data$(a,1)="N"
+  ' for i%=1 to decisions: let decision_data$(i%,1)="N"
 
   let money=1000
   let escape=0
@@ -1446,15 +1463,15 @@ data "NMMMMMMMMMMMILKMM",\
      "Se ha declarado una epidemia entre los campesinos"
 
 ' data:
-' group_data$(a)
-' group_name$(a)
-' group_short_name$(a)
-' group_plural_name$(a)
-' group_genitive_name$(a)
+' group_data$(i%)
+' group_name$(i%)
+' group_short_name$(i%)
+' group_plural_name$(i%)
+' group_genitive_name$(i%)
 
 ' chars in group_data$():
-' 1=popularity
-' 2=power
+' 1=popularity (0..9)
+' 2=power      (0..9)
 ' 3=unknown ' XXX
 ' 4=unknown ' XXX
 
