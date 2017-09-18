@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.4+201709181830"
+version$="0.1.0-dev.5+201709182324"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -309,7 +309,7 @@ defproc murder
 
   loc group
 
-  let group=rnd(1 to 3)
+  let group=rnd(1 to main_groups)
   if group_data$(group,3)="A"
 
     cls_ black,white,black
@@ -363,7 +363,8 @@ defproc audience
       endif
       let this_decision=(this_decision-int(this_decision/24)*24)+1
     end for a
-    for a=1 to 24:let decision_data$(a,1)="N"
+    for a=1 to 24:\
+      let decision_data$(a,1)="N"
   endrep choose_decision
 
   let decision_data$(this_decision,1)="*"
@@ -731,7 +732,7 @@ defproc revolution
   loc a,helping_group,helping_groups,rebel_group,try_escaping
 
   for a=1 to main_groups
-    let rebel_group=rnd(1 to 3)
+    let rebel_group=rnd(1 to main_groups)
     if group_data$(rebel_group,3)="R":\
       exit a
   next a
@@ -1093,27 +1094,27 @@ defproc actual_war
 
   cls_ red,black,black
   center #ow,8,"Leftoto nos invade"
-  let rs=0
+  let ritimba_strength=0
   for a=1 to main_groups
     if group_data$(a,popularity)>low:\
-      let rs=rs+group_data$(a,power)
+      let ritimba_strength=ritimba_strength+group_data$(a,power)
   endfor a
   if group_data$(police,popularity)>low
-    let rs=rs+group_data$(police,power)
+    let ritimba_strength=ritimba_strength+group_data$(police,power)
   endif
-  let rs=rs+strength
-  at #ow,12,1:print #ow,"La fuerza de Ritimba es ";rs
-  let ls=0
+  let ritimba_strength=ritimba_strength+strength
+  at #ow,12,1:print #ow,"La fuerza de Ritimba es ";ritimba_strength
+  let leftoto_strength=0
   for a=1 to 6
     if group_data$(a,popularity)<=low:\
-      let ls=ls+group_data$(a,power)
+      let leftoto_strength=leftoto_strength+group_data$(a,power)
   endfor a
-  at #ow,14,1:print #ow,"La fuerza de Leftoto es ";ls
+  at #ow,14,1:print #ow,"La fuerza de Leftoto es ";leftoto_strength
 
   at #ow,18,3:print #ow,"Una corta y decisiva guerra"
   fx_war
 
-  if ls+rnd(-1 to 1)<rs
+  if leftoto_strength+rnd(-1 to 1)<ritimba_strength
 
     ' Ritimba wins
 
@@ -1228,6 +1229,7 @@ deffn get_key_prompt$(prompt$)
     zx_beep .01,20
 
   endrep press_now
+
   curdis #iw
 
   ret key$
@@ -1331,10 +1333,17 @@ defproc init_data
 
 enddef
 
-' chars in decision_data$():
+' Character fields in decision_data$():
+
 ' 01: decision already taken ("N"=no, "*"=yes)
-' 04-11: +/- popularity for groups 1-8 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
-' 12-17 +/- power for groups 1-6 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
+' 02: cost
+' 03: monthly cost
+' 04..11: +/- popularity for groups 1-8
+' 12..17 +/- power for groups 1-6 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
+
+' Fields 02..17 contain a letter ("G".."S") which represents a
+' number calculated from its ASCII code, being "M" zero.
+' Examples: ... "K"=-1, "L"=-1,"M"=0, "N"=1...
 
 data "NMHQJLMMMMMPKLMMM",\
      "Instaurar el servicio militar obligatorio"
@@ -1437,7 +1446,11 @@ data "NMMMMMMMMMMMILKMM",\
      "Se ha declarado una epidemia entre los campesinos"
 
 ' data:
-' group_data$(a),group_name$(a),group_short_name$(a)
+' group_data$(a)
+' group_name$(a)
+' group_short_name$(a)
+' group_plural_name$(a)
+' group_genitive_name$(a)
 
 ' chars in group_data$():
 ' 1=popularity
@@ -1481,10 +1494,10 @@ data "7---",\
      "los rusos",\
      "de Rusia"
 data "7---",\
-     "Usamérica",\
-     "usamericanos",\
-     "los usamericanos",\
-     "de Usamérica"
+     "Usa",\
+     "useños",\
+     "los useños",\
+     "de Usa"
 
 ' ==============================================================
 ' Special effects {{{1
