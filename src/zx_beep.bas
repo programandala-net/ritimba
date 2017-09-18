@@ -1,7 +1,7 @@
 rem 'zx_beep' procedure for S*BASIC
 rem that simulates the ZX Spectrum's 'beep' command
 
-rem Version 0.3.1+201709181749
+rem Version 0.4.0+20170918
 
 ' Author: Marcos Cruz (programandala.net), 2017
 
@@ -32,6 +32,7 @@ rem Version 0.3.1+201709181749
 ' ----
 ' merge zx_beep_bas
 ' init_zx_beep
+' let zx_beep_tempo=2.1:rem Default. Adjust to your machine.
 ' zx_beep seconds,pitch
 ' ----
 
@@ -52,13 +53,17 @@ defproc zx_beep(duration,tone%)
   let pitch%=tone%+zx_beep_middle_c_offset%
 
   if pitch%>=0 and pitch%<=zx_beep_last_pitch%:\
-      beep duration*1000000/72,ql_pitch%(pitch%)
+      beep zx_beep_tempo*duration*1000000/72,ql_pitch%(pitch%)
 
 enddef
 
 defproc init_zx_beep
 
   loc i,middle_c_pitch%
+
+  let zx_beep_tempo=2.1
+    ' The greater, the longer notes.
+    ' Configure to your machine.
 
   let middle_c_pitch%=33
 
