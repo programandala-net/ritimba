@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.2+201709172125"
+version$="0.1.0-dev.3+201709180048"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -136,12 +136,12 @@ defproc national_anthem
         exit listen
       let pitch=code(tune$(a))-80
       if pitch=16
-        pause 20 ' XXX FIXME -- this made INKEY$ fail in QPC2
+        pause 20
       else
         zx_beep .5,pitch
       endif
     endfor a
-    pause 30 ' XXX FIXME -- this made INKEY$ fail in QPC2
+    pause 30
   endrep listen
   curdis #iw
 enddef
@@ -1492,8 +1492,7 @@ data "7---",\
 defproc zx_border(colour) ' XXX TMP
 enddef
 
-defproc zx_beep(duration,pitch) ' XXX TODO
-enddef
+#include zx_beep.bas
 
 defproc fx_war ' XXX TODO
 enddef
@@ -1697,6 +1696,7 @@ defproc init_once
   init_screen
   init_windows
   init_font
+  init_zx_beep
 enddef
 
 ' ==============================================================
