@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.10+201709191837"
+version$="0.1.0-dev.11+201709192133"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -25,11 +25,12 @@ rem http://programandala.net/es.programa.ritimba.html
 ' http://programandala.net/es.programa.sbim.html
 
 ' ==============================================================
-' Files {{{1
+' Files and requirements {{{1
 
 let dev$=device$("ritimba_bas","flpmdvdevsubwinnfados")
 
 #include device.bas
+#include iso_lower.bas
 
 ' ==============================================================
 ' Main loop {{{1
@@ -391,14 +392,13 @@ defproc audience
   let soliciting_group%=int((this_decision-1)/8)+1
   zx_border soliciting_group%
   let this_decision_data$=decision_data$(this_decision)
-  let this_decision_name$=decision_name$(this_decision)
+  let this_decision$=decision$(this_decision)
   paper #ow%,yellow%:ink #ow%,black%
   center #ow%,10,"Petición "&group_genitive_name$(sociting_group)&":"
   paper #ow%,white%
   at #ow%,14,0
-  ' XXX FIXME convert the first letter of `this_decision_name$` to
-  ' lowercase:
-  tell "¿Está su excelencia conforme con "&this_decision_name$&"?"
+  tell "¿Está su excelencia conforme con "\
+    &iso_lower_1$(this_decision$)&"?"
   wait_key_press
   advert this_decision
 
@@ -409,7 +409,7 @@ defproc audience
   ink #ow%,contrast_colour(soliciting_group%)
   center #ow%,3,"Petición "&group_genitive_name$(soliciting_group%)
   paper #ow%,yellow%:ink #ow%,black%
-  center #ow%,5,this_decision_name$
+  center #ow%,5,this_decision$
   paper #ow%,blue%:print #ow%:cls #ow%,3
 
   let c=cash_advice(this_decision)
@@ -475,7 +475,7 @@ defproc decision
       for i%=code(x$(1))-20 to code(x$(2))-20
         if decision_data$(i%,1)<>"*"
           let options=options+1
-          tellNL options&". "&decision_name$(i%)&"."
+          tellNL options&". "&decision$(i%)&"."
         endif
       endfor i%
 
@@ -512,14 +512,14 @@ defproc decision
       advert chosen_decision
       ' XXX restore the screen colors here?
       at #ow%,4,0
-      print #ow%,decision_name$(chosen_decision)
+      print #ow%,decision$(chosen_decision)
       let c=cash_advice(chosen_decision)
       if not c
         pause 200
         next choose_decision
       endif
       at #ow%,4,0
-      print #ow%,decision_name$(chosen_decision)
+      print #ow%,decision$(chosen_decision)
       if not yes_key:\
         next choose_decision
 
@@ -598,7 +598,7 @@ defproc advert(decision)
     cls_ yellow%,yellow%,yellow%
     paper #ow%,black%
     at #ow%,1,0
-    print #ow%,decision_name$(decision) ' XXX FIXME wrap/justify
+    print #ow%,decision$(decision) ' XXX FIXME wrap/justify
     paper #ow%,white%:ink #ow%,black%
     at #ow%,3,0
     print #ow%,"Su popularidad entre..."
@@ -944,7 +944,7 @@ deffn cash_advice(decision)
     ret 1
 
   pause 250: cls #ow%
-  center #ow%,5,decision_name$(decision)
+  center #ow%,5,decision$(decision)
   at #ow%,8,2:print #ow%,"El dinero necesario"
   print #ow%,\to 4;"no está en el tesoro"\\\:
 
@@ -1079,7 +1079,7 @@ defproc news
       zx_beep .6,30
     cls #ow%
     center #ow%,10,"NOTICIA DE ÚLTIMA HORA"
-    at #ow%,14,0:print #ow%,decision_name$(random_event)
+    at #ow%,14,0:print #ow%,decision$(random_event)
     ink #ow%,white%
     pause 100
     take_only_once_decision random_event
@@ -1335,7 +1335,7 @@ defproc init_data
 
   let decision_name_max_len%=70
   dim decision_data$(decisions%,17)
-  dim decision_name$(decisions%,decision_name_max_len%)
+  dim decision$(decisions%,decision_name_max_len%)
 
   ' XXX TODO -- calculate max length
   dim \
@@ -1354,7 +1354,7 @@ defproc init_data
       print "ERROR: decision name too long:"\x$
       stop
     else
-      let decision_name$(i%)=x$
+      let decision$(i%)=x$
     endif
   endfor i%
 

@@ -21,4 +21,7 @@ Improve layout of the treasure report.
 
 Fix layout of `cash_advice`.
 
+Clarify the symbols of the advice. Consult the original instructions.
 
+Clarify the symbols of the secret police report. Consult the original
+instructions.
