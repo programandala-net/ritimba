@@ -17,6 +17,8 @@ Use character 160 (NBSP in ISO) to separate parts of long numbers.
 
 Remove `scr_width%` and `scr_height%`.
 
-Make all numeric arrays integer.
+Improve layout of the treasure report.
 
-Fix layout of the treasure report.
+Fix layout of `cash_advice`.
+
+

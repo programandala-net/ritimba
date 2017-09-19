@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.9+201709191702"
+version$="0.1.0-dev.10+201709191837"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -179,44 +179,64 @@ defproc treasure_report
   cls_ white%,green%,green%
   print #ow%,fill$("$",columns%*ow_lines%)
   ink #ow%,black%
+  center #ow%,8,"INFORME DEL TESORO"
   treasure_report_details
-
-enddef
-
-defproc treasure_report_details
-
-  ' XXX FIXME center -- write proc to print titles
-  at #ow%,8,7
-  print #ow%,"INFORME DEL TESORO"
-  treasure_report_details_2
 
 enddef
 
 defproc print_money(money)
 
+  ' XXX OLD -- See `money$()`
+
   ' XXX FIXME -- remove blanks on the left
-  print_using #ow%,"###,###,###.###' RTD'",money*1000;
-  ' XXX TODO -- write and ad hoc function
+  ' XXX REMARK -- `print_using` uses commas for decimal point.
+  ' print_using #ow%,"### ### ###,##' RTD'",money*1000;
+
+  print #ow%,money;"000 ";currency$ ' XXX TMP --
 
 enddef
 
-defproc treasure_report_details_2
+deffn money$(ammount)
 
-  paper #ow%,blue%: ink #ow%,white%
-  at #ow%,12,1:print #ow%,"El tesoro";
+  ' Return _ammount_ formatted as money.
+
+  ' XXX TODO --
+  '
+  ' XXX FIXME -- This does not work because when the floating point
+  ' parameter is converted to a string, the exponent format is forced,
+  ' ie. "1234567" becomes "1.234567E6".
+
+  loc i%,ammount$,formatted$
+  let ammount$=ammount
+  for i%=len(ammount$) to 1 step -1
+    print i%,ammount$(i%)
+    let formatted$=ammount$(i%)&formatted$
+    if not(i% mod 3) and i%<>1:\
+      let formatted$=" "&formatted$
+  endfor i%
+  ret formatted$&" "&currency$
+
+enddef
+
+defproc treasure_report_details
+
+  paper #ow%,blue%
+  ink #ow%,white%
+  at #ow%,12,1
+  print #ow%,"El tesoro ";
   if int(money)>=0
-    print #ow%," tiene";
+    print #ow%,"tiene ";
   else
-    print #ow%," ";:print #ow%,"debe";
+    print #ow%,"debe ";
   endif
   print_money abs(int(money))
-  at #ow%,14,0:print #ow%,"Los gastos mensuales son ";
+  at #ow%,14,1
+  print #ow%,"Gastos mensuales: ";
   print_money monthly_payment
   if money_in_switzerland>0
     at #ow%,17,2
-    print #ow%,"[En Suiza tiene ";
+    print #ow%,"En Suiza: ";
     print_money money_in_switzerland
-    print #ow%,"]"
   endif
 
 enddef
@@ -515,7 +535,7 @@ defproc decision
       exit choose_decision
 
     endrep choose_decision
-    treasure_report_details_2
+    treasure_report_details
     exit choose_gratis_decision
   endrep choose_gratis_decision
 
@@ -895,7 +915,7 @@ deffn cash_advice(decision)
   endif
 
   at #ow%,9,1
-  print #ow%,"Esta decisión ": print
+  print #ow%,"Esta decisión";
   ' XXX TODO -- Create a string and use `tell`.
 
   if decision_cost
@@ -912,7 +932,7 @@ deffn cash_advice(decision)
       print #ow%," subiría";
     if decision_monthly_cost%>0:\
       print #ow%," bajaría";
-    print #ow%," los costos mensuales en ";\
+    print #ow%," los gastos mensuales en ";\
       abs(decision_monthly_cost%);" 000 RTD"
   endif
 
@@ -1291,6 +1311,8 @@ defproc init_data
   let groups%=8
   let local_groups%=6 ' all but Russia% and USA%
   let main_groups%=3 ' only the groups% that can rebel.
+
+  let currency$="RTD" ' Ritimban dolar
 
   ' Group ids
   let army%=1
