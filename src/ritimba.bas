@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.11+201709192133"
+version$="0.1.0-dev.12+201709200124"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1711,7 +1711,7 @@ defproc init_windows
   let columns%=32
   let lines%=24
   let csize_width%=3
-  let csize_height%=scr_height%<>256
+  let csize_height%=scr_ylim<>256
 
   let iw_lines%=3 ' input window lines%
   let ow_lines%=lines%-iw_lines% ' output window lines%
@@ -1721,9 +1721,9 @@ defproc init_windows
   let char_width_pixels%=csize_width_pixels(csize_width%)
   let char_height_pixels%=csize_height_pixels(csize_height%)
   let ow_width%=columns%*char_width_pixels%
-  let ow_x%=(scr_width%-ow_width%)/2
+  let ow_x%=(scr_xlim-ow_width%)/2
   let ow_height%=ow_lines%*char_height_pixels%
-  let ow_y%=(scr_height%-(lines%*char_height_pixels%))/2
+  let ow_y%=(scr_ylim-(lines%*char_height_pixels%))/2
   window #ow%,ow_width%,ow_height%,ow_x%,ow_y%
 
   let iw%=fopen("con_") ' input window
@@ -1750,8 +1750,6 @@ defproc init_screen
   let cyan%=5
   let yellow%=6
   let white%=7
-  let scr_width%=scr_xlim
-  let scr_height%=scr_ylim
 enddef
 
 defproc init_once

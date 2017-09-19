@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-09-19
+:revdate: 2017-09-20
 
 == 2017-09-17
 
@@ -14,8 +14,6 @@ Remove the traces of SuperBASIC compatibility. Write only for SBASIC.
 
 Use character 160 (NBSP in ISO) to separate parts of long numbers.
 `tell` will not break them.
-
-Remove `scr_width%` and `scr_height%`.
 
 Improve layout of the treasure report.
 
