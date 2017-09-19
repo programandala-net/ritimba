@@ -8,11 +8,15 @@ Replace isolated `print` with SBASIC printing modifier `\`.
 
 Move all `at` to their own lines.
 
-Make all numeric variables integer.
-
 Remove the traces of SuperBASIC compatibility. Write only for SBASIC.
 
 == 2017-09-19
 
 Use character 160 (NBSP in ISO) to separate parts of long numbers.
 `tell` will not break them.
+
+Remove `scr_width%` and `scr_height%`.
+
+Make all numeric arrays integer.
+
+Fix layout of the treasure report.
