@@ -4,24 +4,27 @@
 
 == 2017-09-17
 
-Remove the traces of SuperBASIC compatibility. Write only for SBASIC.
+- Remove the traces of SuperBASIC compatibility. Write only for SBASIC.
 
 == 2017-09-19
 
-Use character 160 (NBSP in ISO) to separate parts of long numbers.
-`tell` will not break them.
-
-Improve layout of the treasure report.
-
-Fix layout of `cash_advice`.
-
-Clarify the symbols of the advice. Consult the original instructions.
-
-Clarify the symbols of the secret police report. Consult the original
-instructions.
+- Use character 160 (NBSP in ISO) to separate parts of long numbers.
+  `tell` will not break them.
+- Improve layout of the treasure report.
+- Fix layout of `cash_advice`.
+- Clarify the symbols of the advice. Consult the original
+  instructions.
+- Clarify the symbols of the secret police report. Consult the
+  original instructions.
 
 == 2017-09-21
 
-Finish the currency notation.
-
-Fix usage of "tasar".
+- Finish the currency notation.
+- Use `tell` instead of `print` when possible.
+- Fix the numbers of the menu options: they do not match because old
+  decisions are omitted from the list.
+- Improve the final report of the secret police, changing the title
+  instead of adding "FINAL" at the top.
+- Split `ink` and `paper`.
+- Improve the messages and layout of the final escape to Leftoto.
+- Improve the messages about the helicopter.

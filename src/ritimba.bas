@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.16+201709210040"
+version$="0.1.0-dev.17+201709210141"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -153,10 +153,10 @@ defproc welcome
     cls_ white%,black%,blue%
     paper #ow%,cyan%:center #ow%,1,"Bienvenido al cargo"
     paper #ow%,white%
-    if score>0
+    if score%>0
       tellNL "El anterior líder de nuestra"
       tell "amada patria Ritimba"
-      tell "obtuvo una puntuación final de "&score&"."
+      tell "obtuvo una puntuación final de "&score%&"."
       tellNL "Te deseamos que logres hacerlo mucho mejor."
     else
       tellNL "Eres el primer líder de nuestra"
@@ -677,6 +677,14 @@ defproc actual_police_report
   police_report_data
 enddef
 
+defproc final_police_report
+
+  cls_ black%,white%,black%
+  center #ow%,1,"FINAL"
+  police_report_data
+
+enddef
+
 defproc police_report_data
 
   loc group%,line_%
@@ -789,7 +797,7 @@ defproc revolution
   cls #ow%
   if try_escaping
 
-    if decision_data$(36,1)="*"
+    if decision_data$(36,1)="*" ' XXX TODO -- factor
       ' the helicopter was bought before
       if rnd(0 to 2)
         center #ow%,12,"¡Escapas en helicóptero!"
@@ -810,11 +818,12 @@ defproc revolution
 
     if not int((rnd*((group_data$(guerrillas%,power%)/3)+.4)))
       at #ow%,12,0
-      print #ow%,"  Las guerillas no te atraparon "
+      print #ow%,"Las guerillas no te atraparon"
       let escape%=1
     else
       cls_ black%,white%,black%
-      pause 50: fx_2
+      pause 50
+      fx_2
       at #ow%,12,0
       print #ow%,"Las guerillas están celebrándolo"
       fx_2
@@ -895,7 +904,8 @@ defproc revolution
     at #ow%,12,10
     print #ow%,"y ";: print #ow%,"liquidado."
     fx_2
-    let alive%=0:ret
+    let alive%=0
+    ret
   endif
 
   cls_ black%,white%,black%
@@ -1239,8 +1249,6 @@ enddef
 
 defproc the_end
 
-  loc i%,x%
-
   if alive%
     pause 100
   else
@@ -1248,32 +1256,70 @@ defproc the_end
     tune "4d3d1d3d3g1f2f1d2d1d5d"
   endif
 
-  let x%=0
-  for i%=1 to 8: let x%=x%+group_data$(i%,popularity%)
-  cls_ yellow%,black%,cyan%
+  score_report
+
+enddef
+
+defproc score_report
+
+  loc i%,popularity_bonus%,time_bonus%,money_bonus%,bonus_col%
+
+  let bonus_col%=28 ' colum where bonus are displayed
+
+  let score%=0
+
   at #ow%,3,1
+  cls_ yellow%,black%,cyan%
   print #ow%,"Tu puntuación como presidente"
-  print #ow%,\" popularidad final";to 28;x%
-  print #ow%,\" por el tiempo en el poder (";months%;" meses) - ";\
-    to 28;months%*3: let x%=x%+months%*3
+
+  let popularity_bonus%=0
+  for i%=1 to groups%:\
+    let popularity_bonus%=\
+      popularity_bonus%+group_data$(i%,popularity%)
+
+  print #ow%,\"Popularidad final";to bonus_col%;
+  print_using #ow%,"####",popularity_bonus%
+  let score%=score%+popularity_bonus%
+
+  time_bonus%=months%*3
+
+  print #ow%,\"Por el tiempo en el poder"\
+    \"(";months%;" meses):";\
+    to bonus_col%;
+  print_using #ow%,"####",time_bonus%
+  let score%=score%+time_bonus%
 
   if alive%
-    print #ow%,\" Por estar vivo - ";to 28;alive%
-    print #ow%,\" Por el ahorro"\"     (";\
-      thousand$(money_in_switzerland);\
-      " / 10 000) -";to 28;int(money_in_switzerland/10)
-    let x%=x%+alive%+int(money_in_switzerland/10)
+
+    print #ow%,\"Por estar vivo:";to bonus_col%;
+    print_using #ow%,"####",alive%
+    let score%=score%+alive%
+
+    if money_in_switzerland
+      let money_bonus%=int(money_in_switzerland/10)
+      print #ow%,\"Por tus «ahorros» en Suiza"\"(";\
+        thousand$(money_in_switzerland);"):";to bonus_col%;
+      print_using #ow%,"####",money_bonus%
+      let score%=score%+money_bonus%
+    endif
+
   endif
 
-  print #ow%,\\\" Tu total es ";to 28;:print #ow%,x%
-  if x%>score:\
-    let score=x%
-  print #ow%,\"[ La mayor puntuación es ";score;" ]"
-  wait_key_press: cls #ow%
-  cls_ black%,white%,black%
-  at #ow%,1,14
-  print #ow%,"final"
-  police_report_data: wait_key_press
+  print #ow%,\\\"Total:";to bonus_col%;
+  print_using #ow%,"####",score%
+
+  if score%>record%
+    let record%=score%
+    tellNL "Es la mayor puntuación hasta ahora."
+  else
+    tellNL "La mayor puntuación es "&record%&"."
+  endif
+
+  wait_key_press
+  cls #ow%
+  final_police_report
+  wait_key_press
+
 enddef
 
 ' ==============================================================
@@ -1339,7 +1385,8 @@ defproc init_data
 
   loc x$
 
-  let score=0
+  let score%=0
+  let record%=0
   let decisions%=49
   let groups%=8
   let local_groups%=6 ' all but Russia% and USA%
@@ -1410,7 +1457,7 @@ defproc init_data
   let monthly_payment=60
   let strength%=4
   let money_in_switzerland=0
-  let alive%=1
+  let alive%=10
   let months%=0
   let pc%=0 ' XXX what for?
   let revolution_strength%=10
@@ -1628,8 +1675,10 @@ defproc cls_(paper_colour,ink_colour,border_colour)
 
   paper #ow%,paper_colour
   ink #ow%,ink_colour
-  zx_border border_colour: cls #ow%
-  paper #iw%,border_colour: cls #iw%
+  zx_border border_colour
+  cls #ow%
+  paper #iw%,border_colour
+  cls #iw%
   let prompt_colour_1%=border_colour
   let prompt_colour_2=paper_colour
   if prompt_colour_1%=prompt_colour_2
@@ -1670,9 +1719,9 @@ defproc tell(txt$)
 enddef
 
 defproc tellNL(text$)
-  print #ow%,\" ";:tell(text$)
-  ' XXX little bug here:
-  ' an extra blank line is created if the
+  print #ow%,\" ";
+  tell(text$)
+  ' XXX FIXME -- An extra blank line is created if the
   ' previous line occupied the whole width.
 enddef
 
