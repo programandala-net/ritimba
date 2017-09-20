@@ -4,10 +4,6 @@
 
 == 2017-09-17
 
-Replace isolated `print` with SBASIC printing modifier `\`.
-
-Move all `at` to their own lines.
-
 Remove the traces of SuperBASIC compatibility. Write only for SBASIC.
 
 == 2017-09-19
@@ -23,3 +19,11 @@ Clarify the symbols of the advice. Consult the original instructions.
 
 Clarify the symbols of the secret police report. Consult the original
 instructions.
+
+== 2017-09-20
+
+Fix: the name of the requester is not displayed.
+
+== 2017-09-21
+
+Update currency notation.

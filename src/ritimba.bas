@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.12+201709200124"
+version$="0.1.0-dev.13+201709202359"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -246,7 +246,8 @@ defproc bankruptcy
 
   cls #ow%
   center #ow%,5,"El tesoro está en bancarrota"
-  at #ow%,9,0:print #ow%,"Su popularidad con el ejército y"\\:
+  at #ow%,9,0
+  print #ow%,"Su popularidad con el ejército y"\\:
   print #ow%,"con la policía secreta caerán!"\\\:
   print #ow%,"El poder de la policía bajará"\\:
   print #ow%,"y su propio poder también."
@@ -281,7 +282,8 @@ defproc new_month
 
   cls_ yellow%,black%,yellow%
   paper #ow%,cyan%:ink #ow%,white%
-  at #ow%,10,12:print #ow%,"MES  ";
+  at #ow%,10,12
+  print #ow%,"MES  ";
   paper #ow%,white%: ink #ow%,black%
   print #ow%,months%
   pause 50
@@ -372,7 +374,8 @@ defproc audience
 
   cls_ yellow%,black%,yellow%
   paper #ow%,green%
-  at #ow%,5,0:cls #ow%,1
+  at #ow%,5,0
+  cls #ow%,1
   paper #ow%,white%:ink #ow%,black%
   center #ow%,3,"UNA AUDIENCIA"
 
@@ -421,7 +424,8 @@ defproc audience
     print #ow%,"No hay suficientes fondos"
     print #ow%,\\" para";
     print #ow%," pagar esta decisión."
-    at #ow%,15,4:print #ow%,"Su respuesta debe ser no."
+    at #ow%,15,4
+    print #ow%,"Su respuesta debe ser no."
     pause 250
   else
     if yes_key:\
@@ -592,7 +596,8 @@ defproc advert(decision)
   cls_ green%,black%,blue%
   paper #ow%,cyan%
   for i%=0 to ow_lines%-1
-    at #ow%,i%,11:print #ow%,"¿Consejo?"
+    at #ow%,i%,11
+    print #ow%,"¿Consejo?"
   endfor i%
   if yes_key
     cls_ yellow%,yellow%,yellow%
@@ -661,7 +666,8 @@ defproc actual_police_report
   cls_ black%,white%,black%
   print #ow%,"MES ";months%
   ink #ow%,blue%
-  at #ow%,3,0:cls #ow%,1
+  at #ow%,3,0
+  cls #ow%,1
   police_report_data
 enddef
 
@@ -672,8 +678,10 @@ defproc police_report_data
   paper #ow%,white%:ink #ow%,black%
   center #ow%,3,"INFORME DE LA POLICÍA SECRETA"
   paper #ow%,black%:ink #ow%,white%
-  at #ow%,6,1:print #ow%,"POPULARIDAD"
-  at #ow%,6,22:print #ow%,"FUERZA"
+  at #ow%,6,1
+  print #ow%,"POPULARIDAD"
+  at #ow%,6,22
+  print #ow%,"FUERZA"
 
   for group%=1 to groups%
 
@@ -684,7 +692,8 @@ defproc police_report_data
     ink #ow%,black%
     print #ow%,group_short_name$(group%)
     paper #ow%,white%
-    at #ow%,line_%,10:print #ow%,group%
+    at #ow%,line_%,10
+    print #ow%,group%
 
     if group%<=3 and group_data$(group%,3)="R"
       at #ow%,line_%,21
@@ -786,18 +795,22 @@ defproc revolution
       endif
     endif
 
-    at #ow%,10,2:print #ow%,"Tienes que atravesar el"
-    at #ow%,12,6:print #ow%,"monte hacia Leftoto%."
+    at #ow%,10,2
+    print #ow%,"Tienes que atravesar el"
+    at #ow%,12,6
+    print #ow%,"monte hacia Leftoto."
     pause 200
     cls #ow%
 
     if not int((rnd*((group_data$(guerrillas%,power%)/3)+.4)))
-      at #ow%,12,0: print #ow%,"  Las guerillas no te atraparon "
+      at #ow%,12,0
+      print #ow%,"  Las guerillas no te atraparon "
       let escape%=1
     else
       cls_ black%,white%,black%
       pause 50: fx_2
-      at #ow%,12,0:print #ow%,"Las guerillas están celebrándolo"
+      at #ow%,12,0
+      print #ow%,"Las guerillas están celebrándolo"
       fx_2
       let alive%=0
     endif
@@ -864,26 +877,31 @@ defproc revolution
   print #ow%,\\"La de los revolucionarios es ";rebels_strength%
   pause 250
   cls_ white%,black%,white%
-  at #ow%,12,3:print #ow%,"La revolución ha comenzado"
+  at #ow%,12,3
+  print #ow%,"La revolución ha comenzado"
   fx_war
   if not(rebels_strength%<=strength%\
          +group_data$(helping_group,power%)\
          +rnd(-1 to 1))
     cls_ black%,white%,black%
-    at #ow%,10,7:print #ow%,"Has sido derrocado"
-    at #ow%,12,10:print #ow%,"y ";: print #ow%,"liquidado."
+    at #ow%,10,7
+    print #ow%,"Has sido derrocado"
+    at #ow%,12,10
+    print #ow%,"y ";: print #ow%,"liquidado."
     fx_2
     let alive%=0:ret
   endif
 
   cls_ black%,white%,black%
-  at #ow%,10,2:print #ow%,"La revuelta ha sido sofocada."
+  at #ow%,10,2
+  print #ow%,"La revuelta ha sido sofocada."
   at #ow%,0,0
   for i%=1 to ow_lines%-1
     paper #ow%,rnd(1 to 5)
     print #ow%,blank_line$
   endfor i%
-  at #ow%,10,0: print #ow%,"¿Castigas a los revolucionarios?"
+  at #ow%,10,0
+  print #ow%,"¿Castigas a los revolucionarios?"
   if yes_key
     for n=1 to 3: fx_2: pause .1
     let group_data$(rebel_group,1 to 2)="00"
@@ -945,18 +963,15 @@ deffn cash_advice(decision)
 
   pause 250: cls #ow%
   center #ow%,5,decision$(decision)
-  at #ow%,8,2:print #ow%,"El dinero necesario"
+  at #ow%,8,2
+  print #ow%,"El dinero necesario"
   print #ow%,\to 4;"no está en el tesoro"\\\:
 
-  if decision_data$(38,1)="N"
+  if decision_data$(38,1)="N":\
     print #ow%,"Quizá los rusos pueden ayudar."
-    print
-  endif
 
-  if decision_data$(39,1)="N"
-    print #ow%,"Los usamericanos son un pueblo generoso"
-    print
-  endif
+  if decision_data$(39,1)="N":\
+    print #ow%,"Los useños son un pueblo generoso"\:
 
   pause 350
   ret 0
@@ -1016,7 +1031,8 @@ defproc ask_for_loan(decision)
       else
         print #ow%," te concederán"
         let loan=group_data$(7+x%,popularity%)*30+rnd(0 to 200)
-        at #ow%,14,7:print #ow%,y%;",000 dólares"
+        at #ow%,14,7
+        print #ow%,y%;",000 dólares"
         let money=money+loan
         let decision_data$(38+x%,1)="*"
       endif
@@ -1079,7 +1095,8 @@ defproc news
       zx_beep .6,30
     cls #ow%
     center #ow%,10,"NOTICIA DE ÚLTIMA HORA"
-    at #ow%,14,0:print #ow%,decision$(random_event)
+    at #ow%,14,0
+    print #ow%,decision$(random_event)
     ink #ow%,white%
     pause 100
     take_only_once_decision random_event
@@ -1107,9 +1124,12 @@ defproc war
     actual_war
   else
     cls_ black%,white%,cyan%
-    at #ow%,6,1:print #ow%,"Tratado de guerra con Leftoto%"
-    at #ow%,10,3:print #ow%,"Tu popularidad en Ritimba"
-    at #ow%,12,11: print #ow%,"aumentará"
+    at #ow%,6,1
+    print #ow%,"Tratado de guerra con Leftoto"
+    at #ow%,10,3
+    print #ow%,"Tu popularidad en Ritimba"
+    at #ow%,12,11
+    print #ow%,"aumentará"
     for i%=1 to main_groups%,police%: increase_popularity i%
   endif
 
@@ -1146,7 +1166,8 @@ defproc actual_war
   endif
 
   let ritimba_strength=ritimba_strength+strength%
-  at #ow%,12,1:print #ow%,"La fuerza de Ritimba es ";ritimba_strength
+  at #ow%,12,1
+  print #ow%,"La fuerza de Ritimba es ";ritimba_strength
   let leftoto_strength=0
 
   for i%=1 to 6
@@ -1154,9 +1175,11 @@ defproc actual_war
       let leftoto_strength=leftoto_strength+group_data$(i%,power%)
   endfor i%
 
-  at #ow%,14,1:print #ow%,"La fuerza de Leftoto% es ";leftoto_strength
+  at #ow%,14,1
+  print #ow%,"La fuerza de Leftoto% es ";leftoto_strength
 
-  at #ow%,18,3:print #ow%,"Una corta y decisiva guerra"
+  at #ow%,18,3
+  print #ow%,"Una corta y decisiva guerra"
   fx_war
 
   if leftoto_strength+rnd(-1 to 1)<ritimba_strength
@@ -1190,11 +1213,13 @@ defproc actual_war
       at #ow%,12,4
       print #ow%,"Eres acusado de ser un enemigo del pueblo y..."
       pause 30: fx_2
-      at #ow%,18,7:print #ow%,"sumarísimamente ejecutado."
+      at #ow%,18,7
+      print #ow%,"sumarísimamente ejecutado."
     else
       ' Escape
       cls #ow%
-      at #ow%,12,3:print #ow%,"¡Escapas en helicóptero!"
+      at #ow%,12,3
+      print #ow%,"¡Escapas en helicóptero!"
       let escape%=1
 
     endif
@@ -1220,7 +1245,8 @@ defproc the_end
   let x%=0
   for i%=1 to 8: let x%=x%+group_data$(i%,popularity%)
   cls_ yellow%,black%,cyan%
-  at #ow%,3,1:print #ow%,"Tu puntuación como presidente"
+  at #ow%,3,1
+  print #ow%,"Tu puntuación como presidente"
   print #ow%,\" popularidad final";to 28;x%
   print #ow%,\" por el tiempo en el poder (";months%;" meses) - ";\
     to 28;months%*3: let x%=x%+months%*3
@@ -1239,7 +1265,8 @@ defproc the_end
   print #ow%,\"[ La mayor puntuación es ";score;" ]"
   wait_key_press: cls #ow%
   cls_ black%,white%,black%
-  at #ow%,1,14:print #ow%,"final"
+  at #ow%,1,14
+  print #ow%,"final"
   police_report_data: wait_key_press
 enddef
 
@@ -1612,7 +1639,8 @@ defproc center(channel,line_%,text$)
   loc length%
   let length%=len(text$)
   if length%>columns%
-    at #ow%,line_%,0:tell text$
+    at #ow%,line_%,0
+    tell text$
   else
     at #channel,line_%,center_for(length%)
     print #channel,text$
