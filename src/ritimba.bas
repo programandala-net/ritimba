@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.15+201709210037"
+version$="0.1.0-dev.16+201709210040"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1005,7 +1005,7 @@ defproc ask_for_loan(decision)
   endif
   at #ow%,12,0
   if country=usa%
-    print #ow%,"Los usamericanos";
+    print #ow%,"Los useños";
   else
     print #ow%,"Los rusos";
   endif
@@ -1466,7 +1466,7 @@ data "NMMKMPMMMMMLMMMMM",\
 data "NMMMIQMLMLMMKONMM",\
      "Bajar el salario mínimo"
 data "NWHMMPMNMOIMMNMMM",\
-     "Nacionalizar las empresas usamericanas"
+     "Nacionalizar las empresas useñas"
 data "NMRMMPMJMLMMNOMLM",\
      "Tasar las importaciones de leftoto"
 data "NMQNNPMMIMMNMNNMK",\
@@ -1484,9 +1484,9 @@ data "NLILQNMOMNMMMMLMM",\
 data "NMMLKQMMLLMLLOMML",\
      "Dar poderes a los terratenientes"
 data "NRMKMMMQMKNLMMLPM",\
-     "Vender armas usamericanas a Leftoto"
+     "Vender armas useñas a Leftoto"
 data "NYMMMLMLMKPMMMMMM",\
-     "Vender derechos a empresas usamericanas"
+     "Vender derechos a empresas useñas"
 data "NMWKMMMMMPJMMMMNM",\
      "Alquilar a Rusia una base naval"
 data "NMENPPMMMMMLMMLMM",\
@@ -1507,7 +1507,7 @@ data "NMMMMMMMMMMMMMMMM",\
 data "NMMMMMMMMMMMMMMMM",\
      "Solicitar un préstamo a los rusos"
 data "NMMMMMMMMMMMMMMMM",\
-     "Solicitar un préstamo a los usamericanos"
+     "Solicitar un préstamo a los useños"
 data "NZMNNPMGMKMMMMMMM",\
      "Nacionalizar las empresas de Leftoto"
 data "NHMPMMMJMLMRMMKKL",\
