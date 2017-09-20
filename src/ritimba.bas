@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.14+201709210030"
+version$="0.1.0-dev.15+201709210037"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -403,7 +403,7 @@ defproc audience
   let this_decision_data$=decision_data$(this_decision)
   let this_decision$=decision$(this_decision)
   paper #ow%,yellow%:ink #ow%,black%
-  center #ow%,10,"Petición "&group_genitive_name$(sociting_group)&":"
+  center #ow%,10,"Petición "&group_genitive_name$(soliciting_group%)&":"
   paper #ow%,white%
   at #ow%,14,0
   tell "¿Está su excelencia conforme con "\
@@ -1377,8 +1377,8 @@ defproc init_data
     group_data$(groups%,4),\
     group_name$(groups%,18),\
     group_short_name$(groups%,17),\
-    group_plural_name$(groups%,20),\
-    group_genitive_name$(groups%,20)
+    group_plural_name$(groups%,21),\
+    group_genitive_name$(groups%,21)
 
   restore
 
