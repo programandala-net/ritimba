@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.13+201709202359"
+version$="0.1.0-dev.14+201709210030"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -193,7 +193,7 @@ defproc print_money(money)
   ' XXX REMARK -- `print_using` uses commas for decimal point.
   ' print_using #ow%,"### ### ###,##' RTD'",money*1000;
 
-  print #ow%,money;"000 ";currency$ ' XXX TMP --
+  print #ow%,thousand$(money) ' XXX TMP --
 
 enddef
 
@@ -216,6 +216,12 @@ deffn money$(ammount)
       let formatted$=" "&formatted$
   endfor i%
   ret formatted$&" "&currency$
+
+enddef
+
+deffn thousand$(amount)
+
+  return amount&nbsp$&"000 "&currency$
 
 enddef
 
@@ -652,7 +658,7 @@ defproc police_report
   else
 
     center #ow%,6,"¿INFORME de la POLICÍA SECRETA?"
-    center #ow%,12,"(Cuesta 1000 RTD)"
+    center #ow%,12,"(Cuesta "&thousand$(1)&")"
     if yes_key
       let money=money-1
       actual_police_report
@@ -941,7 +947,7 @@ deffn cash_advice(decision)
       print #ow%," aportaría";
     if decision_cost<0:\
       print #ow%," costaría";
-    print #ow%," al tesoro ";abs(decision_cost);" 000 RTD": print
+    print #ow%," al tesoro ";thousand$(abs(decision_cost))\:
   endif
 
   if decision_monthly_cost%
@@ -951,7 +957,7 @@ deffn cash_advice(decision)
     if decision_monthly_cost%>0:\
       print #ow%," bajaría";
     print #ow%," los gastos mensuales en ";\
-      abs(decision_monthly_cost%);" 000 RTD"
+      thousand$(abs(decision_monthly_cost%));
   endif
 
   if money+decision_cost>0:\
@@ -1032,7 +1038,7 @@ defproc ask_for_loan(decision)
         print #ow%," te concederán"
         let loan=group_data$(7+x%,popularity%)*30+rnd(0 to 200)
         at #ow%,14,7
-        print #ow%,y%;",000 dólares"
+        print #ow%,y%;" 000 "&currency$
         let money=money+loan
         let decision_data$(38+x%,1)="*"
       endif
@@ -1052,11 +1058,11 @@ defproc money_transfer
 
   let amount=int(money/2)
   if amount>=1
-    print #ow%,"El tesoro tenía ";int(money);" 000 RTD"
+    print #ow%,"El tesoro tenía ";thousand$(int(money));
     let money_in_switzerland=money_in_switzerland+amount
     let money=money-amount
     pause 100
-    print #ow%,\\amount;" 000 RTD han sido transferidos"
+    print #ow%,\\thousand$(amount);" han sido transferidos"
     exit choose_decision
   else
     center #ow%,12,"Ninguna transferencia hecha"
@@ -1254,8 +1260,8 @@ defproc the_end
   if alive%
     print #ow%,\" Por estar vivo - ";to 28;alive%
     print #ow%,\" Por el ahorro"\"     (";\
-      money_in_switzerland;\
-      "000 RTD / 10 000) -";to 28;int(money_in_switzerland/10)
+      thousand$(money_in_switzerland);\
+      " / 10 000) -";to 28;int(money_in_switzerland/10)
     let x%=x%+alive%+int(money_in_switzerland/10)
   endif
 
@@ -1338,6 +1344,8 @@ defproc init_data
   let groups%=8
   let local_groups%=6 ' all but Russia% and USA%
   let main_groups%=3 ' only the groups% that can rebel.
+
+  let nbsp$=chr$(160) ' non-breaking space in ISO 8859-1
 
   let currency$="RTD" ' Ritimban dolar
 

@@ -26,4 +26,6 @@ Fix: the name of the requester is not displayed.
 
 == 2017-09-21
 
-Update currency notation.
+Finish the currency notation.
+
+Fix usage of "tasar".
