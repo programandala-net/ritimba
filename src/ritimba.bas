@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.30+201709212306"
+version$="0.1.0-dev.31+201709212324"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -41,7 +41,8 @@ defproc ritimba
 
   init_once
   rep again
-    credits:wait_key_press
+    credits
+    key_press
     init_data
     welcome
     rep game
@@ -188,9 +189,9 @@ defproc welcome
     endif
     tellNL "Para empezar podrás ver un informe del"
     tell "tesoro y otro de la policía secreta."
-    wait_key_press
+    key_press
     treasure_report
-    wait_key_press
+    key_press
     actual_police_report
 
 enddef
@@ -406,7 +407,7 @@ enddef
 
 defproc audience
 
-  loc i%,affordable%
+  loc i%,affordable%,this_decision%
 
   wipe yellow%,black%,yellow%
   paper #ow%,green%
@@ -429,18 +430,18 @@ defproc audience
   endrep choose_decision
 
   let decision_data$(this_decision%,1)="*"
-  let soliciting_group%=int((this_decision%-1)/8)+1
+  let soliciting_group%=int((this_decision%-1)/groups%)+1
   zx_border soliciting_group%
   let this_decision_data$=decision_data$(this_decision%)
-  let this_decision$=decision$(this_decision%)
   paper #ow%,yellow%
   ink #ow%,black%
-  center #ow%,10,"Petición "&group_genitive_name$(soliciting_group%)&":"
+  center #ow%,10,"Petición "\
+                 &group_genitive_name$(soliciting_group%)&":"
   paper #ow%,white%
   at #ow%,14,0
   tell "¿Está su excelencia conforme con "\
-    &iso_lower_1$(this_decision$)&"?"
-  wait_key_press
+    &iso_lower_1$(decision$(this_decision%))&"?"
+  key_press
   advert this_decision%
 
   cls #ow%
@@ -451,7 +452,7 @@ defproc audience
   center #ow%,3,"Petición "&group_genitive_name$(soliciting_group%)
   paper #ow%,yellow%
   ink #ow%,black%
-  center #ow%,5,this_decision$
+  center #ow%,5,decision$(this_decision%)
   paper #ow%,blue%:print #ow%:cls #ow%,3
 
   let affordable%=cash_advice%(this_decision%)
@@ -488,6 +489,7 @@ defproc decision
   loc i%,affordable%,chosen_decision,key,options
 
   rep choose_gratis_decision
+
     rep choose_decision
 
       wipe red%,yellow%,blue%
@@ -505,9 +507,13 @@ defproc decision
       at #ow%,14,4:print #ow%,"4. Aumentar el tesoro    "
       at #ow%,16,4:print #ow%,"5. Fortalecer a un grupo "
 
-      let key=code(get_key$)
+      let key=code(get_key$) ' XXX TODO -- Use default routine.
       cls #ow%
       sel on key
+
+        ' XXX TODO -- Extract athe values from `x$` and use them
+        ' directly.
+
         =code("1"):let x$="-2"
         =code("2"):let x$="35"
         =code("3"):let x$="69"
@@ -537,10 +543,13 @@ defproc decision
       if not k$ instr "0123456"
         next choose_decision
       endif
+
       if k$<1 or k$>(code(x$(2))-20)+1-(code(x$)-20)
         next choose_decision
       endif
+
       let chosen_decision=code(x$)-20+k$-1
+
       if decision_data$(chosen_decision,1)="*"
         next choose_decision
       endif
@@ -559,11 +568,13 @@ defproc decision
       ' XXX TODO -- Restore the screen colors here?
       at #ow%,4,0
       print #ow%,decision$(chosen_decision)
+
       let affordable%=cash_advice%(chosen_decision)
       if not affordable%
         pause 200
         next choose_decision
       endif
+
       at #ow%,4,0
       print #ow%,decision$(chosen_decision)
       if not yes_key:\
@@ -581,8 +592,10 @@ defproc decision
       exit choose_decision
 
     endrep choose_decision
+
     treasure_report_details
     exit choose_gratis_decision
+
   endrep choose_gratis_decision
 
 enddef
@@ -678,7 +691,7 @@ defproc advert(decision)
         print #ow%,to 2;group_name$(i%);to 24;"+"(1 to x%>0);x%
       endif
     endfor i%
-    wait_key_press
+    key_press
     cls #ow%
   endif
 enddef
@@ -840,7 +853,7 @@ defproc police_report_data
   tellNL "Tu fuerza es "&strength%&"."
   print #ow%
   tellNL "La fuerza necesaria para una revolución es "&revolution_strength%&"."
-  wait_key_press
+  key_press
 
 enddef
 
@@ -987,7 +1000,7 @@ defproc revolution
     else
       cls #ow%
       center #ow%,8,"¡Estás solo!"
-      wait_key_press
+      key_press
     endif
     exit ask_for_help
 
@@ -1170,7 +1183,7 @@ defproc ask_for_loan(decision)
       endif
     endif
   endif
-  wait_key_press
+  key_press
 
 enddef
 
@@ -1202,36 +1215,41 @@ enddef
 
 defproc news
 
-  loc i%,random_event,first_event,last_event
+  loc i%,random_event%,first_event%,last_event%
 
-  let first_event=44
-  let last_event=49
-  let events%=last_event-first_event+1
+  let first_event%=44
+  let last_event%=49
+  let events%=last_event%-first_event%+1
 
   if not rnd(0 to 2)
 
-    let random_event=rnd(first_event to last_event)
+    let random_event%=rnd(first_event% to last_event%)
     for i%=1 to events%
-      if not (decision_data$(random_event,1)="N"):\
+      ' XXX FIXME --
+      if not (decision_data$(random_event%,1)="N"):\
         exit i%
-      let random_event=random_event+1
-      if random_event>last_event:\
-        let random_event=first_event
+      let random_event%=random_event%+1
+      if random_event%>last_event%:\
+        let random_event%=first_event%
     next i%
       ret
     endfor i%
 
     wipe white%,black%,white%
+
+    ' XXX FIXME -- The original used a flash effect. That's why
+    ' the title is printed again after the sound.
+
     center #ow%,10,"NOTICIA DE ÚLTIMA HORA"
     for i%=1 to 10:\
       zx_beep .6,30
     cls #ow%
     center #ow%,10,"NOTICIA DE ÚLTIMA HORA"
     at #ow%,14,0
-    print #ow%,decision$(random_event)
+    print #ow%,decision$(random_event%)
     ink #ow%,white%
     pause 100
-    take_only_once_decision random_event
+    take_only_once_decision random_event%
     plot
     police_report
 
@@ -1436,10 +1454,10 @@ defproc score_report
     tellNL "La mayor puntuación es "&record%&"."
   endif
 
-  wait_key_press
+  key_press
   cls #ow%
   final_police_report
-  wait_key_press
+  key_press
 
 enddef
 
@@ -1457,8 +1475,10 @@ enddef
 deffn get_key_prompt$(prompt$)
 
   rep dont_press_now
+
     if inkey$(#iw%)="":\
       exit dont_press_now
+
   endrep dont_press_now
 
   rep press_now
@@ -1494,7 +1514,7 @@ deffn yes_key
   ret yes
 enddef
 
-defproc wait_key_press
+defproc key_press
   loc key$
   let key$=get_key$
 enddef
@@ -1611,6 +1631,9 @@ enddef
 ' number calculated from its ASCII code, being "M" zero.
 ' Examples: ... "K"=-1, "L"=-1,"M"=0, "N"=1...
 
+' ..............................
+' Petitions from the army
+
 data "NMHQJLMMMMMPKLMMM",\
      "Instaurar el servicio militar obligatorio"
 data "NMMPMJMMMMMNMLMMM",\
@@ -1627,6 +1650,10 @@ data "NMDQMLMMMMMOLLLMM",\
      "Aumentar la paga de las tropas"
 data "NAMQLLMLLMMPLLKLM",\
      "Comprar más armas y municiomes"
+
+' ..............................
+' Petitions from the peasants
+
 data "NMMLONMMMMMLMMLMM",\
      "Poner freno a los abusos del ejército"
 data "NMMMQIMNMMMMOLMMM",\
@@ -1643,6 +1670,10 @@ data "NMMLQKMNLMMMOLLMM",\
      "Liberar a su líder encarcelado"
 data "NMSMPLMMMMMMMMLMM",\
      "Iniciar una lotería pública"
+
+' ..............................
+' Petitions from the landowners
+
 data "NMMKMPMMMMMLMMMMM",\
      "Prohibir el uso militar de sus tierras"
 data "NMMMIQMLMLMMKONMM",\
@@ -1659,6 +1690,9 @@ data "NMMKLPMMMMMLLNNMM",\
      "Ceder tropa para labrar tierra"
 data "NACNNPMJMONMMPMKM",\
      "Construir un sistema de riego"
+
+' ..............................
+
 data "NMMQLLMMLMMNMMLML",\
      "Nombrar ministro al jefe del ejército"
 data "NLILQNMOMNMMMMLMM",\
@@ -1698,6 +1732,10 @@ data "NMMMPLMMLMMMRLPML",\
      "Legalizar las asociaciones campesinas"
 data "NMMLLPMMLMMLLRLML",\
      "Permitir que los terratenientes tengan ejércitos privados"
+
+' ..............................
+' Events
+
 data "NMMMMMMMIMMMMMQMI",\
      "Los archivos de la policía secreta han sido robados"
 data "NMMMMMMMMMMLMMVMM",\
