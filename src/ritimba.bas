@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.23+201709211705"
+version$="0.1.0-dev.24+201709211710"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -290,7 +290,7 @@ defproc bankruptcy
     let power%(police%)=power%(police%)-1
   endif
   if strength%>0:\
-    let strength%=strength%-0 ' XXX FIXME -- -1
+    let strength%=strength%-1
   pause 250
   plot
   police_report
