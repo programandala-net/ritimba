@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.27+201709211836"
+version$="0.1.0-dev.28+201709212248"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -210,9 +210,10 @@ enddef
 
 defproc print_money(money)
 
-  ' XXX OLD -- See `money$()`
+  ' XXX OLD -- See `money$()`.
 
-  ' XXX FIXME -- remove blanks on the left
+  ' XXX FIXME -- Remove blanks on the left.
+
   ' XXX REMARK -- `print_using` uses commas for decimal point.
   ' print_using #ow%,"### ### ###,##' RTD'",money*1000;
 
@@ -368,7 +369,7 @@ defproc murder
     print #ow%,"INTENTO DE MAGNICIDIO"
     at #ow%,20,0
     print #ow%,"por un miembro de ";group_name$(group%)
-      ' XXX TODO special individual names for this case
+      ' XXX TODO -- Special individual names for this case.
     cls #ow%
     pause 30
     shoot_dead_sfx
@@ -380,9 +381,9 @@ defproc murder
       or not (popularity%(police%)>low% \
       or power%(police%)>low% \
       or rnd(0 to 1)))
-      ' XXX check the compacted logic above
+      ' XXX TODO -- Check the compacted logic above.
       wipe black%,white%,black%
-      center #ow%,12,"¡Está usted muerto!" ' XXX no sense 2º person
+      center #ow%,12,"¡Está usted muerto!" ' XXX TODO -- Improve.
       zx_beep 3,-40
       let alive%=0
     else
@@ -401,7 +402,7 @@ enddef
 
 defproc audience
 
-  loc i%,c
+  loc i%,affordable%
 
   wipe yellow%,black%,yellow%
   paper #ow%,green%
@@ -412,22 +413,22 @@ defproc audience
   center #ow%,3,"UNA AUDIENCIA"
 
   rep choose_decision
-    let this_decision=rnd(1 to 24)
+    let this_decision%=rnd(1 to 24)
     for i%=1 to 22
-      if decision_data$(this_decision,1)="N"
+      if decision_data$(this_decision%,1)="N"
         exit choose_decision
       endif
-      let this_decision=(this_decision-int(this_decision/24)*24)+1
+      let this_decision%=(this_decision%-int(this_decision%/24)*24)+1
     end for i%
     for i%=1 to 24:\
       let decision_data$(i%,1)="N"
   endrep choose_decision
 
-  let decision_data$(this_decision,1)="*"
-  let soliciting_group%=int((this_decision-1)/8)+1
+  let decision_data$(this_decision%,1)="*"
+  let soliciting_group%=int((this_decision%-1)/8)+1
   zx_border soliciting_group%
-  let this_decision_data$=decision_data$(this_decision)
-  let this_decision$=decision$(this_decision)
+  let this_decision_data$=decision_data$(this_decision%)
+  let this_decision$=decision$(this_decision%)
   paper #ow%,yellow%
   ink #ow%,black%
   center #ow%,10,"Petición "&group_genitive_name$(soliciting_group%)&":"
@@ -436,7 +437,7 @@ defproc audience
   tell "¿Está su excelencia conforme con "\
     &iso_lower_1$(this_decision$)&"?"
   wait_key_press
-  advert this_decision
+  advert this_decision%
 
   cls #ow%
   paper #ow%,white%
@@ -449,10 +450,10 @@ defproc audience
   center #ow%,5,this_decision$
   paper #ow%,blue%:print #ow%:cls #ow%,3
 
-  let c=cash_advice(this_decision)
+  let affordable%=cash_advice%(this_decision%)
   ink #ow%,green%
-  ' print #ow%,blank_line$ ' XXX ?
-  if c=0
+
+  if affordable%=0
     cls #ow%
     at #ow%,10,1
     print #ow%,"No hay suficientes fondos"
@@ -470,8 +471,8 @@ defproc audience
   let y%=code(this_decision_data$(soliciting_group%+3))-77
   let x%=x%-y%
   if x%<0:\
-    let x%=0 ' XXX TODO -- use `maximum`
-  ' XXX FIXME -- coercion:
+    let x%=0 ' XXX TODO -- Use `maximum`.
+  ' XXX FIXME -- Coercion:
   let popularity%(soliciting_group%)=x%
   cls #ow%
   treasure_report
@@ -480,7 +481,7 @@ enddef
 
 defproc decision
 
-  loc i%,c,chosen_decision,key,options
+  loc i%,affordable%,chosen_decision,key,options
 
   rep choose_gratis_decision
     rep choose_decision
@@ -551,11 +552,11 @@ defproc decision
       endsel
 
       advert chosen_decision
-      ' XXX restore the screen colors here?
+      ' XXX TODO -- Restore the screen colors here?
       at #ow%,4,0
       print #ow%,decision$(chosen_decision)
-      let c=cash_advice(chosen_decision)
-      if not c
+      let affordable%=cash_advice%(chosen_decision)
+      if not affordable%
         pause 200
         next choose_decision
       endif
@@ -582,12 +583,15 @@ defproc decision
 
 enddef
 
-defproc take_only_once_decision(decision) ' XXX rename
+defproc take_only_once_decision(decision)
+  ' XXX TODO -- Rename.
   let decision_data$(decision,1)="*"
   take_decision decision
 enddef
 
-defproc take_decision(decision) ' XXX rename
+defproc take_decision(decision)
+
+  ' XXX TODO -- Rename.
 
   loc group%,t$,x%
 
@@ -597,28 +601,27 @@ defproc take_decision(decision) ' XXX rename
       ' M means 0 above
       let x%=popularity%(group%)+(code(t$(group%))-77)
       if x%>9:\
-        let x%=9 ' XXX use `maximum` and `minimum`
+        let x%=9 ' XXX TODO -- Use `maximum` and `minimum`.
       if x%<0:\
         let x%=0
-      ' XXX FIXME -- coercion:
+      ' XXX FIXME -- Coercion:
       let popularity%(group%)=x%
     endif
   endfor group%
 
   let t$=decision_data$(decision,12 to 17)
   for group%=1 to local_groups%
-    if t$(group%)<>"M"
-      ' M means 0 above
+    if t$(group%)<>"M" ' M means 0
       let x%=power%(group%)+(code(t$(group%))-77)
       if x%>9:\
-        let x%=9 ' XXX use `maximum` and `minimum`
+        let x%=9 ' XXX TODO -- Use `maximum` and `minimum`.
       if x%<0:\
         let x%=0
       let power%(group%)=x%
     endif
   endfor group%
 
-  ' XXX move: it seems this is month stuff:
+  ' XXX TODO -- Move: it seems this is month stuff:
   let money=money+decision_cost
   let monthly_payment=monthly_payment-decision_monthly_cost%
   if monthly_payment<0:\
@@ -640,7 +643,7 @@ defproc advert(decision)
     wipe yellow%,yellow%,yellow%
     paper #ow%,black%
     at #ow%,1,0
-    print #ow%,decision$(decision) ' XXX FIXME wrap/justify
+    print #ow%,decision$(decision) ' XXX FIXME -- Wrap/justify.
     paper #ow%,white%
     ink #ow%,black%
     at #ow%,3,0
@@ -649,7 +652,7 @@ defproc advert(decision)
     for i%=1 to groups%
       let x%=code(decision_data$(decision,i%+3))-77
       if x%
-        print #ow%,\to 2;group_plural_name$(i%);to 21;
+        print #ow%,\to 2;group_plural_name$(i%);to 24;
         if x%>0:\
           print #ow%,"+";
         print #ow%,x%;
@@ -668,7 +671,7 @@ defproc advert(decision)
     for i%=1 to local_groups%
       let x%=code(decision_data$(decision,i%+11))-77
       if x%
-        print #ow%,to 2;group_name$(i%);to 21;"+"(1 to x%>0);x%
+        print #ow%,to 2;group_name$(i%);to 24;"+"(1 to x%>0);x%
       endif
     endfor i%
     wait_key_press
@@ -723,65 +726,116 @@ enddef
 
 defproc police_report_data
 
-  loc group%,line%
+  loc group%,line%,\
+    header_line%,data_line%,\
+    group_col%,plan_col%,popularity_col%,strength_col%
 
-  paper #ow%,white%
-  ink #ow%,black%
-  center #ow%,3,"INFORME DE LA POLICÍA SECRETA"
+  let title_line%=2
+  let header_line%=title_line%+2
+  let data_line%=header_line%+2
+
+  let group_col%=0
+  let plan_col%=10
+  let ally_col%=14
+  let popularity_col%=17
+  let strength_col%=24
+
   paper #ow%,black%
   ink #ow%,white%
-  at #ow%,6,1
-  print #ow%,"POPULARIDAD"
-  at #ow%,6,22
-  print #ow%,"FUERZA"
+  under #ow%,1
+  center #ow%,title_line%,"INFORME DE LA POLICÍA SECRETA"
+  under #ow%,0
+
+  paper #ow%,black%
+  ink #ow%,white%
+
+  at #ow%,header_line%,group_col%
+  csize #ow%,0,csize_height%
+  print #ow%,"Grupo"
+  restore_csize
+
+  at #ow%,header_line%,plan_col%
+  csize #ow%,0,csize_height%
+  print #ow%,"Prepara"
+  restore_csize
+
+  at #ow%,header_line%,ally_col%
+  csize #ow%,0,csize_height%
+  print #ow%,"Aliado"
+  restore_csize
+
+  at #ow%,header_line%,popularity_col%
+  csize #ow%,0,csize_height%
+  print #ow%,"Popularidad"
+  restore_csize
+
+  at #ow%,header_line%,strength_col%
+  csize #ow%,0,csize_height%
+  print #ow%,"Fuerza"
+  restore_csize
 
   for group%=1 to groups%
 
-    let line%=7+group%
+    let line%=data_line%+group%-1
 
-    at #ow%,line%,11
-    paper #ow%,on_(plan%(group%)=rebellion%,yellow%,red%)
-    ink #ow%,black%
-    print #ow%,group_short_name$(group%)
     paper #ow%,white%
-    at #ow%,line%,10
+    ink #ow%,black%
+    at #ow%,line%,group_col%
     print #ow%,group%
 
-    if is_main_group%(group%) and plan%(group%)=rebellion%
-      at #ow%,line%,21
-      print #ow%,partner%(group%)
+    paper #ow%,yellow%
+    at #ow%,line%,group_col%+1
+    csize #ow%,csize_width%-2,csize_height%
+    print #ow%,group_short_name$(group%);\
+      fill$(" ",max_short_name_len%-len(group_short_name$(group%)))
+    restore_csize
+
+    ' Mark possible plan and ally
+    if is_main_group%(group%)
+      at #ow%,line%,plan_col%
+      csize #ow%,0,csize_height%
+      paper #ow%,black%
+      ink #ow%,red%
+      sel on plan%(group%)
+        =rebellion%
+          print #ow%,"Rebelión"
+          restore_csize
+          at #ow%,line%,ally_col%
+          paper #ow%,white%
+          ink #ow%,black%
+          print #ow%,partner%(group%)
+        =assassination%
+          print #ow%,"Magnicidio"
+      endsel
+      restore_csize
     endif
 
-    let x%=popularity%(group%)
-    if x%
+    if popularity%(group%)
       paper #ow%,green%
       ink #ow%,white%
-      at #ow%,line%,10-x%
-      print #ow%,"987654321"(10-x% to )
+      at #ow%,line%,popularity_col%
+      csize #ow%,csize_width%-1,csize_height%
+      print #ow%,"123456789"(to popularity%(group%))
+      restore_csize
     endif
 
-    ' Mark possible assassination
-    if is_main_group%(group%) and plan%(group%)=assassination%
-      paper #ow%,white%
-      at #ow%,group%+7,21
-      print #ow%,"M"
-    endif
-
-    if group%<=local_groups%
-      at #ow%,line%,22
+    if is_local_group%(group%)
       paper #ow%,red%
       ink #ow%,white%
-      print #ow%,"123456789"(1 to power%(group%))
+      at #ow%,line%,strength_col%
+      csize #ow%,csize_width%-1,csize_height%
+      print #ow%,"123456789"(to power%(group%))
+      restore_csize
     endif
 
   endfor group%
 
   paper #ow%,black%
   ink #ow%,white%
-  at #ow%,17,0
-  print #ow%,"Tu FUERZA es ";strength%
-  at #ow%,19,0
-  print #ow%,"La FUERZA de la REVOLUCIÓN es ";revolution_strength%
+  print #ow%
+  tellNL "Tu fuerza es "&strength%&"."
+  print #ow%
+  tellNL "La fuerza necesaria para una revolución es "&revolution_strength%&"."
   wait_key_press
   wipe green%,black%,green%
 
@@ -790,6 +844,12 @@ enddef
 deffn is_main_group%(a_group%)
 
   return a_group%<=main_groups%
+
+enddef
+
+deffn is_local_group%(a_group%)
+
+  return a_group%<=local_groups%
 
 enddef
 
@@ -806,7 +866,7 @@ defproc police_report_not_avalaible
   if power%(police%)<=low%
     print #ow%,to 3\\"El poder de la policía es ";\
       power%(police%);"."
-        ' XXX TODO -- prevent "policía" twice.
+        ' XXX TODO -- Prevent "policía" twice.
   endif
 
   if money<=0
@@ -845,8 +905,8 @@ defproc revolution
   cls #ow%
   if try_escaping%
 
-    if decision_data$(36,1)="*" ' XXX TODO -- factor
-      ' the helicopter was bought before
+    if decision_data$(36,1)="*" ' XXX TODO -- Factor.
+      ' The helicopter was bought before.
       if rnd(0 to 2)
         center #ow%,12,"¡Escapas en helicóptero!"
         let escape%=1
@@ -985,7 +1045,7 @@ enddef
 ' ==============================================================
 ' Treasure {{{1
 
-deffn cash_advice(decision)
+deffn cash_advice%(decision)
 
   ' loc decision_cost
 
@@ -1051,7 +1111,7 @@ defproc ask_for_loan(decision)
 
   loc country,loan
 
-  sel on decision ' XXX tmp make it better
+  sel on decision ' XXX TODO -- Improve.
     =38:let country=russian
     =39:let country=usa%
   endsel
@@ -1087,7 +1147,7 @@ defproc ask_for_loan(decision)
       print #ow%,"Te deniegan un nuevo préstamo."
     else
 
-      ' XXX FIXME run-time error in this expression:
+      ' XXX FIXME -- Run-time error in this expression:
       ' 2016-01-22: again:
       ' country=0
       ' popularity_field%=1
@@ -1204,7 +1264,7 @@ defproc war
 
 enddef
 
-defproc increase_popularity(group%) ' XXX rename
+defproc increase_popularity(group%) ' XXX TODO -- Rename.
 
   local x%
 
@@ -1212,7 +1272,7 @@ defproc increase_popularity(group%) ' XXX rename
   ' popularity by any amount, positive or negative.
 
   let x%=popularity%(group%)
-  ' XXX FIXME -- coercion:
+  ' XXX FIXME -- Coercion:
   let popularity%(group%)=x%+(x%<9)
 
 enddef
@@ -1253,7 +1313,8 @@ defproc actual_war
 
   if leftoto_strength+rnd(-1 to 1)<ritimba_strength
 
-    ' XXX TODO -- factor
+    ' XXX TODO -- Factor.
+
     ' Ritimba wins
 
     zx_border black%
@@ -1264,7 +1325,8 @@ defproc actual_war
 
   else
 
-    ' XXX TODO -- factor
+    ' XXX TODO -- Factor.
+
     ' Leftoto wins
 
     wipe black%,white%,black%
@@ -1439,14 +1501,16 @@ enddef
 
 defproc init_data
 
-  loc x$
+  loc x$ ' XXX TMP --
 
   let score%=0
   let record%=0
+
   let decisions%=49
+
   let groups%=8
-  let local_groups%=6 ' all but Russia and USA
-  let main_groups%=3  ' only the groups that can rebel.
+  let main_groups%=3  ' only the groups that can rebel
+  let local_groups%=6 ' all groups but Russia and USA
 
   let nbsp$=chr$(160) ' non-breaking space in ISO 8859-1
 
@@ -1474,14 +1538,16 @@ defproc init_data
   dim decision_data$(decisions%,17)
   dim decision$(decisions%,decision_name_max_len%)
 
-  ' XXX TODO -- calculate max length
+  ' XXX TODO -- Calculate max lengths.
+  let max_short_name_len%=17
+
   dim \
     popularity%(groups%),\
     power%(groups%),\
     plan%(groups%),\
     partner%(groups%),\
     group_name$(groups%,18),\
-    group_short_name$(groups%,17),\
+    group_short_name$(groups%,max_short_name_len%),\
     group_plural_name$(groups%,21),\
     group_genitive_name$(groups%,21)
 
@@ -1490,7 +1556,7 @@ defproc init_data
   for i%=1 to decisions%:
     read decision_data$(i%),x$
     if len(x$)>decision_name_max_len%
-      ' XXX tmp
+      ' XXX TMP --
       print "ERROR: decision name too long:"\x$
       stop
     else
@@ -1656,7 +1722,7 @@ data "NMMMMMMMMMMMILKMM",\
 
 data 7,6,none%,none%,\
      "el ejército",\
-     "militares",\
+     "ejército",\
      "los militares",\
      "del ejército"
 data 7,6,none%,none%,\
@@ -1671,7 +1737,7 @@ data 7,6,none%,none%,\
      "de los terratenientes"
 data 0,6,none%,none%,\
      "la guerilla",\
-     "guerrilleros",\
+     "guerrilla",\
      "los guerrilleros",\
      "de la guerrilla"
 data 7,6,none%,none%,\
@@ -1681,7 +1747,7 @@ data 7,6,none%,none%,\
      "de Leftoto"
 data 7,6,none%,none%,\
      "la policía secreta",\
-     "policías secretos",\
+     "policía secreta",\
      "los policías secretos",\
      "de la policía secreta"
 data 7,0,none%,none%,\
@@ -1775,16 +1841,16 @@ defproc center(channel,line%,text$)
 enddef
 
 defproc tell(txt$)
-  local text$,first,last
+  local text$,first%,last%
   if len(txt$)
     let text$=txt$&" "
-    let first=1
-    for last=1 to len(text$)
-      if text$(last)=" "
-        print #ow%,!text$(first to last-1);
-        let first=last+1
+    let first%=1
+    for last%=1 to len(text$)
+      if text$(last%)=" "
+        print #ow%,!text$(first% to last%-1);
+        let first%=last%+1
       endif
-    endfor last
+    endfor last%
   endif
 enddef
 
@@ -1793,6 +1859,12 @@ defproc tellNL(text$)
   tell(text$)
   ' XXX FIXME -- An extra blank line is created if the
   ' previous line occupied the whole width.
+enddef
+
+defproc restore_csize
+
+  csize #ow%,csize_width%,csize_height%
+
 enddef
 
 ' ==============================================================
@@ -1825,7 +1897,7 @@ enddef
 defproc cursen_home(channel%)
   cursen #channel%
   if channel%=iw%:\
-    at# iw%,iw_lines%-1,columns%-1:\
+    at #iw%,iw_lines%-1,columns%-1:\
   else \
     at #ow%,ow_lines%-1,columns%-1
 enddef
@@ -1842,8 +1914,8 @@ deffn column_x%(column%)
 enddef
 
 defproc fonts(font_address)
-  char_use#iw%,font_address,0
-  char_use#ow%,font_address,0
+  char_use #iw%,font_address,0
+  char_use #ow%,font_address,0
 enddef
 
 defproc iso_font
@@ -1858,17 +1930,20 @@ enddef
 ' Init {{{1
 
 defproc init_font
+
   let font$=dev$&"iso8859-1_font"
   font_length=flen(\font$)
   font_address=alchp(font_length)
   lbytes font$,font_address
   iso_font
+
 enddef
 
 defproc init_windows
 
   let columns%=32
   let lines%=24
+
   let csize_width%=3
   let csize_height%=scr_ylim<>256
 
@@ -1876,17 +1951,21 @@ defproc init_windows
   let ow_lines%=lines%-iw_lines% ' output window lines%
 
   let ow%=fopen("scr_") ' output window
+
   csize #ow%,csize_width%,csize_height%
   let char_width_pixels%=csize_width_pixels(csize_width%)
   let char_height_pixels%=csize_height_pixels(csize_height%)
+
   let ow_width%=columns%*char_width_pixels%
-  let ow_x%=(scr_xlim-ow_width%)/2
   let ow_height%=ow_lines%*char_height_pixels%
+  let ow_x%=(scr_xlim-ow_width%)/2
   let ow_y%=(scr_ylim-(lines%*char_height_pixels%))/2
   window #ow%,ow_width%,ow_height%,ow_x%,ow_y%
 
   let iw%=fopen("con_") ' input window
+
   csize #iw%,csize_width%,csize_height%
+
   let iw_width%=ow_width%
   let iw_height%=iw_lines%*char_height_pixels%
   let iw_x%=ow_x%
@@ -1933,7 +2012,7 @@ defproc debug_(message$)
   endif
 enddef
 
-defproc finish ' XXX tmp
+defproc finish ' XXX TMP --
   close
   ql_font
   rechp font_address

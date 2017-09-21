@@ -34,3 +34,10 @@
 - Fix: the score of the previous game is lost.
 - Move the data from `decision_data$()` into numeric arrays. First,
   write a data interface layer to make the code more legible.
+- Rename `tell` to `jprint` or similar, add the channel as parameter
+  and move the code to the library.
+- Move `csize_width_pixels` and `csize_height_pixels` to the library.
+- Rename `cash_advice%()`.
+- Fix: Sometimes the monthly audience has no effect.
+- Fix: Remove green screen at the end of police report.
+- Fix: Two groups can be allies of other.
