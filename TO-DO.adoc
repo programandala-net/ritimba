@@ -41,3 +41,5 @@
 - Fix: Sometimes the monthly audience has no effect.
 - Fix: Two groups can be allies of other.
 - Fix the title effect in `news`.
+- Improve `money_transfer` with menu or input, more information and
+  better layout.

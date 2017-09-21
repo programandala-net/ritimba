@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.31+201709212324"
+version$="0.1.0-dev.31+201709220036"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -486,133 +486,138 @@ enddef
 
 defproc decision
 
-  loc i%,affordable%,chosen_decision,key,options
+  loc i%,\
+    affordable%,\
+    chosen_decision%,\
+    option%,\
+    options%,\
+    first_decision%,\
+    last_decision%
 
-  rep choose_gratis_decision
+  rep choose_decision
 
-    rep choose_decision
+    wipe red%,yellow%,blue%
 
-      wipe red%,yellow%,blue%
+    print #ow%,fill$("*",columns%*ow_lines%)
 
-      print #ow%,fill$("*",columns%*ow_lines%)
-      paper #ow%,blue%
-      ink #ow%,white%
-      center #ow%,3,"DECISIÓN PRESIDENCIAL"
-      paper #ow%,yellow%
-      ink #ow%,black%
-      at #ow%,06,1:print #ow%,"Elige entre:"
-      at #ow%,08,4:print #ow%,"1. Complacer a un grupo  "
-      at #ow%,10,4:print #ow%,"2. Complacer a todos     "
-      at #ow%,12,4:print #ow%,"3. Tus negocios          "
-      at #ow%,14,4:print #ow%,"4. Aumentar el tesoro    "
-      at #ow%,16,4:print #ow%,"5. Fortalecer a un grupo "
+    paper #ow%,blue%
+    ink #ow%,white%
+    center #ow%,3,"DECISIÓN PRESIDENCIAL"
 
-      let key=code(get_key$) ' XXX TODO -- Use default routine.
-      cls #ow%
-      sel on key
+    paper #ow%,yellow%
+    ink #ow%,black%
+    at #ow%,08,4:print #ow%,"1. Complacer a un grupo  "
+    at #ow%,10,4:print #ow%,"2. Complacer a todos     "
+    at #ow%,12,4:print #ow%,"3. Aumentar el tesoro    "
+    at #ow%,14,4:print #ow%,"4. Fortalecer a un grupo "
+    at #ow%,16,4:print #ow%,"5. Asuntos privados      "
 
-        ' XXX TODO -- Extract athe values from `x$` and use them
-        ' directly.
+    let option%=code(get_key$)-code("0")
+    cls #ow%
+    sel on option%
+      =1:let first_decision%=25:let last_decision%=30
+      =2:let first_decision%=31:let last_decision%=33
+      =3:let first_decision%=38:let last_decision%=40
+      =4:let first_decision%=41:let last_decision%=43
+      =5:let first_decision%=34:let last_decision%=37  
+      =remainder:ret
+    endsel
 
-        =code("1"):let x$="-2"
-        =code("2"):let x$="35"
-        =code("3"):let x$="69"
-        =code("4"):let x$=":<"
-        =code("5"):let x$="=?"
-        =remainder:ret
-      endsel
+    ' XXX TODO -- Calculate valid options before displaying them.
 
-      at #ow%,(20-(((code(x$(2))-20)-(code(x$(1))-20))*3))*.5,0
-      let options=0
-      for i%=code(x$(1))-20 to code(x$(2))-20
-        if decision_data$(i%,1)<>"*"
-          let options=options+1
-          tellNL options&". "&decision$(i%)&"."
-        endif
-      endfor i%
-
-      if not options
-        at #ow%,12,3
-        print #ow%,"Esta sección está agotada"
-        pause 150
-        next choose_decision
+    at #ow%,(20-((last_decision%-first_decision%)*3))*.5,0
+    let options%=0
+    for i%=first_decision% to last_decision%
+      if decision_data$(i%,1)<>"*"
+        let options%=options%+1
+        tellNL options%&". "&decision$(i%)&"."
       endif
+    endfor i%
 
-      let k$=get_key$
+    if not options%
+      at #ow%,12,3
+      print #ow%,"Esta sección está agotada"
+      pause 150
+      next choose_decision
+    endif
 
-      if not k$ instr "0123456"
-        next choose_decision
-      endif
+    let k$=get_key$
 
-      if k$<1 or k$>(code(x$(2))-20)+1-(code(x$)-20)
-        next choose_decision
-      endif
+    if not k$ instr "0123456"
+      next choose_decision
+    endif
 
-      let chosen_decision=code(x$)-20+k$-1
+    if k$<1 or k$>last_decision%+1-first_decision%
+      next choose_decision
+    endif
 
-      if decision_data$(chosen_decision,1)="*"
-        next choose_decision
-      endif
+    let chosen_decision%=first_decision%+k$-1
 
-      sel on chosen_decision
-        =37
-          money_transfer
-          exit choose_decision
-        =38,39
-          ask_for_loan chosen_decision
-          treasure_report
-          exit choose_gratis_decision
-      endsel
+    if decision_data$(chosen_decision%,1)="*"
+      next choose_decision
+    endif
 
-      advert chosen_decision
-      ' XXX TODO -- Restore the screen colors here?
-      at #ow%,4,0
-      print #ow%,decision$(chosen_decision)
-
-      let affordable%=cash_advice%(chosen_decision)
-      if not affordable%
-        pause 200
-        next choose_decision
-      endif
-
-      at #ow%,4,0
-      print #ow%,decision$(chosen_decision)
-      if not yes_key:\
-        next choose_decision
-
-      if chosen_decision<>35
-        treasure_report
-        take_only_once_decision chosen_decision
+    sel on chosen_decision%
+      =37
+        money_transfer
         exit choose_decision
-      endif
+      =38,39
+        ask_for_loan chosen_decision%
+        treasure_report
+        ret
+    endsel
 
-      let strength%=strength%+2
+    ' XXX TODO -- Move to the `remainder` of the `sel` above:
+
+    advert chosen_decision%
+    ' XXX TODO -- Restore the screen colors here?
+    at #ow%,4,0
+    print #ow%,decision$(chosen_decision%)
+
+    let affordable%=cash_advice%(chosen_decision%)
+    if not affordable%
+      pause 200
+      next choose_decision
+    endif
+
+    at #ow%,4,0
+    print #ow%,decision$(chosen_decision%)
+    if not yes_key:\
+      next choose_decision
+
+    if chosen_decision%<>35
       treasure_report
-      take_decision chosen_decision
+      take_only_once_decision chosen_decision%
       exit choose_decision
+    endif
 
-    endrep choose_decision
+    let strength%=strength%+2
+    treasure_report
+    take_decision chosen_decision%
+    exit choose_decision
 
-    treasure_report_details
-    exit choose_gratis_decision
+  endrep choose_decision
 
-  endrep choose_gratis_decision
+  treasure_report_details
 
 enddef
 
-defproc take_only_once_decision(decision)
+defproc take_only_once_decision(decision%)
+
   ' XXX TODO -- Rename.
-  let decision_data$(decision,1)="*"
-  take_decision decision
+
+  let decision_data$(decision%,1)="*"
+  take_decision decision%
+
 enddef
 
-defproc take_decision(decision)
+defproc take_decision(decision%)
 
   ' XXX TODO -- Rename.
 
   loc group%,t$,x%
 
-  let t$=decision_data$(decision,4 to 11)
+  let t$=decision_data$(decision%,4 to 11)
   for group%=1 to groups%
     if t$(group%)<>"M"
       ' M means 0 above
@@ -626,7 +631,7 @@ defproc take_decision(decision)
     endif
   endfor group%
 
-  let t$=decision_data$(decision,12 to 17)
+  let t$=decision_data$(decision%,12 to 17)
   for group%=1 to local_groups%
     if t$(group%)<>"M" ' M means 0
       let x%=power%(group%)+(code(t$(group%))-77)
@@ -773,7 +778,7 @@ defproc police_report_data
 
   at #ow%,header_line%,plan_col%
   csize #ow%,0,csize_height%
-  print #ow%,"Prepara"
+  print #ow%,"Prepara" ' XXX TODO -- Improve.
   restore_csize
 
   at #ow%,header_line%,ally_col%
@@ -1188,6 +1193,8 @@ defproc ask_for_loan(decision)
 enddef
 
 defproc money_transfer
+
+  ' XXX TODO -- Improve.
 
   loc amount
 
@@ -1622,8 +1629,8 @@ enddef
 ' Character fields in decision_data$():
 
 ' 01: decision already taken ("N"=no, "*"=yes)
-' 02: cost%
-' 03: monthly cost%
+' 02: cost
+' 03: monthly cost
 ' 04..11: +/- popularity for groups 1-8
 ' 12..17 +/- power for groups% 1-6 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
 
