@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.31+201709220036"
+version$="0.1.0-dev.32+201709220047"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -28,6 +28,10 @@ rem http://programandala.net/es.programa.ritimba.html
 ' Files and requirements {{{1
 
 let dev$=device$("ritimba_bas","flpmdvdevsubwinnfados")
+
+' From "DIY Toolkit", (C) Simon N. Goodwin:
+'   minimum, maximum
+' (Loaded by the <boot> file.)
 
 #include device.bas
 #include iso_lower.bas
@@ -475,9 +479,7 @@ defproc audience
   let x%=popularity%(soliciting_group%)
   let y%=code(this_decision_data$(soliciting_group%+3))-77
   let x%=x%-y%
-  if x%<0:\
-    let x%=0 ' XXX TODO -- Use `maximum`.
-  ' XXX FIXME -- Coercion:
+  let x%=maximum(x%,0)
   let popularity%(soliciting_group%)=x%
   cls #ow%
   treasure_report
@@ -622,11 +624,7 @@ defproc take_decision(decision%)
     if t$(group%)<>"M"
       ' M means 0 above
       let x%=popularity%(group%)+(code(t$(group%))-77)
-      if x%>9:\
-        let x%=9 ' XXX TODO -- Use `maximum` and `minimum`.
-      if x%<0:\
-        let x%=0
-      ' XXX FIXME -- Coercion:
+      let x%=in_range(x%,0,9)
       let popularity%(group%)=x%
     endif
   endfor group%
@@ -635,10 +633,7 @@ defproc take_decision(decision%)
   for group%=1 to local_groups%
     if t$(group%)<>"M" ' M means 0
       let x%=power%(group%)+(code(t$(group%))-77)
-      if x%>9:\
-        let x%=9 ' XXX TODO -- Use `maximum` and `minimum`.
-      if x%<0:\
-        let x%=0
+      let x%=in_range(x%,0,9)
       let power%(group%)=x%
     endif
   endfor group%
@@ -648,6 +643,12 @@ defproc take_decision(decision%)
   let monthly_payment=monthly_payment-decision_monthly_cost%
   if monthly_payment<0:\
     let monthly_payment=0
+
+enddef
+
+deffn in_range(x,min,max)
+
+  return maximum(minimum(x,9),0)
 
 enddef
 
