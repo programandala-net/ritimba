@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.24+201709211710"
+version$="0.1.0-dev.26+201709211756"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -128,9 +128,9 @@ defproc national_flag
 enddef
 
 defproc tapestry(text$)
-  loc i%,times
-  let times=columns%*ow_lines%/len(text$)
-  for i%=1 to times
+  loc i%,times%
+  let times%=columns%*ow_lines%/len(text$)
+  for i%=1 to times%
     print #ow%,text$;" ";
     zx_beep .01,40-i%+rnd*10
   endfor i%
@@ -326,33 +326,32 @@ enddef
 
 defproc plot
 
-  ' XXX TODO -- How this works and what is the meaning the two
-  ' characters of group_data$()?
-
-  loc i%,p%
+  loc main_group%,partner_group%
 
   if months%<=2 or months%<pc%:\
     ret
 
-  for i%=1 to main_groups%:\
-    let group_data$(i%)="::"
+  for main_group%=1 to main_groups%:\
+    let plan%(main_group%)=none%:\
+    let partner%(main_group%)=none%
 
-  for i%=1 to main_groups%
-    if popularity%(i%)<=low%
-      for p%=1 to local_groups%
-        if not(i%=p% or popularity%(p%)>low%)
-          if power%(p%)+power%(i%)\
+  for main_group%=1 to main_groups%
+    if popularity%(main_group%)<=low%
+      for partner_group%=1 to local_groups%
+        if not(main_group%=partner_group% \
+               or popularity%(partner_group%)>low%)
+          if power%(partner_group%)+power%(main_group%)\
              >=revolution_strength%
-            let group_data$(i%,first_field%)="R"
-            let group_data$(i%,second_field%)=p%
-            exit p%
+            let plan%(main_group%)=rebellion%
+            let partner%(main_group%)=partner_group%
+            exit partner_group%
           endif
         endif
-      next p%
-        let group_data$(i%,first_field%)="A"
-      endfor p%
+      next partner_group%
+        let plan%(main_group%)=assassination%
+      endfor partner_group%
     endif
-  endfor i%
+  endfor main_group%
 
 enddef
 
@@ -362,7 +361,7 @@ defproc murder
 
   let group%=rnd(1 to main_groups%)
 
-  if first_field_datum$(group%)="A"
+  if plan%(group%)=assassination%
 
     cls_ black%,white%,black%
     at #ow%,10,7
@@ -375,9 +374,9 @@ defproc murder
     fx_2
     pause 50
 
-    if ((first_field_datum$(army%)="A" \
-      and first_field_datum$(peasants%)="A" \
-      and first_field_datum$(landowners%)="A") \
+    if ((plan%(army%)=assassination% \
+      and plan%(peasants%)=assassination% \
+      and plan%(landowners%)=assassination%) \
       or not (popularity%(police%)>low% \
       or power%(police%)>low% \
       or rnd(0 to 1)))
@@ -739,16 +738,16 @@ defproc police_report_data
     let line_%=7+group%
 
     at #ow%,line_%,11
-    paper #ow%,on_(first_field_datum$(group%)="R",yellow%,red%)
+    paper #ow%,on_(plan%(group%)=rebellion%,yellow%,red%)
     ink #ow%,black%
     print #ow%,group_short_name$(group%)
     paper #ow%,white%
     at #ow%,line_%,10
     print #ow%,group%
 
-    if group%<=3 and first_field_datum$(group%)="R"
+    if is_main_group%(group%) and plan%(group%)=rebellion%
       at #ow%,line_%,21
-      print #ow%,second_field_datum$(group%) ' XXX what does it mean?
+      print #ow%,partner%(group%)
     endif
 
     let x%=popularity%(group%)
@@ -759,11 +758,11 @@ defproc police_report_data
       print #ow%,"987654321"(10-x% to )
     endif
 
-    ' Mark possible assasination
-    if group%<=3 and first_field_datum$(group%)="A"
+    ' Mark possible assassination
+    if is_main_group%(group%) and plan%(group%)=assassination%
       paper #ow%,white%
       at #ow%,group%+7,21
-      print #ow%,"A"
+      print #ow%,"M"
     endif
 
     if group%<=local_groups%
@@ -783,6 +782,12 @@ defproc police_report_data
   print #ow%,"La FUERZA de la REVOLUCIÓN es ";revolution_strength%
   wait_key_press
   cls_ green%,black%,green%
+
+enddef
+
+deffn is_main_group%(a_group%)
+
+  return a_group%<=main_groups%
 
 enddef
 
@@ -819,7 +824,7 @@ defproc revolution
 
   for i%=1 to main_groups%
     let rebel_group%=rnd(1 to main_groups%)
-    if group_data$(rebel_group%,first_field%)="R":\
+    if plan%(rebel_group%)=rebellion%:\
       exit i%
   next i%
     ret
@@ -881,14 +886,14 @@ defproc revolution
 
     let rebels_strength%=\
       power%(rebel_group%)\
-      +power%(group_data$(rebel_group%,second_field%))
+      +power%(partner%(rebel_group%))
 
     at #ow%,5,0
     tell \
       "Se han unido "&\
       group_name$(rebel_group%)&\
       " y "&\
-      group_name$(group_data$(rebel_group%,second_field%))
+      group_name$(partner%(rebel_group%))
 
     print #ow%,\\"Su fuerza conjunta es ";rebels_strength%
     print #ow%,\\"¿A quién vas a pedir ayuda?"
@@ -965,8 +970,8 @@ defproc revolution
       pause .1
     let popularity%(rebel_group%)=0
     let power%(rebel_group%)=0
-    let popularity%(group_data$(rebel_group%,second_field%))=0
-    let power%(group_data$(rebel_group%,second_field%))=0
+    let popularity%(partner%(rebel_group%))=0
+    let power%(partner%(rebel_group%))=0
   endif
   let power%(helping_group%)=9
   let pc%=months%+2
@@ -1425,17 +1430,6 @@ defproc wait_key_press
 enddef
 
 ' ==============================================================
-' Data interface {{{1
-
-deffn first_field_datum$(a_group%)
-  return group_data$(a_group%,first_field%)
-enddef
-
-deffn second_field_datum$(a_group%)
-  return group_data$(a_group%,second_field%)
-enddef
-
-' ==============================================================
 ' Data {{{1
 
 defproc init_data
@@ -1463,9 +1457,9 @@ defproc init_data
   let russia%=7
   let usa%=8
 
-  ' Group fields in group_data$()
-  let first_field%=1  ' XXX TMP -- Unknown usage.
-  let second_field%=2 ' XXX TMP -- Unknown usage.
+  let none%=-1         ' plan or partner identifier
+  let rebellion%=1     ' plan identifier
+  let assassination%=2 ' plan identifier
 
   ' Decision fields in decision_data$()
   let cost%=2
@@ -1479,7 +1473,8 @@ defproc init_data
   dim \
     popularity%(groups%),\
     power%(groups%),\
-    group_data$(groups%,2),\
+    plan%(groups%),\
+    partner%(groups%),\
     group_name$(groups%,18),\
     group_short_name$(groups%,17),\
     group_plural_name$(groups%,21),\
@@ -1502,7 +1497,8 @@ defproc init_data
     read \
       popularity%(i%),\
       power%(i%),\
-      group_data$(i%),\
+      plan%(i%),\
+      partner%(i%),\
       group_name$(i%),\
       group_short_name$(i%),\
       group_plural_name$(i%),\
@@ -1525,6 +1521,10 @@ defproc init_data
 
 enddef
 
+' ----------------------------------------------
+' Decisions data
+
+' XXX REMARK --
 ' Character fields in decision_data$():
 
 ' 01: decision already taken ("N"=no, "*"=yes)
@@ -1637,56 +1637,54 @@ data "NMMMMMMMMMMMMOMIM",\
 data "NMMMMMMMMMMMILKMM",\
      "Se ha declarado una epidemia entre los campesinos"
 
-' data:
-' popularity (0..9)
-' power (0..9)
-' group_data$(i%)
-'   chars in group_data$():
-'   1=first_field%  ' XXX TMP -- Unknown usage.
-'     It can hold ":", "-", "R" (rebel?), "A" (assasination?)...
-'   2=second_field% ' XXX TMP -- Unknown usage.
-'     It can hold ":", "-" or a group ("0".."9")
+' ----------------------------------------------
+' Groups data
+
+' popularity%(i%):  0..9
+' power%(i%):       0..9
+' plan%(i%):        none% | rebellion% | assassination%
+' partner%(i%):     none% | group
 ' group_name$(i%)
 ' group_short_name$(i%)
 ' group_plural_name$(i%)
 ' group_genitive_name$(i%)
 
-data 7,6,"::",\
+data 7,6,none%,none%,\
      "el ejército",\
      "militares",\
      "los militares",\
      "del ejército"
-data 7,6,"::",\
+data 7,6,none%,none%,\
      "los campesinos",\
      "campesinos",\
      "los campesinos",\
      "de los campesinos"
-data 7,6,"::",\
+data 7,6,none%,none%,\
      "los terratenientes",\
      "terratenientes",\
      "los terratenientes",\
      "de los terratenientes"
-data 0,6,"--",\
+data 0,6,none%,none%,\
      "la guerilla",\
      "guerrilleros",\
      "los guerrilleros",\
      "de la guerrilla"
-data 7,6,"--",\
+data 7,6,none%,none%,\
      "Leftoto",\
      "leftotanos",\
      "los leftotanos",\
      "de Leftoto"
-data 7,6,"--",\
+data 7,6,none%,none%,\
      "la policía secreta",\
      "policías secretos",\
      "los policías secretos",\
      "de la policía secreta"
-data 7,0,"--",\
+data 7,0,none%,none%,\
      "Rusia",\
      "rusos",\
      "los rusos",\
      "de Rusia"
-data 7,0,"--",\
+data 7,0,none%,none%,\
      "Usa",\
      "useños",\
      "los useños",\

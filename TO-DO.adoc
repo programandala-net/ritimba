@@ -32,3 +32,7 @@
 
 - Rename `pc%`.
 - Fix: the score of the previous game is lost.
+- Move the data from `decision_data$()` into numeric arrays. First,
+  write a data interface layer to make the code more legible.
+- Rename `cls_`.
+- Rename special effects.
