@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.26+201709211756"
+version$="0.1.0-dev.27+201709211836"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -75,7 +75,7 @@ ritimba
 ' Presentation {{{1
 
 defproc credits
-  cls_ black%,white%,blue%
+  wipe black%,white%,blue%
   at #ow%,1,0
   print #ow%,"Ritimba"
   print #ow%,\\"Por:"\"Marcos Cruz (programandala.net),"
@@ -138,7 +138,7 @@ enddef
 
 defproc title
   loc i%
-  cls_ cyan%,black%,black%
+  wipe cyan%,black%,black%
   tapestry "Ritimba"
   national_flag
   for i%=1 to 50:
@@ -173,7 +173,7 @@ enddef
 defproc welcome
 
     title
-    cls_ white%,black%,blue%
+    wipe white%,black%,blue%
     paper #ow%,cyan%:center #ow%,1,"Bienvenido al cargo"
     paper #ow%,white%
     if score%>0
@@ -200,7 +200,7 @@ enddef
 
 defproc treasure_report
 
-  cls_ white%,green%,green%
+  wipe white%,green%,green%
   print #ow%,fill$("$",columns%*ow_lines%)
   ink #ow%,black%
   center #ow%,8,"INFORME DEL TESORO"
@@ -306,7 +306,7 @@ defproc new_month
   let revolution_strength%=rnd(10 to 12)
   let months%=months%+1
 
-  cls_ yellow%,black%,yellow%
+  wipe yellow%,black%,yellow%
   paper #ow%,cyan%
   ink #ow%,white%
   at #ow%,10,12
@@ -363,15 +363,15 @@ defproc murder
 
   if plan%(group%)=assassination%
 
-    cls_ black%,white%,black%
+    wipe black%,white%,black%
     at #ow%,10,7
-    print #ow%,"INTENTO DE ASESINATO"
+    print #ow%,"INTENTO DE MAGNICIDIO"
     at #ow%,20,0
     print #ow%,"por un miembro de ";group_name$(group%)
       ' XXX TODO special individual names for this case
     cls #ow%
     pause 30
-    fx_2
+    shoot_dead_sfx
     pause 50
 
     if ((plan%(army%)=assassination% \
@@ -381,12 +381,12 @@ defproc murder
       or power%(police%)>low% \
       or rnd(0 to 1)))
       ' XXX check the compacted logic above
-      cls_ black%,white%,black%
+      wipe black%,white%,black%
       center #ow%,12,"¡Está usted muerto!" ' XXX no sense 2º person
       zx_beep 3,-40
       let alive%=0
     else
-      cls_ white%,black%,black%
+      wipe white%,black%,black%
       paper #ow%,white%
       ink #ow%,black%
       center #ow%,12," Intento fallido "
@@ -403,7 +403,7 @@ defproc audience
 
   loc i%,c
 
-  cls_ yellow%,black%,yellow%
+  wipe yellow%,black%,yellow%
   paper #ow%,green%
   at #ow%,5,0
   cls #ow%,1
@@ -442,7 +442,7 @@ defproc audience
   paper #ow%,white%
   center #ow%,1,"  DECISIÓN  "
   paper #ow%,soliciting_group%
-  ink #ow%,contrast_colour(soliciting_group%)
+  ink #ow%,contrast_colour%(soliciting_group%)
   center #ow%,3,"Petición "&group_genitive_name$(soliciting_group%)
   paper #ow%,yellow%
   ink #ow%,black%
@@ -485,7 +485,7 @@ defproc decision
   rep choose_gratis_decision
     rep choose_decision
 
-      cls_ red%,yellow%,blue%
+      wipe red%,yellow%,blue%
 
       print #ow%,fill$("*",columns%*ow_lines%)
       paper #ow%,blue%
@@ -630,14 +630,14 @@ defproc advert(decision)
 
   loc i%,x%
 
-  cls_ green%,black%,blue%
+  wipe green%,black%,blue%
   paper #ow%,cyan%
   for i%=0 to ow_lines%-1
     at #ow%,i%,11
     print #ow%,"¿Consejo?"
   endfor i%
   if yes_key
-    cls_ yellow%,yellow%,yellow%
+    wipe yellow%,yellow%,yellow%
     paper #ow%,black%
     at #ow%,1,0
     print #ow%,decision$(decision) ' XXX FIXME wrap/justify
@@ -681,7 +681,7 @@ enddef
 
 defproc police_report
 
-  cls_ black%,white%,black%
+  wipe black%,white%,black%
 
   if money<=0 \
     or popularity%(police%)<=low% \
@@ -703,17 +703,19 @@ defproc police_report
 enddef
 
 defproc actual_police_report
-  cls_ black%,white%,black%
+
+  wipe black%,white%,black%
   print #ow%,"MES ";months%
   ink #ow%,blue%
   at #ow%,3,0
   cls #ow%,1
   police_report_data
+
 enddef
 
 defproc final_police_report
 
-  cls_ black%,white%,black%
+  wipe black%,white%,black%
   center #ow%,1,"FINAL"
   police_report_data
 
@@ -721,7 +723,7 @@ enddef
 
 defproc police_report_data
 
-  loc group%,line_%
+  loc group%,line%
 
   paper #ow%,white%
   ink #ow%,black%
@@ -735,18 +737,18 @@ defproc police_report_data
 
   for group%=1 to groups%
 
-    let line_%=7+group%
+    let line%=7+group%
 
-    at #ow%,line_%,11
+    at #ow%,line%,11
     paper #ow%,on_(plan%(group%)=rebellion%,yellow%,red%)
     ink #ow%,black%
     print #ow%,group_short_name$(group%)
     paper #ow%,white%
-    at #ow%,line_%,10
+    at #ow%,line%,10
     print #ow%,group%
 
     if is_main_group%(group%) and plan%(group%)=rebellion%
-      at #ow%,line_%,21
+      at #ow%,line%,21
       print #ow%,partner%(group%)
     endif
 
@@ -754,7 +756,7 @@ defproc police_report_data
     if x%
       paper #ow%,green%
       ink #ow%,white%
-      at #ow%,line_%,10-x%
+      at #ow%,line%,10-x%
       print #ow%,"987654321"(10-x% to )
     endif
 
@@ -766,7 +768,7 @@ defproc police_report_data
     endif
 
     if group%<=local_groups%
-      at #ow%,line_%,22
+      at #ow%,line%,22
       paper #ow%,red%
       ink #ow%,white%
       print #ow%,"123456789"(1 to power%(group%))
@@ -781,7 +783,7 @@ defproc police_report_data
   at #ow%,19,0
   print #ow%,"La FUERZA de la REVOLUCIÓN es ";revolution_strength%
   wait_key_press
-  cls_ green%,black%,green%
+  wipe green%,black%,green%
 
 enddef
 
@@ -830,13 +832,13 @@ defproc revolution
     ret
   endfor i%
 
-  cls_ red%,black%,red%
+  wipe red%,black%,red%
   ink #ow%,white%
   center #ow%,10,"REVOLUCIÓN"
   for i%=1 to 5:\
     zx_beep .5,20:\
     zx_beep .5,10
-  cls_ yellow%,black%,yellow%
+  wipe yellow%,black%,yellow%
 
   center #ow%,12,"¿Intento de escape?"
   let try_escaping%=yes_key
@@ -867,12 +869,12 @@ defproc revolution
       print #ow%,"Las guerillas no te atraparon"
       let escape%=1
     else
-      cls_ black%,white%,black%
+      wipe black%,white%,black%
       pause 50
-      fx_2
+      shoot_dead_sfx
       at #ow%,12,0
       print #ow%,"Las guerillas están celebrándolo"
-      fx_2
+      shoot_dead_sfx
       let alive%=0
     endif
     ret
@@ -937,24 +939,24 @@ defproc revolution
     power%(helping_group%)
   print #ow%,\\"La de los revolucionarios es ";rebels_strength%
   pause 250
-  cls_ white%,black%,white%
+  wipe white%,black%,white%
   at #ow%,12,3
   print #ow%,"La revolución ha comenzado"
-  fx_war
+  war_sfx
   if not(rebels_strength%<=strength%\
          +power%(helping_group%)\
          +rnd(-1 to 1))
-    cls_ black%,white%,black%
+    wipe black%,white%,black%
     at #ow%,10,7
     print #ow%,"Has sido derrocado"
     at #ow%,12,10
     print #ow%,"y ";: print #ow%,"liquidado."
-    fx_2
+    shoot_dead_sfx
     let alive%=0
     ret
   endif
 
-  cls_ black%,white%,black%
+  wipe black%,white%,black%
   at #ow%,10,2
   print #ow%,"La revuelta ha sido sofocada."
   at #ow%,0,0
@@ -966,7 +968,7 @@ defproc revolution
   print #ow%,"¿Castigas a los revolucionarios?"
   if yes_key
     for n=1 to 3:\
-      fx_2:\
+      shoot_dead_sfx:\
       pause .1
     let popularity%(rebel_group%)=0
     let power%(rebel_group%)=0
@@ -1054,7 +1056,7 @@ defproc ask_for_loan(decision)
     =39:let country=usa%
   endsel
 
-  cls_ yellow%,black%,red%
+  wipe yellow%,black%,red%
   paper #ow%,red%
   print #ow%,\"SOLICITUD DE PRÉSTAMO EXTRANJERO"
   center #ow%,12,"ESPERA"
@@ -1156,7 +1158,7 @@ defproc news
       ret
     endfor i%
 
-    cls_ white%,black%,white%
+    wipe white%,black%,white%
     center #ow%,10,"NOTICIA DE ÚLTIMA HORA"
     for i%=1 to 10:\
       zx_beep .6,30
@@ -1190,7 +1192,7 @@ defproc war
   if not rnd(0 to 3)
     actual_war
   else
-    cls_ black%,white%,cyan%
+    wipe black%,white%,cyan%
     at #ow%,6,1
     print #ow%,"Tratado de guerra con Leftoto"
     at #ow%,10,3
@@ -1219,8 +1221,8 @@ defproc actual_war
 
   loc i%
 
-  cls_ red%,black%,black%
-  center #ow%,8,"Leftoto% nos invade"
+  wipe red%,black%,black%
+  center #ow%,8,"Leftoto nos invade"
   let ritimba_strength=0
 
   for i%=1 to main_groups%
@@ -1243,11 +1245,11 @@ defproc actual_war
   endfor i%
 
   at #ow%,14,1
-  print #ow%,"La fuerza de Leftoto% es ";leftoto_strength
+  print #ow%,"La fuerza de Leftoto es ";leftoto_strength
 
   at #ow%,18,3
   print #ow%,"Una corta y decisiva guerra"
-  fx_war
+  war_sfx
 
   if leftoto_strength+rnd(-1 to 1)<ritimba_strength
 
@@ -1257,31 +1259,34 @@ defproc actual_war
     zx_border black%
     cls #ow%
     at #ow%,12,7
-    print #ow%," Leftoto% derrotado ":
+    print #ow%," Leftoto derrotado ":
     let power%(leftoto%)=0
 
   else
 
     ' XXX TODO -- factor
-    ' Leftoto% wins
+    ' Leftoto wins
 
-    cls_ black%,white%,black%
+    wipe black%,white%,black%
     at #ow%,7,7
-    print #ow%,"Victoria de Leftoto%"
+    print #ow%,"Victoria de Leftoto"
 
     if not(decision_data$(36,1)="*" and rnd(0 to 2))
 
       let alive%=0
       if decision_data$(36,1)="*"
         at #ow%,10,0
-        print #ow%,"El motor del helicóptero se para"
+        print #ow%,"El motor del helicóptero se para."
         pause 80
       endif
       at #ow%,12,4
-      print #ow%,"Eres acusado de ser un enemigo del pueblo y..."
-      pause 30: fx_2
+      print #ow%,"Eres acusado de ser un enemigo del pueblo y,"
+      pause 30:
+      print #ow%,"tras un juicio sumarísimo,"
+      pause 30:
+      shoot_dead_sfx
       at #ow%,18,7
-      print #ow%,"sumarísimamente ejecutado."
+      print #ow%,"ejecutado."
     else
       ' Escape
       cls #ow%
@@ -1320,7 +1325,7 @@ defproc score_report
   let score%=0
 
   at #ow%,3,1
-  cls_ yellow%,black%,cyan%
+  wipe yellow%,black%,cyan%
   print #ow%,"Tu puntuación como presidente"
 
   let popularity_bonus%=0
@@ -1376,9 +1381,9 @@ enddef
 ' ==============================================================
 ' Input {{{1
 
-defproc key_prompt(prompt$,colour)
-  paper #iw%,colour
-  ink #iw%,contrast_colour(colour)
+defproc key_prompt(prompt$,colour%)
+  paper #iw%,colour%
+  ink #iw%,contrast_colour%(colour%)
   cls #iw%
   center #iw%,1,prompt$
   cursen_home #iw%
@@ -1693,27 +1698,30 @@ data 7,0,none%,none%,\
 ' ==============================================================
 ' Special effects {{{1
 
-defproc zx_border(colour) ' XXX TMP
+defproc zx_border(colour%) ' XXX TMP
 enddef
 
 #include zx_beep.bas
 
-defproc fx_war ' XXX TODO
+defproc war_sfx
+  ' XXX TODO
 enddef
 
-defproc fx_2
+defproc shoot_dead_sfx
+  ' XXX TODO --
 enddef
 
-defproc tune(m$)
+defproc tune(score$)
 
   loc note%
 
-  for note%=1 to len(m$) step 2
-    if m$(note%+1)=" "
-      pause code(m$(note%))/4
-      next note%:exit note%
+  for note%=1 to len(score$) step 2
+    if score$(note%+1)=" "
+      pause code(score$(note%))/4
+    else
+      zx_beep (code(score$(note%))-code("0"))/6,\
+               code(score$(note%+1))-code("i")
     endif
-    zx_beep (code(m$(note%))-48)/6,code(m$(note%+1))-105
   endfor note%
 
 enddef
@@ -1731,18 +1739,20 @@ enddef
 ' ==============================================================
 ' Text output {{{1
 
-defproc cls_(paper_colour,ink_colour,border_colour)
+defproc wipe(paper_colour%,ink_colour%,border_colour%)
 
-  paper #ow%,paper_colour
-  ink #ow%,ink_colour
-  zx_border border_colour
+  ' Clear the windows with the given colour combination.
+
+  paper #ow%,paper_colour%
+  ink #ow%,ink_colour%
+  zx_border border_colour%
   cls #ow%
-  paper #iw%,border_colour
+  paper #iw%,border_colour%
   cls #iw%
-  let prompt_colour_1%=border_colour
-  let prompt_colour_2=paper_colour
+  let prompt_colour_1%=border_colour%
+  let prompt_colour_2=paper_colour%
   if prompt_colour_1%=prompt_colour_2
-    let prompt_colour_2=contrast_colour(prompt_colour_1%)
+    let prompt_colour_2=contrast_colour%(prompt_colour_1%)
   endif
   zx_beep .1,40
 
@@ -1752,14 +1762,14 @@ deffn center_for(width_in_chars)
   ret (columns%-width_in_chars)/2
 enddef
 
-defproc center(channel,line_%,text$)
+defproc center(channel,line%,text$)
   loc length%
   let length%=len(text$)
   if length%>columns%
-    at #ow%,line_%,0
+    at #ow%,line%,0
     tell text$
   else
-    at #channel,line_%,center_for(length%)
+    at #channel,line%,center_for(length%)
     print #channel,text$
   endif
 enddef
@@ -1788,8 +1798,8 @@ enddef
 ' ==============================================================
 ' Screen {{{1
 
-deffn csize_width_pixels(w)
-  sel on w
+deffn csize_width_pixels(width%)
+  sel on width%
     =0:ret 6
     =1:ret 8
     =2:ret 12
@@ -1797,34 +1807,38 @@ deffn csize_width_pixels(w)
   endsel
 enddef
 
-deffn csize_height_pixels(h)
-  ret h*10+10
+deffn csize_height_pixels(height%)
+  ret height%*10+10
 enddef
 
-deffn contrast_colour(colour)
-  ' XXX TODO make it with a bit mask
-  sel on colour
-    =black%,blue%,red%,purple%:ret white%
-    =remainder:ret black%
+deffn contrast_colour%(colour%)
+
+  sel on colour%
+    =black%,blue%,red%,purple%:\
+      ret white%
+    =remainder:\
+      ret black%
   endsel
+
 enddef
 
-defproc cursen_home(channel)
-  cursen #channel
-  if channel=iw%:\
+defproc cursen_home(channel%)
+  cursen #channel%
+  if channel%=iw%:\
     at# iw%,iw_lines%-1,columns%-1:\
   else \
     at #ow%,ow_lines%-1,columns%-1
 enddef
 
-deffn ow_line_y(line_%)
+deffn ow_line_y(line%)
   ' Return the y pixel coord of the given line in #ow%.
-  ret char_height_pixels%*line_%
+  ret char_height_pixels%*line%
 enddef
 
-deffn ow_column_x(column)
+deffn column_x%(column%)
   ' Return the x% pixel coord of the given column in #ow%.
-  ret char_width_pixels%*column
+  ' XXX REMARK -- Not used yet.
+  ret char_width_pixels%*column%
 enddef
 
 defproc fonts(font_address)
