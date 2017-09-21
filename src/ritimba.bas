@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.20+201709211508"
+version$="0.1.0-dev.21+201709211511"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1089,7 +1089,7 @@ defproc ask_for_loan(decision)
         print #ow%," te concederán"
         let loan=group_data$(7+x%,popularity%)*30+rnd(0 to 200)
         at #ow%,14,7
-        print #ow%,y%;" 000 "&currency$
+        print #ow%,y%;nbsp$&"000 "&currency$
         let money=money+loan
         let decision_data$(38+x%,1)="*"
       endif
