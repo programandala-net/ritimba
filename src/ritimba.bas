@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.28+201709212248"
+version$="0.1.0-dev.29+201709212259"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -276,22 +276,26 @@ defproc bankruptcy
 
   cls #ow%
   center #ow%,5,"El tesoro está en bancarrota"
+
   at #ow%,9,0
-  print #ow%,"Su popularidad con el ejército y"\\:
-  print #ow%,"con la policía secreta caerán!"\\\:
-  print #ow%,"El poder de la policía bajará"\\:
-  print #ow%,"y su propio poder también."
-  if popularity%(army%)>0
-    let popularity%(army%)=popularity%(army%)-1
-  endif
-  if popularity%(police%)>0
-    let popularity%(police%)=popularity%(police%)-1
-  endif
-  if power%(police)>0
-    let power%(police%)=power%(police%)-1
-  endif
-  if strength%>0:\
-    let strength%=strength%-1
+
+  tellNL "Su popularidad entre el ejército y \
+    la policía secreta caerán."
+
+  tellNL "El poder de la policía \
+    y su propio poder se reducirán también."
+
+  let popularity%(army%)=popularity%(army%)\
+                         -(popularity%(army%)>0)
+
+  let popularity%(police%)=popularity%(police%)\
+                           -(popularity%(police%)>0)
+    
+  let power%(police%)=power%(police%)\
+                      -(power%(police)>0)
+
+  let strength%=strength%-(strength%>0)
+
   pause 250
   plot
   police_report
@@ -334,7 +338,7 @@ defproc plot
 
   for main_group%=1 to main_groups%:\
     let plan%(main_group%)=none%:\
-    let partner%(main_group%)=none%
+    let ally%(main_group%)=none%
 
   for main_group%=1 to main_groups%
     if popularity%(main_group%)<=low%
@@ -344,7 +348,7 @@ defproc plot
           if power%(partner_group%)+power%(main_group%)\
              >=revolution_strength%
             let plan%(main_group%)=rebellion%
-            let partner%(main_group%)=partner_group%
+            let ally%(main_group%)=partner_group%
             exit partner_group%
           endif
         endif
@@ -803,7 +807,7 @@ defproc police_report_data
           at #ow%,line%,ally_col%
           paper #ow%,white%
           ink #ow%,black%
-          print #ow%,partner%(group%)
+          print #ow%,ally%(group%)
         =assassination%
           print #ow%,"Magnicidio"
       endsel
@@ -948,14 +952,14 @@ defproc revolution
 
     let rebels_strength%=\
       power%(rebel_group%)\
-      +power%(partner%(rebel_group%))
+      +power%(ally%(rebel_group%))
 
     at #ow%,5,0
     tell \
       "Se han unido "&\
       group_name$(rebel_group%)&\
       " y "&\
-      group_name$(partner%(rebel_group%))
+      group_name$(ally%(rebel_group%))
 
     print #ow%,\\"Su fuerza conjunta es ";rebels_strength%
     print #ow%,\\"¿A quién vas a pedir ayuda?"
@@ -1032,8 +1036,8 @@ defproc revolution
       pause .1
     let popularity%(rebel_group%)=0
     let power%(rebel_group%)=0
-    let popularity%(partner%(rebel_group%))=0
-    let power%(partner%(rebel_group%))=0
+    let popularity%(ally%(rebel_group%))=0
+    let power%(ally%(rebel_group%))=0
   endif
   let power%(helping_group%)=9
   let pc%=months%+2
@@ -1545,7 +1549,7 @@ defproc init_data
     popularity%(groups%),\
     power%(groups%),\
     plan%(groups%),\
-    partner%(groups%),\
+    ally%(groups%),\
     group_name$(groups%,18),\
     group_short_name$(groups%,max_short_name_len%),\
     group_plural_name$(groups%,21),\
@@ -1569,7 +1573,7 @@ defproc init_data
       popularity%(i%),\
       power%(i%),\
       plan%(i%),\
-      partner%(i%),\
+      ally%(i%),\
       group_name$(i%),\
       group_short_name$(i%),\
       group_plural_name$(i%),\
@@ -1714,7 +1718,7 @@ data "NMMMMMMMMMMMILKMM",\
 ' popularity%(i%):  0..9
 ' power%(i%):       0..9
 ' plan%(i%):        none% | rebellion% | assassination%
-' partner%(i%):     none% | group
+' ally%(i%):        none% | group
 ' group_name$(i%)
 ' group_short_name$(i%)
 ' group_plural_name$(i%)
