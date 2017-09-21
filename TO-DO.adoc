@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-09-21
+:revdate: 2017-09-22
 
 == 2017-09-17
 
@@ -25,7 +25,6 @@
   decisions are omitted from the list.
 - Improve the final report of the secret police, changing the title
   instead of adding "FINAL" at the top.
-- Split `ink` and `paper`.
 - Improve the messages and layout of the final escape to Leftoto.
 - Improve the messages about the helicopter.
 - Add a ZX Spectrum border when the SMSQ screen is greater than

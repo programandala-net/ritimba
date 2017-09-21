@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.19+201709210229"
+version$="0.1.0-dev.20+201709211508"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -143,7 +143,8 @@ defproc title
   national_flag
   for i%=1 to 50:
     zx_beep .03,i%
-  paper #ow%,white%:ink #ow%,black%
+  paper #ow%,white%
+  ink #ow%,black%
   center #ow%,3," Pulsa una tecla y gobernarás "
   center #ow%,5," Ritimba "
   national_anthem
@@ -309,10 +310,12 @@ defproc new_month
   let months%=months%+1
 
   cls_ yellow%,black%,yellow%
-  paper #ow%,cyan%:ink #ow%,white%
+  paper #ow%,cyan%
+  ink #ow%,white%
   at #ow%,10,12
   print #ow%,"MES  ";
-  paper #ow%,white%: ink #ow%,black%
+  paper #ow%,white%
+  ink #ow%,black%
   print #ow%,months%
   pause 50
   plot
@@ -385,7 +388,8 @@ defproc murder
       let alive%=0
     else
       cls_ white%,black%,black%
-      paper #ow%,white%:ink #ow%,black%
+      paper #ow%,white%
+      ink #ow%,black%
       center #ow%,12," Intento fallido "
     endif
 
@@ -404,7 +408,8 @@ defproc audience
   paper #ow%,green%
   at #ow%,5,0
   cls #ow%,1
-  paper #ow%,white%:ink #ow%,black%
+  paper #ow%,white%
+  ink #ow%,black%
   center #ow%,3,"UNA AUDIENCIA"
 
   rep choose_decision
@@ -424,7 +429,8 @@ defproc audience
   zx_border soliciting_group%
   let this_decision_data$=decision_data$(this_decision)
   let this_decision$=decision$(this_decision)
-  paper #ow%,yellow%:ink #ow%,black%
+  paper #ow%,yellow%
+  ink #ow%,black%
   center #ow%,10,"Petición "&group_genitive_name$(soliciting_group%)&":"
   paper #ow%,white%
   at #ow%,14,0
@@ -439,7 +445,8 @@ defproc audience
   paper #ow%,soliciting_group%
   ink #ow%,contrast_colour(soliciting_group%)
   center #ow%,3,"Petición "&group_genitive_name$(soliciting_group%)
-  paper #ow%,yellow%:ink #ow%,black%
+  paper #ow%,yellow%
+  ink #ow%,black%
   center #ow%,5,this_decision$
   paper #ow%,blue%:print #ow%:cls #ow%,3
 
@@ -482,9 +489,11 @@ defproc decision
       cls_ red%,yellow%,blue%
 
       print #ow%,fill$("*",columns%*ow_lines%)
-      paper #ow%,blue%:ink #ow%,white%
+      paper #ow%,blue%
+      ink #ow%,white%
       center #ow%,3,"DECISIÓN PRESIDENCIAL"
-      paper #ow%,yellow%:ink #ow%,black%
+      paper #ow%,yellow%
+      ink #ow%,black%
       at #ow%,06,1:print #ow%,"Elige entre:"
       at #ow%,08,4:print #ow%,"1. Complacer a un grupo  "
       at #ow%,10,4:print #ow%,"2. Complacer a todos     "
@@ -492,7 +501,8 @@ defproc decision
       at #ow%,14,4:print #ow%,"4. Aumentar el tesoro    "
       at #ow%,16,4:print #ow%,"5. Fortalecer a un grupo "
 
-      let key=code(get_key$): cls #ow%
+      let key=code(get_key$)
+      cls #ow%
       sel on key
         =code("1"):let x$="-2"
         =code("2"):let x$="35"
@@ -632,7 +642,8 @@ defproc advert(decision)
     paper #ow%,black%
     at #ow%,1,0
     print #ow%,decision$(decision) ' XXX FIXME wrap/justify
-    paper #ow%,white%:ink #ow%,black%
+    paper #ow%,white%
+    ink #ow%,black%
     at #ow%,3,0
     print #ow%,"Su popularidad entre..."
     paper #ow%,yellow%
@@ -644,9 +655,11 @@ defproc advert(decision)
           print #ow%,"+";
         print #ow%,x%;
         if soliciting_group%=i% and decision<25
-          paper #ow%,soliciting_group%:ink #ow%,yellow%
+          paper #ow%,soliciting_group%
+          ink #ow%,yellow%
           print #ow%,"< "
-          paper #ow%,yellow%:ink #ow%,black%
+          paper #ow%,yellow%
+          ink #ow%,black%
         endif
       endif
     endfor i%
@@ -711,9 +724,11 @@ defproc police_report_data
 
   loc group%,line_%
 
-  paper #ow%,white%:ink #ow%,black%
+  paper #ow%,white%
+  ink #ow%,black%
   center #ow%,3,"INFORME DE LA POLICÍA SECRETA"
-  paper #ow%,black%:ink #ow%,white%
+  paper #ow%,black%
+  ink #ow%,white%
   at #ow%,6,1
   print #ow%,"POPULARIDAD"
   at #ow%,6,22
@@ -738,7 +753,8 @@ defproc police_report_data
 
     let x%=group_data$(group%,popularity%)
     if x%
-      paper #ow%,green%:ink #ow%,white%
+      paper #ow%,green%
+      ink #ow%,white%
       at #ow%,line_%,10-x%
       print #ow%,"987654321"(10-x% to )
     endif
@@ -751,13 +767,15 @@ defproc police_report_data
 
     if group%<=local_groups%
       at #ow%,line_%,22
-      paper #ow%,red%: ink #ow%,white%
+      paper #ow%,red%
+      ink #ow%,white%
       print #ow%,"123456789"(1 to group_data$(group%,power%))
     endif
 
   endfor group%
 
-  paper #ow%,black%:ink #ow%,white%
+  paper #ow%,black%
+  ink #ow%,white%
   at #ow%,17,0
   print #ow%,"Tu FUERZA es ";strength%
   at #ow%,19,0
@@ -959,7 +977,8 @@ deffn cash_advice(decision)
 
   ' loc decision_cost
 
-  paper #ow%,yellow%:ink #ow%,black%
+  paper #ow%,yellow%
+  ink #ow%,black%
   let decision_cost=10*(code(decision_data$(decision,cost%))-77)
   let decision_monthly_cost%=\
     code(decision_data$(decision,monthly_cost%))-77
