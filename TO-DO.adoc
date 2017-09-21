@@ -39,5 +39,4 @@
 - Move `csize_width_pixels` and `csize_height_pixels` to the library.
 - Rename `cash_advice%()`.
 - Fix: Sometimes the monthly audience has no effect.
-- Fix: Remove green screen at the end of police report.
 - Fix: Two groups can be allies of other.

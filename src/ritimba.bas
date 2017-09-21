@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.29+201709212259"
+version$="0.1.0-dev.30+201709212306"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -841,7 +841,6 @@ defproc police_report_data
   print #ow%
   tellNL "La fuerza necesaria para una revolución es "&revolution_strength%&"."
   wait_key_press
-  wipe green%,black%,green%
 
 enddef
 
