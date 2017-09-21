@@ -28,3 +28,5 @@
 - Split `ink` and `paper`.
 - Improve the messages and layout of the final escape to Leftoto.
 - Improve the messages about the helicopter.
+- Add a ZX Spectrum border when the SMSQ screen is greater than
+  256x256.

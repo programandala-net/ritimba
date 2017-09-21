@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.17+201709210141"
+version$="0.1.0-dev.19+201709210229"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -85,24 +85,46 @@ defproc credits
 enddef
 
 defproc national_flag
-  loc i%,height%,x%,y%
-  let height%=11
-  let x%=center_for(18)
-  let y%=8
-  for i%=y% to y%+height%
-    at #ow%,i%,x%
-    paper #ow%,red%
-    print #ow%,"   ";
+
+  loc i%,\
+    flag_width%,flag_height%,flag_x%,flag_y%,\
+    stars_width%,stars_height%,stars_x%,stars_y%,stars_row$,\
+    bar_colour%
+
+  let flag_width%=22  ' in chars
+  let flag_height%=12 ' in chars
+  let flag_x%=center_for(flag_width%)
+  let flag_y%=8
+
+  let stars_width%=4  ' in chars
+  let stars_height%=4 ' in chars
+  let stars_row$=fill$("*",stars_width%)
+  let stars_x%=center_for(stars_width%)
+  let stars_y%=flag_y%+(flag_height%-stars_height%)/2
+
+  let bar_colour%=green%
+
+  for i%=flag_y% to flag_y%+flag_height%-1
+    at #ow%,i%,flag_x%
+    paper #ow%,bar_colour%
+    print #ow%,"     ";
     paper #ow%,blue%
     print #ow%,"            ";
-    paper #ow%,green%
-    print #ow%,"   "
+    paper #ow%,bar_colour%
+    print #ow%,"     "
+    if bar_colour%=green%
+      let bar_colour%=red%
+    else
+      let bar_colour%=green%
+    endif
   endfor i%
-  paper #ow%,blue%:ink #ow%,yellow%
-  let x%=center_for(6)
-  at #ow%,13,x%:print #ow%,"******"
-  at #ow%,14,x%:print #ow%,"  **  "
-  at #ow%,15,x%:print #ow%,"******"
+
+  paper #ow%,blue%
+  ink #ow%,yellow%
+  for i%=stars_y% to stars_y%+stars_height%-1:\
+    at #ow%,i%,stars_x%:\
+    print #ow%,stars_row$
+
 enddef
 
 defproc tapestry(text$)
