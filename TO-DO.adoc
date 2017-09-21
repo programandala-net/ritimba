@@ -27,3 +27,8 @@
 - Improve the messages about the helicopter.
 - Add a ZX Spectrum border when the SMSQ screen is greater than
   256x256.
+
+== 2017-09-22
+
+- Rename `pc%`.
+- Fix: the score of the previous game is lost.
