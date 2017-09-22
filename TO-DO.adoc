@@ -43,3 +43,9 @@
 - Fix the title effect in `news`.
 - Improve `money_transfer` with menu or input, more information and
   better layout.
+- Improve: Calculate valid options in `decision` before displaying
+  them.
+- Improve `center_for` and `center`: calculate the actual size of the
+  text using the current `csize`.
+- Combine the ordinary advice report and the money advice report into
+  one.
