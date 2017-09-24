@@ -2,23 +2,15 @@
 :author: Marcos Cruz (programandala.net)
 :revdate: 2017-09-24
 
-== 2017-09-17
-
-- Remove the traces of SuperBASIC compatibility. Write only for SBASIC.
-
 == 2017-09-19
 
 - Improve layout of the treasure report.
-- Fix layout of `cash_advice`.
 - Clarify the symbols of the advice. Consult the original
   instructions.
-- Clarify the symbols of the secret police report. Consult the
-  original instructions.
 
 == 2017-09-21
 
 - Finish the currency notation.
-- Use `tell` instead of `print` when possible.
 - Fix the numbers of the menu options: they do not match because old
   decisions are omitted from the list.
 - Improve the final report of the secret police, changing the title
@@ -32,14 +24,9 @@
 
 - Rename `pc%`.
 - Fix: the score of the previous game is lost.
-- Move the data from `decision_data$()` into numeric arrays. First,
-  write a data interface layer to make the code more legible.
-- Rename `tell` to `jprint` or similar, add the channel as parameter
-  and move the code to the library.
+- Move the data from `decision_data$()` into numeric arrays.
 - Move `csize_width_pixels` and `csize_height_pixels` to the library.
-- Rename `cash_advice%()`.
-- Fix: Sometimes the monthly audience has no effect.
-- Fix: Two groups can be allies of other.
+- Fix: Two groups can be allies of other. (Solved?)
 - Fix the title effect in `news`.
 - Improve `money_transfer` with menu or input, more information and
   better layout.
@@ -55,3 +42,8 @@
 - Change "tesoro" to "Hacienda"...
 - Fix: `datum_col%` must be 30 to make "los policías secretos" fix.
   But the mark "<" should be moved to the name first.
+
+== 2017-09-24
+
+- Use `print_l` instead of `print` when possible.
+- Add a channel parameter to `print_l` and move it to the library.

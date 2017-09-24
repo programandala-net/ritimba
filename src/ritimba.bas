@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.39+201709241954"
+version$="0.1.0-dev.40+201709242332"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -351,7 +351,7 @@ enddef
 
 defproc plot
 
-  loc main_group%,partner_group%
+  loc main_group%,ally_group%
 
   if months%<=2 or months%<pc%:\
     ret
@@ -362,19 +362,19 @@ defproc plot
 
   for main_group%=1 to main_groups%
     if popularity%(main_group%)<=low%
-      for partner_group%=1 to local_groups%
-        if not(main_group%=partner_group% \
-               or popularity%(partner_group%)>low%)
-          if power%(partner_group%)+power%(main_group%)\
+      for ally_group%=1 to local_groups%
+        if not(main_group%=ally_group% \
+               or popularity%(ally_group%)>low%)
+          if power%(ally_group%)+power%(main_group%)\
              >=revolution_strength%
             let plan%(main_group%)=rebellion%
-            let ally%(main_group%)=partner_group%
-            exit partner_group%
+            let ally%(main_group%)=ally_group%
+            exit ally_group%
           endif
         endif
-      next partner_group%
+      next ally_group%
         let plan%(main_group%)=assassination%
-      endfor partner_group%
+      endfor ally_group%
     endif
   endfor main_group%
 
@@ -464,13 +464,13 @@ defproc audience
   if not petitions_left%:\
     restore_petitions
 
-  rep chose_petition
+  rep choose_petition
     let petition%=rnd(1 to petitions%)
-    if decision_data$(petition%,1)="N":\
-      exit chose_petition
-  endrep chose_petition
+    if not is_decision_taken%(petition%):\
+      exit choose_petition
+  endrep choose_petition
 
-  let decision_data$(petition%,1)="*"
+  mark_decision_taken petition%
   let soliciting_group%=int((petition%-1)/groups%)+1
   paper #ow%,yellow%
   ink #ow%,black%
@@ -520,20 +520,9 @@ deffn petitions_left%
   loc i%,count%
 
   for i%=1 to petitions%:\
-    let count%=count%+(decision_data$(i%,1)="N")
+    let count%=count%+not is_decision_taken%(i%)
 
   ret count%
-
-enddef
-
-defproc restore_petitions
-
-  ' Mark all petitions not done.
-
-  loc i%
-
-  for i%=1 to petitions%:\
-    let decision_data$(i%,1)="N"
 
 enddef
 
@@ -543,7 +532,7 @@ defproc reject(petitition%)
 
   let new_popularity%=\
     popularity%(soliciting_group%)\
-    -(code(decision_data$(petition%,soliciting_group%+3))-77)
+    -decision_popularity_effect%(petition%,soliciting_group%)
 
   let popularity%(soliciting_group%)=maximum(new_popularity%,0)
 
@@ -572,8 +561,9 @@ defproc decision
 
     paper #ow%,yellow%
     ink #ow%,black%
-    ' XXX TODO -- Store these options in an array
-    ' and reuse them as titles of the lower level.
+    ' XXX TODO -- Store these options in an array,
+    ' reuse them as titles of the lower level,
+    ' and keep the data of their unused suboptions.
     at #ow%,08,4:print #ow%,"1. Complacer a un grupo  "
     at #ow%,10,4:print #ow%,"2. Complacer a todos     "
     at #ow%,12,4:print #ow%,"3. Aumentar el tesoro    "
@@ -597,7 +587,7 @@ defproc decision
     at #ow%,(20-((last_decision%-first_decision%)*3))*.5,0
     let options%=0
     for i%=first_decision% to last_decision%
-      if decision_data$(i%,1)<>"*"
+      if not is_decision_taken%(i%)
         let options%=options%+1
         paragraph
         print_l options%&". "&decision$(i%)&"."
@@ -605,8 +595,8 @@ defproc decision
     endfor i%
 
     if not options%
-      at #ow%,12,3
-      print #ow%,"Esta sección está agotada"
+      paragraph
+      print_l "Esta sección está agotada"
       pause 150
       next choose_decision
     endif
@@ -617,47 +607,60 @@ defproc decision
       next choose_decision
     endif
 
-    if k$<1 or k$>last_decision%+1-first_decision%
+    if k$<1 or k$>last_decision%-first_decision%+1
       next choose_decision
     endif
 
     let chosen_decision%=first_decision%+k$-1
 
-    if decision_data$(chosen_decision%,1)="*"
+    if is_decision_taken%(chosen_decision%)
       next choose_decision
     endif
 
     sel on chosen_decision%
+
       =37
         money_transfer
         exit choose_decision
+
       =38,39
         ask_for_loan chosen_decision%
         exit choose_decision
+
+      =remainder
+
+        maybe_advice chosen_decision%
+
+        if affordable%(chosen_decision%)
+
+          ' XXX FIXME -- Layout, colour...:
+          cls #ow%
+          paper #ow%,white%
+
+          print_l "¿"&decision$(chosen_decision%)&"?"
+
+          if yes_key%
+
+            if chosen_decision%=35
+              let strength%=strength%+2
+              take_decision chosen_decision%
+              exit choose_decision
+            else
+              take_only_once_decision chosen_decision%
+              exit choose_decision
+            endif
+
+          endif
+
+        else
+
+          ' XXX TODO --
+          pause 200
+
+        endif
+        next choose_decision
+
     endsel
-
-    ' XXX TODO -- Move to the `remainder` of the `sel` above:
-
-    maybe_advice chosen_decision%
-
-    print_l "¿"&decision$(chosen_decision%)&"?"
-
-    if not affordable%(chosen_decision%)
-      pause 200
-      next choose_decision
-    endif
-
-    if not yes_key%:\
-      next choose_decision
-
-    if chosen_decision%<>35
-      take_only_once_decision chosen_decision%
-      exit choose_decision
-    endif
-
-    let strength%=strength%+2
-    take_decision chosen_decision%
-    exit choose_decision
 
   endrep choose_decision
 
@@ -667,7 +670,7 @@ defproc take_only_once_decision(decision%)
 
   ' XXX TODO -- Rename.
 
-  let decision_data$(decision%,1)="*"
+  mark_decision_taken decision%
   take_decision decision%
 
 enddef
@@ -676,31 +679,25 @@ defproc take_decision(decision%)
 
   ' XXX TODO -- Rename.
 
-  loc group%,t$,x%
+  loc group%,new_popularity%,new_power%
 
-  let t$=decision_data$(decision%,4 to 11)
   for group%=1 to groups%
-    if t$(group%)<>"M" ' XXX TODO -- Remove. M means 0.
-      let x%=popularity%(group%)+(code(t$(group%))-77)
-      let x%=in_range(x%,0,9)
-      let popularity%(group%)=x%
-    endif
+    let new_popularity%=popularity%(group%)\
+      +decision_popularity_effect%(decision%,group%)
+    let popularity%(group%)=in_range(new_popularity%,0,9)
   endfor group%
 
-  let t$=decision_data$(decision%,12 to 17)
   for group%=1 to local_groups%
-    if t$(group%)<>"M" ' XXX TODO -- Remove. M means 0.
-      let x%=power%(group%)+(code(t$(group%))-77)
-      let x%=in_range(x%,0,9)
-      let power%(group%)=x%
-    endif
+    let new_power%=power%(group%)\
+      +decision_power_effect%(decision%,group%)
+    let power%(group%)=in_range(new_power%,0,9)
   endfor group%
 
   let money=\
     money+decision_cost
 
   let monthly_payment=\
-    maximum(monthly_payment-decision_monthly_cost%,0)
+    maximum(monthly_payment-decision_monthly_cost,0)
 
 enddef
 
@@ -746,7 +743,7 @@ defproc advice(decision%)
 
   let variations%=0
   for i%=1 to groups%
-    let variation%=code(decision_data$(decision%,i%+3))-77
+    let variation%=decision_popularity_effect%(decision%,i%)
     let variations%=variations%+abs(variation%)
     if variation%
       print #ow%,\
@@ -774,7 +771,7 @@ defproc advice(decision%)
 
   let variations%=0
   for i%=1 to local_groups%
-    let variation%=code(decision_data$(decision%,i%+11))-77
+    let variation%=decision_power_effect%(decision%,i%)
     let variations%=variations%+abs(variation%)
     if variation%
       print #ow%,\
@@ -1027,7 +1024,7 @@ defproc revolution
   cls #ow%
   if try_escaping%
 
-    if decision_data$(36,1)="*" ' XXX TODO -- Factor.
+    if is_decision_taken%(36) ' XXX TODO -- Factor.
       ' The helicopter was bought before.
       if rnd(0 to 2)
         center #ow%,12,"¡Escapas en helicóptero!"
@@ -1167,87 +1164,6 @@ enddef
 ' ==============================================================
 ' Treasure {{{1
 
-' deffn affordable_decision%(decision%)
-
-'   ' XXX OLD
-
-'   loc printout$
-
-'   paper #ow%,yellow%
-'   ink #ow%,black%
-'   let decision_cost=10*(code(decision_data$(decision%,cost%))-77)
-'   let decision_monthly_cost%=\
-'     code(decision_data$(decision%,monthly_cost%))-77
-
-'   let printout$="Esta decisión"
-
-'   if not decision_cost and not decision_monthly_cost%
-'     ' XXX TMP --
-'     ' XXX TODO -- Integrate into a main `if else` and share the exit.
-'     let printout$=printout$&" no costaría dinero."
-'     tellNL printout$
-'     ret 1
-'   endif
-
-'   if decision_cost
-
-'     if decision_cost>0
-'       let printout$=printout$&" aportaría"
-'     else
-'       let printout$=printout$&" costaría"
-'     endif
-
-'     let printout$=printout$&\
-'       " al tesoro "&thousand$(abs(decision_cost))
-
-'   endif
-
-'   if decision_cost and decision_monthly_cost%:\
-'     let printout$=printout$&" y"
-
-'   if decision_monthly_cost%
-
-'     if decision_monthly_cost%<0
-'       let printout$=printout$&" aumentaría"
-'     else
-'       let printout$=printout$&" reduciría"
-'     endif
-
-'     let printout$=printout$\
-'       &" los gastos mensuales en "\
-'       &thousand$(abs(decision_monthly_cost%))
-
-'   endif
-
-'   tellNL printout$&"."
-
-'   if money+decision_cost>0:\
-'     ret 1
-
-'   if not(\
-'        (decision_cost<0 or decision_monthly_cost%<0) \
-'        and \
-'        (money+decision_cost<0 or money+decision_monthly_cost%<0)\
-'      ):\
-'     ret 1
-'     ' XXX TODO -- Check the condition.
-
-'   pause 250
-'   cls #ow%
-'   center #ow%,5,decision$(decision%)
-'   tellNL "El dinero necesario no está en el tesoro."
-
-'   ' XXX TODO -- Combine into one condition and one message:
-'   if decision_data$(38,1)="N":\
-'     tellNL "Quizá los rusos pueden ayudar."
-'   if decision_data$(39,1)="N":\
-'     tellNL "Los useños son un pueblo generoso"
-
-'   pause 350
-'   ret 0
-
-' enddef
-
 defproc decision_treasure_report(decision%)
 
   loc printout$
@@ -1255,14 +1171,13 @@ defproc decision_treasure_report(decision%)
   paper #ow%,yellow%
   ink #ow%,black%
 
-  let decision_cost=10*(code(decision_data$(decision%,cost%))-77)
-
-  let decision_monthly_cost%=\
-    code(decision_data$(decision%,monthly_cost%))-77
+  ' XXX TODO -- Factor:
+  let decision_cost=10*decision_cost%(decision%)
+  let decision_monthly_cost=decision_monthly_cost%(decision%)
 
   let printout$="Esta decisión"
 
-  if not decision_cost and not decision_monthly_cost%
+  if not decision_cost and not decision_monthly_cost
 
     let printout$=printout$&" no costaría dinero."
     paragraph
@@ -1283,12 +1198,12 @@ defproc decision_treasure_report(decision%)
 
     endif
 
-    if decision_cost and decision_monthly_cost%:\
+    if decision_cost and decision_monthly_cost:\
       let printout$=printout$&" y"
 
-    if decision_monthly_cost%
+    if decision_monthly_cost
 
-      if decision_monthly_cost%<0
+      if decision_monthly_cost<0
         let printout$=printout$&" aumentaría"
       else
         let printout$=printout$&" reduciría"
@@ -1296,7 +1211,7 @@ defproc decision_treasure_report(decision%)
 
       let printout$=printout$\
         &" los gastos mensuales en "\
-        &thousand$(abs(decision_monthly_cost%))
+        &thousand$(abs(decision_monthly_cost))
 
     endif
 
@@ -1306,9 +1221,9 @@ defproc decision_treasure_report(decision%)
     if money+decision_cost>0:\
       ret
     if not(\
-         (decision_cost<0 or decision_monthly_cost%<0) \
+         (decision_cost<0 or decision_monthly_cost<0) \
          and \
-         (money+decision_cost<0 or money+decision_monthly_cost%<0)\
+         (money+decision_cost<0 or money+decision_monthly_cost<0)\
        ):\
       ret
       ' XXX TODO -- Check and factor the condition.
@@ -1317,10 +1232,10 @@ defproc decision_treasure_report(decision%)
     print_l "El dinero necesario no está en el tesoro."
 
     ' XXX TODO -- Combine into one condition and one message:
-    if decision_data$(38,1)="N":\
+    if not is_decision_taken%(38):\
       paragraph
       print_l "Quizá los rusos pueden ayudar."
-    if decision_data$(39,1)="N":\
+    if not is_decision_taken%(39):\
       paragraph
       print_l "Los useños son un pueblo generoso"
 
@@ -1330,14 +1245,11 @@ enddef
 
 deffn affordable%(decision%)
 
-  ' XXX TODO -- 
+  ' XXX TODO -- Factor:
+  let decision_cost=10*decision_cost%(decision%)
+  let decision_monthly_cost=decision_monthly_cost%(decision%)
 
-  let decision_cost=10*(code(decision_data$(decision%,cost%))-77)
-
-  let decision_monthly_cost%=\
-    code(decision_data$(decision%,monthly_cost%))-77
-
-  if not decision_cost and not decision_monthly_cost%
+  if not decision_cost and not decision_monthly_cost
     ret 1
   endif
 
@@ -1345,9 +1257,9 @@ deffn affordable%(decision%)
     ret 1
 
   ret \
-     (decision_cost<0 or decision_monthly_cost%<0) \
+     (decision_cost<0 or decision_monthly_cost<0) \
      and \
-     (money+decision_cost<0 or money+decision_monthly_cost%<0)
+     (money+decision_cost<0 or money+decision_monthly_cost<0)
     ' XXX TODO -- Check and factor the condition.
 
 enddef
@@ -1387,7 +1299,7 @@ defproc ask_for_loan(decision%)
     print #ow%,"opinan que es demasiado pronto \
       para conceder ayudas ecónomicas."
   else
-    if decision_data$(decision%,1)="*"
+    if is_decision_taken%(decision%)
       at #ow%,12,2
       print #ow%,"Te deniegan un nuevo préstamo."
     else
@@ -1408,7 +1320,7 @@ defproc ask_for_loan(decision%)
         at #ow%,14,7
         print #ow%,y%;nbsp$&"000 "&currency$
         let money=money+loan
-        let decision_data$(38+x%,1)="*"
+        mark_decision_taken 38+x%
       endif
     endif
   endif
@@ -1457,7 +1369,7 @@ defproc news
     let random_event%=rnd(first_event% to last_event%)
     for i%=1 to events%
       ' XXX FIXME --
-      if not (decision_data$(random_event%,1)="N"):\
+      if not is_decision_taken%(random_event%):\
         exit i%
       let random_event%=random_event%+1
       if random_event%>last_event%:\
@@ -1586,10 +1498,10 @@ defproc actual_war
     at #ow%,7,7
     print #ow%,"Victoria de Leftoto"
 
-    if not(decision_data$(36,1)="*" and rnd(0 to 2))
+    if not(is_decision_taken(36) and rnd(0 to 2))
 
       let alive%=0
-      if decision_data$(36,1)="*"
+      if is_decision_taken(36)
         at #ow%,10,0
         print #ow%,"El motor del helicóptero se para."
         pause 80
@@ -1648,7 +1560,7 @@ defproc score_report
     let popularity_bonus%=\
       popularity_bonus%+popularity%(i%)
 
-  print #ow%,\"Popularidad final";to bonus_col%;
+  print #ow%,\"Popularidad final:";to bonus_col%;
   print_using #ow%,"####",popularity_bonus%
   let score%=score%+popularity_bonus%
 
@@ -1754,6 +1666,69 @@ defproc key_press
 enddef
 
 ' ==============================================================
+' Data interface {{{1
+
+defproc mark_decision_taken(decision%)
+
+  ' Mark a decision taken.
+
+  let decision_data$(decision%,1)="*"
+
+enddef
+
+defproc restore_petitions
+
+  ' Mark all petitions not done.
+
+  loc i%
+
+  for i%=1 to petitions%:\
+    let decision_data$(i%,1)="N"
+
+enddef
+
+defproc restore_decisions
+
+  ' Mark all decisions not done.
+
+  loc i%
+
+  for i%=1 to decisions%:\
+    let decision_data$(i%,1)="N"
+
+enddef
+
+deffn is_decision_taken%(decision%)
+    
+  ret decision_data$(decision%,1)="*"
+
+enddef
+
+deffn decision_cost%(decision%)
+    
+  ret code(decision_data$(decision%,2))-code("M")
+
+enddef
+
+deffn decision_monthly_cost%(decision%)
+    
+  ret code(decision_data$(decision%,3))-code("M")
+
+enddef
+
+deffn decision_popularity_effect%(decision%,group%)
+    
+  ret code(decision_data$(decision%,group%+3))-code("M")
+
+enddef
+
+deffn decision_power_effect%(decision%,group%)
+
+  ret code(decision_data$(decision%,group%+11))-code("M")
+
+enddef
+
+' ==============================================================
 ' Data {{{1
 
 defproc init_data
@@ -1784,13 +1759,9 @@ defproc init_data
   let russia%=7
   let usa%=8
 
-  let none%=-1         ' plan or partner identifier
+  let none%=-1         ' plan or ally identifier
   let rebellion%=1     ' plan identifier
   let assassination%=2 ' plan identifier
-
-  ' Decision fields in decision_data$()
-  let cost%=2
-  let monthly_cost%=3
 
   let decision_name_max_len%=70
   dim decision_data$(decisions%,17)
@@ -1836,9 +1807,10 @@ defproc init_data
       member$(i%)
   endfor i%
 
-  ' XXX TODO -- Not needed.
-  ' for i%=1 to decisions%:\
-  '   let decision_data$(i%,1)="N"
+  
+  ' XXX TODO -- Not needed except to play again, what
+  ' needs more restoration.
+  restore_decisions
 
   let money=1000
   let escape%=0
