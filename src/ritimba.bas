@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.34+201709241526"
+version$="0.1.0-dev.35+201709241622"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -455,9 +455,7 @@ defproc audience
 
   cls #ow%
   paper #ow%,white%
-  center #ow%,1,"  DECISIÓN  "
-  ' paper #ow%,soliciting_group% ' XXX OLD
-  ' ink #ow%,contrast_colour%(soliciting_group%) ' XXX OLD
+  center #ow%,1,"DECISIÓN"
   center #ow%,3,"Petición "\
                 &group_genitive_name$(soliciting_group%)
   ' XXX FIXME -- Colours:
@@ -465,10 +463,7 @@ defproc audience
   ink #ow%,black%
   tellNL decision$(petition%)&"."
 
-  ' XXX TODO -- Prevent the report from being displayed here:
-  let affordable%=affordable_decision%(petition%)
-
-  if not affordable%
+  if not affordable%(petition%)
     cls #ow%
     tellNL "No hay suficientes fondos para adoptar esta decisión."
     tellNL "Su respuesta debe ser no."
@@ -498,7 +493,6 @@ enddef
 defproc decision
 
   loc i%,\
-    affordable%,\
     chosen_decision%,\
     option%,\
     options%,\
@@ -587,8 +581,7 @@ defproc decision
 
     tell "¿"&decision$(chosen_decision%)&"?"
 
-    let affordable%=affordable_decision%(chosen_decision%)
-    if not affordable%
+    if not affordable%(chosen_decision%)
       pause 200
       next choose_decision
     endif
@@ -680,7 +673,6 @@ defproc advice(decision%)
     i%,\
     variation%,variations%,\
     datum_col%,\
-    void%,\
     tell_separation_backup%
 
   wipe yellow%,black%,yellow%
@@ -717,11 +709,11 @@ defproc advice(decision%)
   endfor i%
 
   if not variations%:\
-    tell "Ningún cambio."
+    tell "Ningún cambio.":\
+    print #ow%
 
   under #ow%,1
-  print #ow%
-  tell "La fuerza de los grupos"
+  tellNL "La fuerza de los grupos"
   print #ow%
   under #ow%,0
 
@@ -737,16 +729,16 @@ defproc advice(decision%)
   endfor i%
 
   if not variations%:\
-    tell "Ningún cambio."
+    tell "Ningún cambio.":\
+    print #ow%
 
   under #ow%,1
-  print #ow%
-  tell "El tesoro"
+  tellNL "El tesoro"
   under #ow%,0
 
   let tell_separation_backup%=tell_separation%
   let tell_separation%=0
-  let void%=affordable_decision%(decision%)
+  decision_treasure_report decision%
   let tell_separation%=tell_separation_backup%
 
   key_press
@@ -1118,86 +1110,183 @@ enddef
 ' ==============================================================
 ' Treasure {{{1
 
-deffn affordable_decision%(decision%)
+' deffn affordable_decision%(decision%)
 
-  ' XXX TODO -- Separate the calculation (ie., if it's affordable or
-  ' not) from the report.
+'   ' XXX OLD
 
-  ' loc decision_cost
+'   loc printout$
+
+'   paper #ow%,yellow%
+'   ink #ow%,black%
+'   let decision_cost=10*(code(decision_data$(decision%,cost%))-77)
+'   let decision_monthly_cost%=\
+'     code(decision_data$(decision%,monthly_cost%))-77
+
+'   let printout$="Esta decisión"
+
+'   if not decision_cost and not decision_monthly_cost%
+'     ' XXX TMP --
+'     ' XXX TODO -- Integrate into a main `if else` and share the exit.
+'     let printout$=printout$&" no costaría dinero."
+'     tellNL printout$
+'     ret 1
+'   endif
+
+'   if decision_cost
+
+'     if decision_cost>0
+'       let printout$=printout$&" aportaría"
+'     else
+'       let printout$=printout$&" costaría"
+'     endif
+
+'     let printout$=printout$&\
+'       " al tesoro "&thousand$(abs(decision_cost))
+
+'   endif
+
+'   if decision_cost and decision_monthly_cost%:\
+'     let printout$=printout$&" y"
+
+'   if decision_monthly_cost%
+
+'     if decision_monthly_cost%<0
+'       let printout$=printout$&" aumentaría"
+'     else
+'       let printout$=printout$&" reduciría"
+'     endif
+
+'     let printout$=printout$\
+'       &" los gastos mensuales en "\
+'       &thousand$(abs(decision_monthly_cost%))
+
+'   endif
+
+'   tellNL printout$&"."
+
+'   if money+decision_cost>0:\
+'     ret 1
+
+'   if not(\
+'        (decision_cost<0 or decision_monthly_cost%<0) \
+'        and \
+'        (money+decision_cost<0 or money+decision_monthly_cost%<0)\
+'      ):\
+'     ret 1
+'     ' XXX TODO -- Check the condition.
+
+'   pause 250
+'   cls #ow%
+'   center #ow%,5,decision$(decision%)
+'   tellNL "El dinero necesario no está en el tesoro."
+
+'   ' XXX TODO -- Combine into one condition and one message:
+'   if decision_data$(38,1)="N":\
+'     tellNL "Quizá los rusos pueden ayudar."
+'   if decision_data$(39,1)="N":\
+'     tellNL "Los useños son un pueblo generoso"
+
+'   pause 350
+'   ret 0
+
+' enddef
+
+defproc decision_treasure_report(decision%)
+
   loc printout$
 
   paper #ow%,yellow%
   ink #ow%,black%
+
   let decision_cost=10*(code(decision_data$(decision%,cost%))-77)
+
   let decision_monthly_cost%=\
     code(decision_data$(decision%,monthly_cost%))-77
 
   let printout$="Esta decisión"
 
   if not decision_cost and not decision_monthly_cost%
-    ' XXX TMP --
-    ' XXX TODO -- Integrate into a main `if else` and share the exit.
+
     let printout$=printout$&" no costaría dinero."
     tellNL printout$
+
+  else
+
+    if decision_cost
+
+      if decision_cost>0
+        let printout$=printout$&" aportaría"
+      else
+        let printout$=printout$&" costaría"
+      endif
+
+      let printout$=printout$&\
+        " al tesoro "&thousand$(abs(decision_cost))
+
+    endif
+
+    if decision_cost and decision_monthly_cost%:\
+      let printout$=printout$&" y"
+
+    if decision_monthly_cost%
+
+      if decision_monthly_cost%<0
+        let printout$=printout$&" aumentaría"
+      else
+        let printout$=printout$&" reduciría"
+      endif
+
+      let printout$=printout$\
+        &" los gastos mensuales en "\
+        &thousand$(abs(decision_monthly_cost%))
+
+    endif
+
+    tellNL printout$&"."
+
+    if money+decision_cost>0:\
+      ret
+    if not(\
+         (decision_cost<0 or decision_monthly_cost%<0) \
+         and \
+         (money+decision_cost<0 or money+decision_monthly_cost%<0)\
+       ):\
+      ret
+      ' XXX TODO -- Check and factor the condition.
+
+    tellNL "El dinero necesario no está en el tesoro."
+
+    ' XXX TODO -- Combine into one condition and one message:
+    if decision_data$(38,1)="N":\
+      tellNL "Quizá los rusos pueden ayudar."
+    if decision_data$(39,1)="N":\
+      tellNL "Los useños son un pueblo generoso"
+
+  endif
+
+enddef
+
+deffn affordable%(decision%)
+
+  ' XXX TODO -- 
+
+  let decision_cost=10*(code(decision_data$(decision%,cost%))-77)
+
+  let decision_monthly_cost%=\
+    code(decision_data$(decision%,monthly_cost%))-77
+
+  if not decision_cost and not decision_monthly_cost%
     ret 1
   endif
-
-  if decision_cost
-
-    if decision_cost>0
-      let printout$=printout$&" aportaría"
-    else
-      let printout$=printout$&" costaría"
-    endif
-
-    let printout$=printout$&\
-      " al tesoro "&thousand$(abs(decision_cost))
-
-  endif
-
-  if decision_cost and decision_monthly_cost%:\
-    let printout$=printout$&" y"
-
-  if decision_monthly_cost%
-
-    if decision_monthly_cost%<0
-      let printout$=printout$&" aumentaría"
-    else
-      let printout$=printout$&" reduciría"
-    endif
-
-    let printout$=printout$\
-      &" los gastos mensuales en "\
-      &thousand$(abs(decision_monthly_cost%))
-
-  endif
-
-  tellNL printout$&"."
 
   if money+decision_cost>0:\
     ret 1
 
-  if not(\
-       (decision_cost<0 or decision_monthly_cost%<0) \
-       and \
-       (money+decision_cost<0 or money+decision_monthly_cost%<0)\
-     ):\
-    ret 1
-    ' XXX TODO -- Check the condition.
-
-  pause 250
-  cls #ow%
-  center #ow%,5,decision$(decision%)
-  tellNL "El dinero necesario no está en el tesoro."
-
-  ' XXX TODO -- Combine into one condition and one message:
-  if decision_data$(38,1)="N":\
-    tellNL "Quizá los rusos pueden ayudar."
-  if decision_data$(39,1)="N":\
-    tellNL "Los useños son un pueblo generoso"
-
-  pause 350
-  ret 0
+  ret \
+     (decision_cost<0 or decision_monthly_cost%<0) \
+     and \
+     (money+decision_cost<0 or money+decision_monthly_cost%<0)
+    ' XXX TODO -- Check and factor the condition.
 
 enddef
 
@@ -2003,7 +2092,7 @@ enddef
 
 defproc tellNL(text$)
   loc i%
-  for i%=0 to tell_separation%:\
+  for i%=0 to tell_separation%-1:\
     print #ow%
   print #ow%,fill$(" ",tell_indentation%);
   tell(text$)
@@ -2153,11 +2242,6 @@ enddef
 
 ' ==============================================================
 ' Meta {{{1
-
-defproc w0
-  window 800,600,0,0
-  csize 3,1
-enddef
 
 defproc debug_(message$)
   if 1
