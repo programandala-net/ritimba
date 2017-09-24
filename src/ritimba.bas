@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.40+201709242332"
+version$="0.1.0-dev.41+201709242354"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -45,7 +45,7 @@ defproc ritimba
   loc i%
 
   init_once
-  rep again
+  rep
     credits
     key_press
     init_data
@@ -72,7 +72,7 @@ defproc ritimba
         exit game
     endrep game
     the_end
-  endrep again
+  endrep
 
 enddef
 
@@ -186,26 +186,30 @@ defproc welcome
     paper #ow%,cyan%
     center #ow%,1,"Bienvenido al cargo"
     paper #ow%,white%
-    if score%>0
+    if first_game%
       paragraph
-      print_l "El anterior líder de nuestra"
-      print_l "amada patria Ritimba"
-      print_l "obtuvo una puntuación final de "&score%&"."
+      print_l "El anterior líder de nuestra \
+        amada patria Ritimba \
+        obtuvo una puntuación final de "&score%&"."
       paragraph
       print_l "Te deseamos que logres hacerlo mucho mejor."
     else
       paragraph
-      print_l "Eres el primer líder de nuestra"
-      print_l "amada patria Ritimba."
-      print_l "Te deseamos que lo hagas bien."
+      print_l "Eres el primer presidente de nuestra \
+        amada patria Ritimba. \
+        Te deseamos que lo hagas bien."
     endif
     paragraph
-    print_l "Para empezar podrás ver un informe del"
-    print_l "tesoro y otro de la policía secreta."
+    print_l "Para empezar podrás ver un informe del \
+      tesoro y otro de la policía secreta."
     key_press
     treasure_report
     actual_police_report
 
+enddef
+
+deffn first_game%
+  ret score%>0 and record%
 enddef
 
 ' ==============================================================
@@ -1735,9 +1739,6 @@ defproc init_data
 
   loc x$ ' XXX TMP --
 
-  let score%=0
-  let record%=0
-
   let petitions%=24
   let decisions%=49
 
@@ -2315,6 +2316,8 @@ defproc init_once
   init_windows
   init_font
   init_zx_beep
+  let score%=0
+  let record%=0
 enddef
 
 ' ==============================================================
