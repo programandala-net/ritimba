@@ -33,9 +33,9 @@ let dev$=device$("ritimba_bas","flpmdvdevsubwinnfados")
 '   minimum, maximum
 ' (Loaded by the <boot> file.)
 
-#include device.bas
-#include iso_lower.bas
-#include iso_upper.bas
+#include lib/device.bas
+#include lib/iso_lower.bas
+#include lib/iso_upper.bas
 
 ' ==============================================================
 ' Main loop {{{1
@@ -1889,7 +1889,7 @@ data 7,0,none%,none%,\
 defproc zx_border(colour%) ' XXX TMP
 enddef
 
-#include zx_beep.bas
+#include lib/zx_beep.bas
 
 defproc war_sfx
   ' XXX TODO

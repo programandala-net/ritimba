@@ -3,7 +3,7 @@
 # This file is part of Ritimba
 # http://programandala.net/es.programa.ritimba.html
 
-# Last modified 201709180056
+# Last modified 201709241435
 # See change log at the end of the file
 
 # ==============================================================
@@ -19,10 +19,12 @@ all: target/boot target/ritimba_bas
 clean:
 	rm -f target/*_bas target/boot
 
-target/boot: src/boot.bas src/device.bas
+target/boot: src/boot.bas src/lib/device.bas
 	sbim $< $@
 
-target/ritimba_bas: src/ritimba.bas src/device.bas src/zx_beep.bas
+lib_files=$(wildcard src/lib/*.bas)
+
+target/ritimba_bas: src/ritimba.bas $(lib_files)
 	sbim $< $@
 
 # ==============================================================
@@ -31,3 +33,5 @@ target/ritimba_bas: src/ritimba.bas src/device.bas src/zx_beep.bas
 # 2017-09-17: Start.
 #
 # 2017-09-18: Add <src/zx_beep.bas>.
+#
+# 2017-09-24: Update library files directory.

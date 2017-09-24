@@ -1,7 +1,7 @@
 rem 'zx_beep' procedure for S*BASIC
 rem that simulates the ZX Spectrum's 'beep' command
 
-rem Version 0.4.0+20170918
+rem Version 0.4.0+201709181828
 
 ' Author: Marcos Cruz (programandala.net), 2017
 

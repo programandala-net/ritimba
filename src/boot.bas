@@ -3,7 +3,7 @@ rem This file is part of Ritimba
 rem http://programandala.net/es.programa.ritimba.html
 rem Copyright (C) 2011,2012,2015,2016,2017 Marcos Cruz (programandala.net)
 
-' Last modified 201709221549
+' Last modified 201709241429
 
 ' ==============================================================
 
@@ -25,6 +25,6 @@ lrespr dev$&"ext_chans_code"
 
 lrun dev$&"ritimba_bas"
 
-#include device.bas
+#include lib/device.bas
 
 ' vim: filetype=sbim
