@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.36+201709241751"
+version$="0.1.0-dev.37+201709241930"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -436,21 +436,17 @@ defproc audience
   ink #ow%,black%
   center #ow%,3,"UNA AUDIENCIA"
 
-  rep choose_decision
-    let petition%=rnd(1 to 24)
-    for i%=1 to 22
-      if decision_data$(petition%,1)="N"
-        exit choose_decision
-      endif
-      let petition%=(petition%-int(petition%/24)*24)+1
-    end for i%
-    for i%=1 to 24:\
-      let decision_data$(i%,1)="N"
-  endrep choose_decision
+  if not petitions_left%:\
+    restore_petitions
+
+  rep chose_petition
+    let petition%=rnd(1 to petitions%)
+    if decision_data$(petition%,1)="N":\
+      exit chose_petition
+  endrep chose_petition
 
   let decision_data$(petition%,1)="*"
   let soliciting_group%=int((petition%-1)/groups%)+1
-  let this_decision_data$=decision_data$(petition%)
   paper #ow%,yellow%
   ink #ow%,black%
   center #ow%,10,"Petición "\
@@ -486,19 +482,46 @@ defproc audience
     if yes_key%
       take_decision petition%
     else
-      reject_the_petition
+      reject petition%
     endif
   endif
 
 enddef
 
-defproc reject_the_petition
+deffn petitions_left%
+
+  ' Return the number of petitions that have not been done yet.
+
+  loc i%,count%
+
+  for i%=1 to petitions%:\
+    let count%=count%+(decision_data$(i%,1)="N")
+
+  ret count%
+
+enddef
+
+defproc restore_petitions
+
+  ' Mark all petitions not done.
+
+  loc i%
+
+  for i%=1 to petitions%:\
+    let decision_data$(i%,1)="N"
+
+enddef
+
+defproc reject(petitition%)
 
   loc new_popularity%
 
-  let new_popularity%=popularity%(soliciting_group%)&\
-    -(code(this_decision_data$(soliciting_group%+3))-77)
+  let new_popularity%=\
+    popularity%(soliciting_group%)\
+    -(code(decision_data$(petition%,soliciting_group%+3))-77)
+
   let popularity%(soliciting_group%)=maximum(new_popularity%,0)
+
   cls #ow%
 
 enddef
@@ -908,6 +931,7 @@ defproc police_report_data
   ink #ow%,white%
   paragraph
   print_l "Tu fuerza es "&strength%&"."
+  end_paragraph
   paragraph
   print_l "La fuerza necesaria para una revolución es "&revolution_strength%&"."
   key_press
@@ -1714,6 +1738,7 @@ defproc init_data
   let score%=0
   let record%=0
 
+  let petitions%=24
   let decisions%=49
 
   let groups%=8
@@ -1801,7 +1826,7 @@ defproc init_data
 enddef
 
 ' ----------------------------------------------
-' Decisions data
+' Petitions, decisions and events data
 
 ' XXX REMARK --
 ' Character fields in decision_data$():
@@ -1817,7 +1842,7 @@ enddef
 ' Examples: ... "K"=-1, "L"=-1,"M"=0, "N"=1...
 
 ' ..............................
-' Petitions from the army
+' Petitions from the army (8)
 
 data "NMHQJLMMMMMPKLMMM",\
      "Instaurar el servicio militar obligatorio"
@@ -1837,7 +1862,7 @@ data "NAMQLLMLLMMPLLKLM",\
      "Comprar más armas y municiomes"
 
 ' ..............................
-' Petitions from the peasants
+' Petitions from the peasants (8)
 
 data "NMMLONMMMMMLMMLMM",\
      "Poner freno a los abusos del ejército"
@@ -1857,7 +1882,7 @@ data "NMSMPLMMMMMMMMLMM",\
      "Iniciar una lotería pública"
 
 ' ..............................
-' Petitions from the landowners
+' Petitions from the landowners (8)
 
 data "NMMKMPMMMMMLMMMMM",\
      "Prohibir el uso militar de sus tierras"
@@ -1877,6 +1902,7 @@ data "NACNNPMJMONMMPMKM",\
      "Construir un sistema de riego"
 
 ' ..............................
+' Decisions
 
 data "NMMQLLMMLMMNMMLML",\
      "Nombrar ministro al jefe del ejército"

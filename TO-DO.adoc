@@ -55,3 +55,7 @@
 - Change "tesoro" to "Hacienda"...
 - Fix: `datum_col%` must be 30 to make "los policías secretos" fix.
   But the mark "<" should be moved to the name first.
+
+== 2017-09-24
+
+- Remove the prefix "group_" from arrays.
