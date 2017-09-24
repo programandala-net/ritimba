@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.38+201709241932"
+version$="0.1.0-dev.39+201709241954"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -54,7 +54,7 @@ defproc ritimba
       new_month
       audience
       plot
-      murder
+      assassination
       if not alive%:\
         exit game
       war
@@ -380,44 +380,69 @@ defproc plot
 
 enddef
 
-defproc murder
+defproc assassination
 
   loc group%
 
   let group%=rnd(1 to main_groups%)
 
-  if plan%(group%)=assassination%
+  if plan%(group%)=assassination%:\
+    try_assassination
 
-    wipe black%,white%,black%
-    at #ow%,10,7
-    print #ow%,"INTENTO DE MAGNICIDIO"
-    at #ow%,20,0
-    print #ow%,"por un miembro de ";name$(group%)
-      ' XXX TODO -- Special individual names for this case.
-    cls #ow%
-    pause 30
-    shoot_dead_sfx
-    pause 50
+enddef
 
-    if ((plan%(army%)=assassination% \
-      and plan%(peasants%)=assassination% \
-      and plan%(landowners%)=assassination%) \
-      or not (popularity%(police%)>low% \
-      or power%(police%)>low% \
-      or rnd(0 to 1)))
-      ' XXX TODO -- Check the compacted logic above.
-      wipe black%,white%,black%
-      center #ow%,12,"¡Está usted muerto!" ' XXX TODO -- Improve.
-      zx_beep 3,-40
-      let alive%=0
-    else
-      wipe white%,black%,black%
-      paper #ow%,white%
-      ink #ow%,black%
-      center #ow%,12," Intento fallido "
-    endif
+defproc try_assassination
 
+  wipe black%,white%,black%
+  center #ow%,8,"INTENTO DE MAGNICIDIO"
+  center #ow%,10,"por un "&member$(group%)&""
+  pause 50
+  cls #ow%
+  shoot_dead_sfx
+  pause 50
+
+  if all_plan_assassination% or not secret_police_is_effective%
+    successful_assassination
+  else
+    failed_assassination
   endif
+
+enddef
+
+defproc failed_assassination
+
+  ' XXX TODO -- Improve.
+  wipe white%,black%,black%
+  paper #ow%,white%
+  ink #ow%,black%
+  center #ow%,12,"Intento fallido"
+
+enddef
+
+defproc successful_assassination
+
+  ' XXX TODO -- Improve.
+  wipe black%,white%,black%
+  center #ow%,12,"¡Está usted muerto!"
+  zx_beep 3,-40
+  let alive%=0
+
+enddef
+
+deffn all_plan_assassination%
+
+  return \
+        plan%(army%)=assassination% \
+    and plan%(peasants%)=assassination% \
+    and plan%(landowners%)=assassination%
+
+enddef
+
+deffn secret_police_is_effective%
+
+  ret popularity%(police%)>low% \
+      or power%(police%)>low% \
+      or rnd(0 to 1)
 
 enddef
 
@@ -1782,7 +1807,8 @@ defproc init_data
     name$(groups%,18),\
     short_name$(groups%,max_short_name_len%),\
     plural_name$(groups%,21),\
-    genitive_name$(groups%,21)
+    genitive_name$(groups%,21),\
+    member$(groups%,15)
 
   restore
 
@@ -1806,7 +1832,8 @@ defproc init_data
       name$(i%),\
       short_name$(i%),\
       plural_name$(i%),\
-      genitive_name$(i%)
+      genitive_name$(i%),\
+      member$(i%)
   endfor i%
 
   ' XXX TODO -- Not needed.
@@ -1976,42 +2003,50 @@ data 7,6,none%,none%,\
      "el ejército",\
      "ejército",\
      "los militares",\
-     "del ejército"
+     "del ejército",\
+     "militar"
 data 7,6,none%,none%,\
      "los campesinos",\
      "campesinos",\
      "los campesinos",\
-     "de los campesinos"
+     "de los campesinos",\
+     "campesino"
 data 7,6,none%,none%,\
      "los terratenientes",\
      "terratenientes",\
      "los terratenientes",\
-     "de los terratenientes"
+     "de los terratenientes",\
+     "terrateniente"
 data 0,6,none%,none%,\
      "la guerilla",\
      "guerrilla",\
      "los guerrilleros",\
-     "de la guerrilla"
+     "de la guerrilla",\
+     "guerrillero"
 data 7,6,none%,none%,\
      "Leftoto",\
      "leftotanos",\
      "los leftotanos",\
-     "de Leftoto"
+     "de Leftoto",\
+     "leftotano"
 data 7,6,none%,none%,\
      "la policía secreta",\
      "policía secreta",\
      "los policías secretos",\
-     "de la policía secreta"
+     "de la policía secreta",\
+     "policía secreto"
 data 7,0,none%,none%,\
      "Rusia",\
      "rusos",\
      "los rusos",\
-     "de Rusia"
+     "de Rusia",\
+     "ruso"
 data 7,0,none%,none%,\
      "Usa",\
      "useños",\
      "los useños",\
-     "de Usa"
+     "de Usa",\
+     "useño"
 
 ' ==============================================================
 ' Special effects {{{1
