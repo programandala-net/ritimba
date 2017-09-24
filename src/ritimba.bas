@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.37+201709241930"
+version$="0.1.0-dev.38+201709241932"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -392,7 +392,7 @@ defproc murder
     at #ow%,10,7
     print #ow%,"INTENTO DE MAGNICIDIO"
     at #ow%,20,0
-    print #ow%,"por un miembro de ";group_name$(group%)
+    print #ow%,"por un miembro de ";name$(group%)
       ' XXX TODO -- Special individual names for this case.
     cls #ow%
     pause 30
@@ -450,7 +450,7 @@ defproc audience
   paper #ow%,yellow%
   ink #ow%,black%
   center #ow%,10,"Petición "\
-                 &group_genitive_name$(soliciting_group%)&":"
+                 &genitive_name$(soliciting_group%)&":"
   paper #ow%,white%
   at #ow%,14,0
   print_l "¿Está su excelencia conforme con "\
@@ -464,7 +464,7 @@ defproc audience
   paper #ow%,white%
   center #ow%,1,"DECISIÓN"
   center #ow%,3,"Petición "\
-                &group_genitive_name$(soliciting_group%)
+                &genitive_name$(soliciting_group%)
   ' XXX FIXME -- Colours:
   paper #ow%,yellow%
   ink #ow%,black%
@@ -725,7 +725,7 @@ defproc advice(decision%)
     let variations%=variations%+abs(variation%)
     if variation%
       print #ow%,\
-        "- Entre ";group_plural_name$(i%);\
+        "- Entre ";plural_name$(i%);\
         to datum_col%;"+"(1 to variation%>0);variation%;
       if soliciting_group%=i% and decision%<25
         ' XXX TODO -- Convert into a footnote.
@@ -753,7 +753,7 @@ defproc advice(decision%)
     let variations%=variations%+abs(variation%)
     if variation%
       print #ow%,\
-        "- ";iso_upper_1$(group_name$(i%));\
+        "- ";iso_upper_1$(name$(i%));\
         to datum_col%;"+"(1 to variation%>0);variation%
     endif
   endfor i%
@@ -883,8 +883,8 @@ defproc police_report_data
     at #ow%,line%,group_col%+1
     csize #ow%,csize_width%-2,csize_height%
     print #ow%,\
-      group_short_name$(group%);\
-      fill$(" ",max_short_name_len%-len(group_short_name$(group%)))
+      short_name$(group%);\
+      fill$(" ",max_short_name_len%-len(short_name$(group%)))
     restore_csize
 
     ' Mark possible plan and ally
@@ -1050,16 +1050,16 @@ defproc revolution
     at #ow%,5,0
     print_l \
       "Se han unido "&\
-      group_name$(rebel_group%)&\
+      name$(rebel_group%)&\
       " y "&\
-      group_name$(ally%(rebel_group%))
+      name$(ally%(rebel_group%))
 
     print #ow%,\\"Su fuerza conjunta es ";rebels_strength%
     print #ow%,\\"¿A quién vas a pedir ayuda?"
     let helping_groups%=0
     for i%=1 to local_groups%
       if popularity%(i%)>low%
-      print #ow%,to 6;i%;" ";group_name$(i%)
+      print #ow%,to 6;i%;" ";name$(i%)
       let helping_groups%=helping_groups%+1
       endif
     endfor i%
@@ -1092,7 +1092,7 @@ defproc revolution
   at #ow%,8,0
   print #ow%,"Tu fuerza es ";strength%
   print #ow%,\\"La fuerza de ";\
-    group_name$(helping_group%);" es ";\
+    name$(helping_group%);" es ";\
     power%(helping_group%)
   print #ow%,\\"La de los revolucionarios es ";rebels_strength%
   pause 250
@@ -1779,10 +1779,10 @@ defproc init_data
     power%(groups%),\
     plan%(groups%),\
     ally%(groups%),\
-    group_name$(groups%,18),\
-    group_short_name$(groups%,max_short_name_len%),\
-    group_plural_name$(groups%,21),\
-    group_genitive_name$(groups%,21)
+    name$(groups%,18),\
+    short_name$(groups%,max_short_name_len%),\
+    plural_name$(groups%,21),\
+    genitive_name$(groups%,21)
 
   restore
 
@@ -1803,10 +1803,10 @@ defproc init_data
       power%(i%),\
       plan%(i%),\
       ally%(i%),\
-      group_name$(i%),\
-      group_short_name$(i%),\
-      group_plural_name$(i%),\
-      group_genitive_name$(i%)
+      name$(i%),\
+      short_name$(i%),\
+      plural_name$(i%),\
+      genitive_name$(i%)
   endfor i%
 
   ' XXX TODO -- Not needed.
@@ -1967,10 +1967,10 @@ data "NMMMMMMMMMMMILKMM",\
 ' power%(i%):       0..9
 ' plan%(i%):        none% | rebellion% | assassination%
 ' ally%(i%):        none% | group
-' group_name$(i%)
-' group_short_name$(i%)
-' group_plural_name$(i%)
-' group_genitive_name$(i%)
+' name$(i%)
+' short_name$(i%)
+' plural_name$(i%)
+' genitive_name$(i%)
 
 data 7,6,none%,none%,\
      "el ejército",\
