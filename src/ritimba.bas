@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.32+201709220047"
+version$="0.1.0-dev.33+201709241424"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -35,6 +35,7 @@ let dev$=device$("ritimba_bas","flpmdvdevsubwinnfados")
 
 #include device.bas
 #include iso_lower.bas
+#include iso_upper.bas
 
 ' ==============================================================
 ' Main loop {{{1
@@ -165,12 +166,14 @@ defproc national_anthem
         exit listen
       let pitch=code(tune$(i%))-80
       if pitch=16
-        beep:pause 20
+        beep
+        pause 20
       else
         zx_beep .5,pitch
       endif
     endfor i%
-    beep:pause 30
+    beep
+    pause 30
   endrep listen
   curdis #iw%
 enddef
@@ -179,7 +182,8 @@ defproc welcome
 
     title
     wipe white%,black%,blue%
-    paper #ow%,cyan%:center #ow%,1,"Bienvenido al cargo"
+    paper #ow%,cyan%
+    center #ow%,1,"Bienvenido al cargo"
     paper #ow%,white%
     if score%>0
       tellNL "El anterior líder de nuestra"
@@ -295,7 +299,7 @@ defproc bankruptcy
 
   let popularity%(police%)=popularity%(police%)\
                            -(popularity%(police%)>0)
-    
+
   let power%(police%)=power%(police%)\
                       -(power%(police)>0)
 
@@ -411,7 +415,7 @@ enddef
 
 defproc audience
 
-  loc i%,affordable%,this_decision%
+  loc i%,petition%
 
   wipe yellow%,black%,yellow%
   paper #ow%,green%
@@ -422,21 +426,20 @@ defproc audience
   center #ow%,3,"UNA AUDIENCIA"
 
   rep choose_decision
-    let this_decision%=rnd(1 to 24)
+    let petition%=rnd(1 to 24)
     for i%=1 to 22
-      if decision_data$(this_decision%,1)="N"
+      if decision_data$(petition%,1)="N"
         exit choose_decision
       endif
-      let this_decision%=(this_decision%-int(this_decision%/24)*24)+1
+      let petition%=(petition%-int(petition%/24)*24)+1
     end for i%
     for i%=1 to 24:\
       let decision_data$(i%,1)="N"
   endrep choose_decision
 
-  let decision_data$(this_decision%,1)="*"
-  let soliciting_group%=int((this_decision%-1)/groups%)+1
-  zx_border soliciting_group%
-  let this_decision_data$=decision_data$(this_decision%)
+  let decision_data$(petition%,1)="*"
+  let soliciting_group%=int((petition%-1)/groups%)+1
+  let this_decision_data$=decision_data$(petition%)
   paper #ow%,yellow%
   ink #ow%,black%
   center #ow%,10,"Petición "\
@@ -444,43 +447,49 @@ defproc audience
   paper #ow%,white%
   at #ow%,14,0
   tell "¿Está su excelencia conforme con "\
-    &iso_lower_1$(decision$(this_decision%))&"?"
+    &iso_lower_1$(decision$(petition%))&"?"
   key_press
-  advert this_decision%
+  maybe_advice petition%
+
+  ' XXX FIXME -- Layout, colour...:
 
   cls #ow%
   paper #ow%,white%
   center #ow%,1,"  DECISIÓN  "
-  paper #ow%,soliciting_group%
-  ink #ow%,contrast_colour%(soliciting_group%)
-  center #ow%,3,"Petición "&group_genitive_name$(soliciting_group%)
+  ' paper #ow%,soliciting_group% ' XXX OLD
+  ' ink #ow%,contrast_colour%(soliciting_group%) ' XXX OLD
+  center #ow%,3,"Petición "\
+                &group_genitive_name$(soliciting_group%)
+  ' XXX FIXME -- Colours:
   paper #ow%,yellow%
   ink #ow%,black%
-  center #ow%,5,decision$(this_decision%)
-  paper #ow%,blue%:print #ow%:cls #ow%,3
+  tellNL decision$(petition%)&"."
 
-  let affordable%=cash_advice%(this_decision%)
-  ink #ow%,green%
+  ' XXX TODO -- Prevent the report from being displayed here:
+  let affordable%=affordable_decision%(petition%)
 
-  if affordable%=0
+  if not affordable%
     cls #ow%
-    at #ow%,10,1
-    print #ow%,"No hay suficientes fondos"
-    print #ow%,\\" para";
-    print #ow%," pagar esta decisión."
-    at #ow%,15,4
-    print #ow%,"Su respuesta debe ser no."
+    tellNL "No hay suficientes fondos para adoptar esta decisión."
+    tellNL "Su respuesta debe ser no."
     pause 250
   else
-    if yes_key:\
-      ret
+    if yes_key%
+      take_decision petition%
+    else
+      reject_the_petition
+    endif
   endif
 
-  let x%=popularity%(soliciting_group%)
-  let y%=code(this_decision_data$(soliciting_group%+3))-77
-  let x%=x%-y%
-  let x%=maximum(x%,0)
-  let popularity%(soliciting_group%)=x%
+enddef
+
+defproc reject_the_petition
+
+  loc new_popularity%
+
+  let new_popularity%=popularity%(soliciting_group%)&\
+    -(code(this_decision_data$(soliciting_group%+3))-77)
+  let popularity%(soliciting_group%)=maximum(new_popularity%,0)
   cls #ow%
   treasure_report
 
@@ -508,6 +517,8 @@ defproc decision
 
     paper #ow%,yellow%
     ink #ow%,black%
+    ' XXX TODO -- Store these options in an array
+    ' and reuse them as titles of the lower level.
     at #ow%,08,4:print #ow%,"1. Complacer a un grupo  "
     at #ow%,10,4:print #ow%,"2. Complacer a todos     "
     at #ow%,12,4:print #ow%,"3. Aumentar el tesoro    "
@@ -517,11 +528,12 @@ defproc decision
     let option%=code(get_key$)-code("0")
     cls #ow%
     sel on option%
+      ' XXX TODO -- Store these values in an array.
       =1:let first_decision%=25:let last_decision%=30
       =2:let first_decision%=31:let last_decision%=33
       =3:let first_decision%=38:let last_decision%=40
       =4:let first_decision%=41:let last_decision%=43
-      =5:let first_decision%=34:let last_decision%=37  
+      =5:let first_decision%=34:let last_decision%=37
       =remainder:ret
     endsel
 
@@ -571,20 +583,17 @@ defproc decision
 
     ' XXX TODO -- Move to the `remainder` of the `sel` above:
 
-    advert chosen_decision%
-    ' XXX TODO -- Restore the screen colors here?
-    at #ow%,4,0
-    print #ow%,decision$(chosen_decision%)
+    maybe_advice chosen_decision%
 
-    let affordable%=cash_advice%(chosen_decision%)
+    tell "¿"&decision$(chosen_decision%)&"?"
+
+    let affordable%=affordable_decision%(chosen_decision%)
     if not affordable%
       pause 200
       next choose_decision
     endif
 
-    at #ow%,4,0
-    print #ow%,decision$(chosen_decision%)
-    if not yes_key:\
+    if not yes_key%:\
       next choose_decision
 
     if chosen_decision%<>35
@@ -621,8 +630,7 @@ defproc take_decision(decision%)
 
   let t$=decision_data$(decision%,4 to 11)
   for group%=1 to groups%
-    if t$(group%)<>"M"
-      ' M means 0 above
+    if t$(group%)<>"M" ' XXX TODO -- Remove. M means 0.
       let x%=popularity%(group%)+(code(t$(group%))-77)
       let x%=in_range(x%,0,9)
       let popularity%(group%)=x%
@@ -631,18 +639,18 @@ defproc take_decision(decision%)
 
   let t$=decision_data$(decision%,12 to 17)
   for group%=1 to local_groups%
-    if t$(group%)<>"M" ' M means 0
+    if t$(group%)<>"M" ' XXX TODO -- Remove. M means 0.
       let x%=power%(group%)+(code(t$(group%))-77)
       let x%=in_range(x%,0,9)
       let power%(group%)=x%
     endif
   endfor group%
 
-  ' XXX TODO -- Move: it seems this is month stuff:
-  let money=money+decision_cost
-  let monthly_payment=monthly_payment-decision_monthly_cost%
-  if monthly_payment<0:\
-    let monthly_payment=0
+  let money=\
+    money+decision_cost
+
+  let monthly_payment=\
+    maximum(monthly_payment-decision_monthly_cost%,0)
 
 enddef
 
@@ -652,54 +660,98 @@ deffn in_range(x,min,max)
 
 enddef
 
-defproc advert(decision)
-
-  loc i%,x%
+defproc maybe_advice(decision%)
 
   wipe green%,black%,blue%
-  paper #ow%,cyan%
-  for i%=0 to ow_lines%-1
-    at #ow%,i%,11
-    print #ow%,"¿Consejo?"
+
+  at #ow%,ow_lines%/3,0
+  tell "¿Quiere recibir consejo \
+    acerca de las consecuencias de tomar la decisión de "\
+    &iso_lower_1$(decision$(decision%))&"?"
+
+  if yes_key%:\
+    advice decision%
+
+enddef
+
+defproc advice(decision%)
+
+  loc \
+    i%,\
+    variation%,variations%,\
+    datum_col%,\
+    void%,\
+    tell_separation_backup%
+
+  wipe yellow%,black%,yellow%
+
+  let datum_col%=27
+
+  tell "Consecuencias de "\
+    &iso_lower_1$(decision$(decision%))&":"
+
+  under #ow%,1
+  tellNL "La popularidad del presidente"
+  print #ow%
+  under #ow%,0
+
+  let variations%=0
+  for i%=1 to groups%
+    let variation%=code(decision_data$(decision%,i%+3))-77
+    let variations%=variations%+abs(variation%)
+    if variation%
+      print #ow%,\
+        "- Entre ";group_plural_name$(i%);\
+        to datum_col%;"+"(1 to variation%>0);variation%;
+      if soliciting_group%=i% and decision%<25
+        ' XXX TODO -- Convert into a footnote.
+        paper #ow%,red%
+        ink #ow%,yellow%
+        print #ow%,"<"
+        paper #ow%,yellow%
+        ink #ow%,black%
+      else
+        print #ow%
+      endif
+    endif
   endfor i%
-  if yes_key
-    wipe yellow%,yellow%,yellow%
-    paper #ow%,black%
-    at #ow%,1,0
-    print #ow%,decision$(decision) ' XXX FIXME -- Wrap/justify.
-    paper #ow%,white%
-    ink #ow%,black%
-    at #ow%,3,0
-    print #ow%,"Su popularidad entre..."
-    paper #ow%,yellow%
-    for i%=1 to groups%
-      let x%=code(decision_data$(decision,i%+3))-77
-      if x%
-        print #ow%,\to 2;group_plural_name$(i%);to 24;
-        if x%>0:\
-          print #ow%,"+";
-        print #ow%,x%;
-        if soliciting_group%=i% and decision<25
-          paper #ow%,soliciting_group%
-          ink #ow%,yellow%
-          print #ow%,"< "
-          paper #ow%,yellow%
-          ink #ow%,black%
-        endif
-      endif
-    endfor i%
-    paper #ow%,white%
-    print #ow%,\\\"El poder de..."
-    paper #ow%,yellow%
-    for i%=1 to local_groups%
-      let x%=code(decision_data$(decision,i%+11))-77
-      if x%
-        print #ow%,to 2;group_name$(i%);to 24;"+"(1 to x%>0);x%
-      endif
-    endfor i%
-    key_press
-    cls #ow%
-  endif
+
+  if not variations%:\
+    tell "Ningún cambio."
+
+  under #ow%,1
+  print #ow%
+  tell "La fuerza de los grupos"
+  print #ow%
+  under #ow%,0
+
+  let variations%=0
+  for i%=1 to local_groups%
+    let variation%=code(decision_data$(decision%,i%+11))-77
+    let variations%=variations%+abs(variation%)
+    if variation%
+      print #ow%,\
+        "- ";iso_upper_1$(group_name$(i%));\
+        to datum_col%;"+"(1 to variation%>0);variation%
+    endif
+  endfor i%
+
+  if not variations%:\
+    tell "Ningún cambio."
+
+  under #ow%,1
+  print #ow%
+  tell "El tesoro"
+  under #ow%,0
+
+  let tell_separation_backup%=tell_separation%
+  let tell_separation%=0
+  let void%=affordable_decision%(decision%)
+  let tell_separation%=tell_separation_backup%
+
+  key_press
+  cls #ow%
+
 enddef
 
 ' ==============================================================
@@ -717,9 +769,9 @@ defproc police_report
 
   else
 
-    center #ow%,6,"¿INFORME de la POLICÍA SECRETA?"
+    center #ow%,6,"¿Informe de la Policía Secreta?"
     center #ow%,12,"(Cuesta "&thousand$(1)&")"
-    if yes_key
+    if yes_key%
       let money=money-1
       actual_police_report
     endif
@@ -809,7 +861,8 @@ defproc police_report_data
     paper #ow%,yellow%
     at #ow%,line%,group_col%+1
     csize #ow%,csize_width%-2,csize_height%
-    print #ow%,group_short_name$(group%);\
+    print #ow%,\
+      group_short_name$(group%);\
       fill$(" ",max_short_name_len%-len(group_short_name$(group%)))
     restore_csize
 
@@ -855,9 +908,7 @@ defproc police_report_data
 
   paper #ow%,black%
   ink #ow%,white%
-  print #ow%
   tellNL "Tu fuerza es "&strength%&"."
-  print #ow%
   tellNL "La fuerza necesaria para una revolución es "&revolution_strength%&"."
   key_press
 
@@ -923,7 +974,7 @@ defproc revolution
   wipe yellow%,black%,yellow%
 
   center #ow%,12,"¿Intento de escape?"
-  let try_escaping%=yes_key
+  let try_escaping%=yes_key%
   cls #ow%
   if try_escaping%
 
@@ -1032,7 +1083,7 @@ defproc revolution
     at #ow%,10,7
     print #ow%,"Has sido derrocado"
     at #ow%,12,10
-    print #ow%,"y ";: print #ow%,"liquidado."
+    print #ow%,"y liquidado."
     shoot_dead_sfx
     let alive%=0
     ret
@@ -1048,7 +1099,7 @@ defproc revolution
   endfor i%
   at #ow%,10,0
   print #ow%,"¿Castigas a los revolucionarios?"
-  if yes_key
+  if yes_key%
     for n=1 to 3:\
       shoot_dead_sfx:\
       pause .1
@@ -1067,73 +1118,94 @@ enddef
 ' ==============================================================
 ' Treasure {{{1
 
-deffn cash_advice%(decision)
+deffn affordable_decision%(decision%)
+
+  ' XXX TODO -- Separate the calculation (ie., if it's affordable or
+  ' not) from the report.
 
   ' loc decision_cost
+  loc printout$
 
   paper #ow%,yellow%
   ink #ow%,black%
-  let decision_cost=10*(code(decision_data$(decision,cost%))-77)
+  let decision_cost=10*(code(decision_data$(decision%,cost%))-77)
   let decision_monthly_cost%=\
-    code(decision_data$(decision,monthly_cost%))-77
+    code(decision_data$(decision%,monthly_cost%))-77
+
+  let printout$="Esta decisión"
 
   if not decision_cost and not decision_monthly_cost%
-    at #ow%,10,7
-    print #ow%,"No cuesta dinero."
+    ' XXX TMP --
+    ' XXX TODO -- Integrate into a main `if else` and share the exit.
+    let printout$=printout$&" no costaría dinero."
+    tellNL printout$
     ret 1
   endif
 
-  at #ow%,9,1
-  print #ow%,"Esta decisión";
-  ' XXX TODO -- Create a string and use `tell`.
-
   if decision_cost
-    if decision_cost>0:\
-      print #ow%," aportaría";
-    if decision_cost<0:\
-      print #ow%," costaría";
-    print #ow%," al tesoro ";thousand$(abs(decision_cost))\:
+
+    if decision_cost>0
+      let printout$=printout$&" aportaría"
+    else
+      let printout$=printout$&" costaría"
+    endif
+
+    let printout$=printout$&\
+      " al tesoro "&thousand$(abs(decision_cost))
+
   endif
+
+  if decision_cost and decision_monthly_cost%:\
+    let printout$=printout$&" y"
 
   if decision_monthly_cost%
-    print #ow%," y"
-    if decision_monthly_cost%<0:\
-      print #ow%," subiría";
-    if decision_monthly_cost%>0:\
-      print #ow%," bajaría";
-    print #ow%," los gastos mensuales en ";\
-      thousand$(abs(decision_monthly_cost%));
+
+    if decision_monthly_cost%<0
+      let printout$=printout$&" aumentaría"
+    else
+      let printout$=printout$&" reduciría"
+    endif
+
+    let printout$=printout$\
+      &" los gastos mensuales en "\
+      &thousand$(abs(decision_monthly_cost%))
+
   endif
+
+  tellNL printout$&"."
 
   if money+decision_cost>0:\
     ret 1
 
-  if not((decision_cost<0 or decision_monthly_cost%<0) \
-    and (money+decision_cost<0 or money+decision_monthly_cost%<0)):\
+  if not(\
+       (decision_cost<0 or decision_monthly_cost%<0) \
+       and \
+       (money+decision_cost<0 or money+decision_monthly_cost%<0)\
+     ):\
     ret 1
+    ' XXX TODO -- Check the condition.
 
-  pause 250: cls #ow%
-  center #ow%,5,decision$(decision)
-  at #ow%,8,2
-  print #ow%,"El dinero necesario"
-  print #ow%,\to 4;"no está en el tesoro"\\\:
+  pause 250
+  cls #ow%
+  center #ow%,5,decision$(decision%)
+  tellNL "El dinero necesario no está en el tesoro."
 
+  ' XXX TODO -- Combine into one condition and one message:
   if decision_data$(38,1)="N":\
-    print #ow%,"Quizá los rusos pueden ayudar."
-
+    tellNL "Quizá los rusos pueden ayudar."
   if decision_data$(39,1)="N":\
-    print #ow%,"Los useños son un pueblo generoso"\:
+    tellNL "Los useños son un pueblo generoso"
 
   pause 350
   ret 0
 
 enddef
 
-defproc ask_for_loan(decision)
+defproc ask_for_loan(decision%)
 
   loc country,loan
 
-  sel on decision ' XXX TODO -- Improve.
+  sel on decision% ' XXX TODO -- Improve.
     =38:let country=russian
     =39:let country=usa%
   endsel
@@ -1164,7 +1236,7 @@ defproc ask_for_loan(decision)
     print #ow%,"opinan que es demasiado pronto \
       para conceder ayudas ecónomicas."
   else
-    if decision_data$(decision,1)="*"
+    if decision_data$(decision%,1)="*"
       at #ow%,12,2
       print #ow%,"Te deniegan un nuevo préstamo."
     else
@@ -1288,7 +1360,8 @@ defproc war
     print #ow%,"Tu popularidad en Ritimba"
     at #ow%,12,11
     print #ow%,"aumentará"
-    for i%=1 to main_groups%,police%: increase_popularity i%
+    for i%=1 to main_groups%,police%:\
+      increase_popularity i%
   endif
 
 enddef
@@ -1497,7 +1570,7 @@ deffn get_key_prompt$(prompt$)
       exit press_now
     zx_beep .01,30
 
-    key_prompt prompt$,prompt_colour_2
+    key_prompt prompt$,prompt_colour_2%
     let key$=inkey$(#iw%,50)
     if key$<>"":\
       exit press_now
@@ -1515,11 +1588,11 @@ deffn get_key$
   ret get_key_prompt$("TECLA")
 enddef
 
-deffn yes_key
-  loc yes
-  let yes = "s"==get_key_prompt$('TECLA ("S" = SÍ)')
-  zx_beep .25,10+40*yes
-  ret yes
+deffn yes_key%
+  loc yes%
+  let yes% = "s"==get_key_prompt$('TECLA ("S" = SÍ)')
+  zx_beep .25,10+40*yes%
+  ret yes%
 enddef
 
 defproc key_press
@@ -1735,7 +1808,7 @@ data "NMMMMMMMMMMMMMMMM",\
 data "NZMNNPMGMKMMMMMMM",\
      "Nacionalizar las empresas de Leftoto"
 data "NHMPMMMJMLMRMMKKL",\
-     "Comprar armas para el ejercito"
+     "Comprar armas para el ejército"
 data "NMMMPLMMLMMMRLPML",\
      "Legalizar las asociaciones campesinas"
 data "NMMLLPMMLMMLLRLML",\
@@ -1844,12 +1917,29 @@ enddef
 ' ==============================================================
 ' Stock code {{{1
 
-deffn on_(flag,result_if_false,result_if_true)
-  if flag:\
-    ret result_if_true:\
-  else:\
-    ret result_if_false
-enddef
+' deffn on_(flag,result_if_false,result_if_true)
+'   ' XXX REMARK -- Not used.
+'   if flag:\
+'     ret result_if_true:\
+'   else:\
+'     ret result_if_false
+' enddef
+
+' deffn if_(flag,result_if_true,result_if_false)
+'   ' XXX REMARK -- Not used.
+'   if flag:\
+'     ret result_if_true:\
+'   else:\
+'     ret result_if_false
+' enddef
+
+' deffn if$(flag,result_if_true$,result_if_false$)
+'   ' XXX REMARK -- Not used.
+'   if flag:\
+'     ret result_if_true$:\
+'   else:\
+'     ret result_if_false$
+' enddef
 
 ' ==============================================================
 ' Text output {{{1
@@ -1865,16 +1955,16 @@ defproc wipe(paper_colour%,ink_colour%,border_colour%)
   paper #iw%,border_colour%
   cls #iw%
   let prompt_colour_1%=border_colour%
-  let prompt_colour_2=paper_colour%
-  if prompt_colour_1%=prompt_colour_2
-    let prompt_colour_2=contrast_colour%(prompt_colour_1%)
+  let prompt_colour_2%=paper_colour%
+  if prompt_colour_1%=prompt_colour_2%
+    let prompt_colour_2%=contrast_colour%(prompt_colour_1%)
   endif
   zx_beep .1,40
 
 enddef
 
-deffn center_for(width_in_chars)
-  ret (columns%-width_in_chars)/2
+deffn center_for(width_in_chars%)
+  ret (columns%-width_in_chars%)/2
 enddef
 
 defproc center(channel,line%,text$)
@@ -1887,6 +1977,14 @@ defproc center(channel,line%,text$)
     at #channel,line%,center_for(length%)
     print #channel,text$
   endif
+enddef
+
+defproc center_here(channel,text$)
+  ' XXX UNDER DEVELOPMENT
+  loc length%
+  let length%=minimum(len(text$),columns%)
+  at #channel,line%,center_for(length%)
+  print #channel,text$(to length%)
 enddef
 
 defproc tell(txt$)
@@ -1904,10 +2002,14 @@ defproc tell(txt$)
 enddef
 
 defproc tellNL(text$)
-  print #ow%,\" ";
+  loc i%
+  for i%=0 to tell_separation%:\
+    print #ow%
+  print #ow%,fill$(" ",tell_indentation%);
   tell(text$)
   ' XXX FIXME -- An extra blank line is created if the
   ' previous line occupied the whole width.
+  ' Fix with a check with `chan_b%`.
 enddef
 
 defproc restore_csize
@@ -2037,6 +2139,8 @@ defproc init_screen
   let cyan%=5
   let yellow%=6
   let white%=7
+  let tell_separation%=1
+  let tell_indentation%=0
 enddef
 
 defproc init_once

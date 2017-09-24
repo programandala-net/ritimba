@@ -49,3 +49,9 @@
   text using the current `csize`.
 - Combine the ordinary advice report and the money advice report into
   one.
+
+== 2017-09-23
+
+- Move library source files to <src/lib>.
+- Change "tesoro" to "Hacienda"...
+- Add `randomise`.
