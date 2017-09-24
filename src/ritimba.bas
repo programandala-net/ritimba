@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.33+201709241424"
+version$="0.1.0-dev.34+201709241526"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -2144,6 +2144,7 @@ defproc init_screen
 enddef
 
 defproc init_once
+  randomise
   init_screen
   init_windows
   init_font
