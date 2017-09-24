@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.41+201709242354"
+version$="0.1.0-dev.42+201709250017"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1362,45 +1362,62 @@ enddef
 
 defproc news
 
-  loc i%,random_event%,first_event%,last_event%
+  if not rnd(0 to 2):\
+    do_news
 
+enddef
+
+defproc do_news
+
+  loc i%,random_event%,first_event%,last_event%,flashes%
+
+  ' XXX TODO -- Preserve current paper and ink colours.
+
+  let flashes%=10
+
+  ' XXX TODO -- Move to `init_constants`:
   let first_event%=44
   let last_event%=49
   let events%=last_event%-first_event%+1
 
-  if not rnd(0 to 2)
+  let random_event%=rnd(first_event% to last_event%)
+  for i%=1 to events%
+    if not is_decision_taken%(random_event%):\
+      exit i%
+    let random_event%=random_event%+1
+    if random_event%>last_event%:\
+      let random_event%=first_event%
+  next i%
+    ret
+  endfor i%
 
-    let random_event%=rnd(first_event% to last_event%)
-    for i%=1 to events%
-      ' XXX FIXME --
-      if not is_decision_taken%(random_event%):\
-        exit i%
-      let random_event%=random_event%+1
-      if random_event%>last_event%:\
-        let random_event%=first_event%
-    next i%
-      ret
-    endfor i%
+  wipe white%,black%,white%
 
-    wipe white%,black%,white%
-
-    ' XXX FIXME -- The original used a flash effect. That's why
-    ' the title is printed again after the sound.
-
+  for i%=1 to flashes%
+    if i% mod 2
+      paper #ow%,white%
+      ink #ow%,black%
+    else
+      paper #ow%,black%
+      ink #ow%,white%
+    endif
     center #ow%,10,"NOTICIA DE ÚLTIMA HORA"
-    for i%=1 to 10:\
+    if i%<>flashes%:\
       zx_beep .6,30
-    cls #ow%
-    center #ow%,10,"NOTICIA DE ÚLTIMA HORA"
-    at #ow%,14,0
-    print #ow%,decision$(random_event%)
-    ink #ow%,white%
-    pause 100
-    take_only_once_decision random_event%
-    plot
-    police_report
+  endfor i%
 
-  endif
+  repeat:\
+    if not beeping:\
+      exit
+
+  paper #ow%,white%
+  ink #ow%,black%
+  at #ow%,14,0
+  print_l_paragraph decision$(random_event%)
+  pause 100
+  take_only_once_decision random_event%
+  plot
+  police_report
 
 enddef
 

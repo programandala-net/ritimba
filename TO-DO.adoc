@@ -47,4 +47,7 @@
 
 - Use `print_l` instead of `print` when possible.
 - Add a channel parameter to `print_l` and move it to the library.
-- Fix printing of events.
+
+== 2017-09-25
+
+- Move constants to their own init proc, called from `init_once`.
