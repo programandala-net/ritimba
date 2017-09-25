@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.43+201709251629"
+version$="0.1.0-dev.44+201709251906"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1366,16 +1366,11 @@ enddef
 
 defproc do_news
 
-  loc i%,random_event%,first_event%,last_event%,flashes%
+  loc i%,random_event%,flashes%
 
   ' XXX TODO -- Preserve current paper and ink colours.
 
   let flashes%=10
-
-  ' XXX TODO -- Move to `init_constants`:
-  let first_event%=44
-  let last_event%=49
-  let events%=last_event%-first_event%+1
 
   let random_event%=rnd(first_event% to last_event%)
   for i%=1 to events%
@@ -1753,31 +1748,6 @@ defproc init_data
 
   loc x$ ' XXX TMP --
 
-  let petitions%=24
-  let decisions%=49
-
-  let groups%=8
-  let main_groups%=3  ' only the groups that can rebel
-  let local_groups%=6 ' all groups but Russia and USA
-
-  let nbsp$=chr$(160) ' non-breaking space in ISO 8859-1
-
-  let currency$="RTD" ' Ritimban dolar
-
-  ' Group ids
-  let army%=1
-  let peasants%=2
-  let landowners%=3
-  let guerrillas%=4
-  let leftoto%=5
-  let police%=6
-  let russia%=7
-  let usa%=8
-
-  let none%=-1         ' plan or ally identifier
-  let rebellion%=1     ' plan identifier
-  let assassination%=2 ' plan identifier
-
   let decision_name_max_len%=70
   dim decision_data$(decisions%,17)
   dim decision$(decisions%,decision_name_max_len%)
@@ -1832,7 +1802,7 @@ defproc init_data
   let monthly_payment=60
   let strength%=4
   let money_in_switzerland=0
-  let alive%=10
+  let alive%=1
   let months%=0
   let pc%=0 ' XXX TODO -- What for?
   let revolution_strength%=10
@@ -2312,6 +2282,23 @@ defproc init_screen
   if disp_type<>32:\
     mode 32
   colour_ql
+  let paragraph_separation%=1
+  let paragraph_indentation%=0
+enddef
+
+defproc init_once
+  randomise
+  init_constants
+  init_screen
+  init_windows
+  init_font
+  init_zx_beep
+  let score%=0
+  let record%=0
+enddef
+
+defproc init_constants
+
   let black%=0
   let blue%=1
   let red%=2
@@ -2320,18 +2307,38 @@ defproc init_screen
   let cyan%=5
   let yellow%=6
   let white%=7
-  let paragraph_separation%=1
-  let paragraph_indentation%=0
-enddef
 
-defproc init_once
-  randomise
-  init_screen
-  init_windows
-  init_font
-  init_zx_beep
-  let score%=0
-  let record%=0
+  let petitions%=24
+  let decisions%=49
+
+  let groups%=8
+  let main_groups%=3  ' only the groups that can rebel
+  let local_groups%=6 ' all groups but Russia and USA
+
+  let nbsp$=chr$(160) ' non-breaking space in ISO 8859-1
+
+  let currency$="RTD" ' Ritimban dolar
+
+  ' Group ids
+  let army%=1
+  let peasants%=2
+  let landowners%=3
+  let guerrillas%=4
+  let leftoto%=5
+  let police%=6
+  let russia%=7
+  let usa%=8
+
+  ' Plan identifiers
+  let none%=-1 ' also used as ally identifier
+  let rebellion%=1
+  let assassination%=2
+
+  ' Events
+  let first_event%=44
+  let last_event%=49
+  let events%=last_event%-first_event%+1
+
 enddef
 
 ' ==============================================================

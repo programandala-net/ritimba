@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-09-24
+:revdate: 2017-09-25
 
 == 2017-09-19
 
@@ -47,7 +47,3 @@
 
 - Use `print_l` instead of `print` when possible.
 - Add a channel parameter to `print_l` and move it to the library.
-
-== 2017-09-25
-
-- Move constants to their own init proc, called from `init_once`.
