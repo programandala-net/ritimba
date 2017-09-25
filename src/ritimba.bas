@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.44+201709251906"
+version$="0.1.0-dev.45+201709252308"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -402,7 +402,7 @@ defproc try_assassination
   shoot_dead_sfx
   pause 50
 
-  if all_plan_assassination% or not secret_police_is_effective%
+  if all_groups_plan_assassination% or not secret_police_is_effective%
     successful_assassination
   else
     failed_assassination
@@ -430,7 +430,7 @@ defproc successful_assassination
 
 enddef
 
-deffn all_plan_assassination%
+deffn all_groups_plan_assassination%
 
   return \
         plan%(army%)=assassination% \
@@ -677,8 +677,6 @@ defproc take_only_once_decision(decision%)
 enddef
 
 defproc take_decision(decision%)
-
-  ' XXX TODO -- Rename.
 
   loc group%,new_popularity%,new_power%
 
@@ -1082,8 +1080,8 @@ defproc revolution
     let helping_groups%=0
     for i%=1 to local_groups%
       if popularity%(i%)>low%
-      print #ow%,to 6;i%;" ";name$(i%)
-      let helping_groups%=helping_groups%+1
+        print #ow%,to 6;i%;" ";name$(i%)
+        let helping_groups%=helping_groups%+1
       endif
     endfor i%
 
@@ -1418,125 +1416,160 @@ enddef
 
 defproc war
 
-  loc i%
+  if \
+       popularity%(leftoto%)<=low%\
+    and power%(leftoto%)>=low%:\
+    possible_war
 
-  if popularity%(leftoto%)>low%:\
-    ret
+enddef
 
-  if power%(leftoto%)<low%:\
-    ret
+defproc possible_war
+
+  ' XXX TODO -- Message.
 
   if not rnd(0 to 3)
     actual_war
   else
-    wipe black%,white%,cyan%
-    at #ow%,6,1
-    print #ow%,"Tratado de guerra con Leftoto"
-    at #ow%,10,3
-    print #ow%,"Tu popularidad en Ritimba"
-    at #ow%,12,11
-    print #ow%,"aumentará"
-    for i%=1 to main_groups%,police%:\
-      increase_popularity i%
+    threat_of_war
   endif
+
+enddef
+
+defproc threat_of_war
+
+  ' XXX TODO -- Improve texts.
+
+  loc i%
+
+  wipe black%,white%,cyan%
+  center #ow%,6,"Amenaza de guerra contra Leftoto"
+  center #ow%,10,"Tu popularidad en Ritimba"
+  center #ow%,12,"aumentará"
+  for i%=1 to main_groups%,police%:\
+    increase_popularity i%
 
 enddef
 
 defproc increase_popularity(group%) ' XXX TODO -- Rename.
 
-  local x%
+  local current_popularity%
 
   ' XXX TODO -- Write a general solution to update the
   ' popularity by any amount, positive or negative.
 
-  let x%=popularity%(group%)
-  ' XXX FIXME -- Coercion:
-  let popularity%(group%)=x%+(x%<9)
+  let current_popularity%=popularity%(group%)
+  let popularity%(group%)=current_popularity%+(current_popularity%<9)
 
 enddef
 
 defproc actual_war
 
-  loc i%
+  loc ritimba_strength%,leftoto_strength%
 
   wipe red%,black%,black%
-  center #ow%,8,"Leftoto nos invade"
-  let ritimba_strength=0
 
-  for i%=1 to main_groups%
-    if popularity%(i%)>low%:\
-      let ritimba_strength=ritimba_strength+power%(i%)
-  endfor i%
+  center #ow%,8,"Leftoto nos invade" ' XXX TODO -- Improve.
 
-  if popularity%(police%)>low%
-    let ritimba_strength=ritimba_strength+power%(police%)
-  endif
+  let ritimba_strength%=ritimba_current_strength%
 
-  let ritimba_strength=ritimba_strength+strength%
   at #ow%,12,1
-  print #ow%,"La fuerza de Ritimba es ";ritimba_strength
-  let leftoto_strength=0
+  print #ow%,"La fuerza de Ritimba es ";ritimba_strength%
 
-  for i%=1 to 6
-    if popularity%(i%)<=low%:\
-      let leftoto_strength=leftoto_strength+power%(i%)
-  endfor i%
+  let leftoto_strength%=leftoto_current_strength%
 
   at #ow%,14,1
-  print #ow%,"La fuerza de Leftoto es ";leftoto_strength
+  print #ow%,"La fuerza de Leftoto es ";leftoto_strength%
 
   at #ow%,18,3
   print #ow%,"Una corta y decisiva guerra"
   war_sfx
 
-  if leftoto_strength+rnd(-1 to 1)<ritimba_strength
+  if leftoto_strength%+rnd(-1 to 1)<ritimba_strength%
+    ritimba_wins
+  else
+    leftoto_wins
+  endif
 
-    ' XXX TODO -- Factor.
+enddef
 
-    ' Ritimba wins
+deffn ritimba_current_strength%
 
-    zx_border black%
+  loc i%,ritimba_strength%
+
+  for i%=1 to main_groups%,police%
+    if popularity%(i%)>low%:\
+      let ritimba_strength%=ritimba_strength%+power%(i%)
+  endfor i%
+
+  ret ritimba_strength%+strength%
+
+enddef
+
+deffn leftoto_current_strength%
+
+  loc i%,leftoto_strength%
+
+  for i%=1 to local_groups%
+    if popularity%(i%)<=low%:\
+      let leftoto_strength%=leftoto_strength%+power%(i%)
+  endfor i%
+
+  ret leftoto_strength%
+
+enddef
+
+defproc ritimba_wins
+
+  zx_border black%
+  cls #ow%
+  center #ow%,12,"Leftoto ha sido derrotado":
+  let power%(leftoto%)=0
+
+enddef
+
+defproc leftoto_wins
+
+  wipe black%,white%,black%
+  center #ow%,7,"Victoria de Leftoto"
+
+  if have_helicopter% and rnd(0 to 2)
+
+    ' XXX TODO -- Improve texts.
+
+    ' Escape
+
     cls #ow%
-    at #ow%,12,7
-    print #ow%," Leftoto derrotado ":
-    let power%(leftoto%)=0
+    at #ow%,12,3
+    print #ow%,"¡Escapas en helicóptero!"
+    let escape%=1
 
   else
 
-    ' XXX TODO -- Factor.
+    ' XXX TODO -- Improve texts.
 
-    ' Leftoto wins
-
-    wipe black%,white%,black%
-    at #ow%,7,7
-    print #ow%,"Victoria de Leftoto"
-
-    if not(is_decision_taken(36) and rnd(0 to 2))
-
-      let alive%=0
-      if is_decision_taken(36)
-        at #ow%,10,0
-        print #ow%,"El motor del helicóptero se para."
-        pause 80
-      endif
-      at #ow%,12,4
-      print #ow%,"Eres acusado de ser un enemigo del pueblo y,"
-      pause 30:
-      print #ow%,"tras un juicio sumarísimo,"
-      pause 30:
-      shoot_dead_sfx
-      at #ow%,18,7
-      print #ow%,"ejecutado."
-    else
-      ' Escape
-      cls #ow%
-      at #ow%,12,3
-      print #ow%,"¡Escapas en helicóptero!"
-      let escape%=1
-
+    if have_helicopter%
+      at #ow%,10,0
+      print_l "Intentas escapar en helicóptero, \
+               pero el motor sufre una avería."
+      pause 80
     endif
 
+    at #ow%,12,0
+    print_l "Eres acusado de ser un enemigo del pueblo y, \
+             tras un juicio sumarísimo,"
+    pause 50
+    shoot_dead_sfx
+    print_l "ejecutado."
+    end_paragraph
+    let alive%=0
+
   endif
+
+enddef
+
+deffn have_helicopter%
+
+  ret is_decision_taken%(36)
 
 enddef
 
@@ -2015,6 +2048,7 @@ enddef
 
 defproc war_sfx
   ' XXX TODO
+  pause 1000
 enddef
 
 defproc shoot_dead_sfx
