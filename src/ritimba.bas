@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.42+201709250017"
+version$="0.1.0-dev.43+201709251629"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -27,13 +27,10 @@ rem http://programandala.net/es.programa.ritimba.html
 ' ==============================================================
 ' Files and requirements {{{1
 
-let dev$=device$("ritimba_bas","flpmdvdevsubwinnfados")
-
 ' From "DIY Toolkit", (C) Simon N. Goodwin:
 '   minimum, maximum
 ' (Loaded by the <boot> file.)
 
-#include lib/device.bas
 #include lib/iso_lower.bas
 #include lib/iso_upper.bas
 
@@ -2266,7 +2263,7 @@ enddef
 
 defproc init_font
 
-  let font$=dev$&"iso8859-1_font"
+  let font$=home_dir$&"iso8859-1_font"
   font_length=flen(\font$)
   font_address=alchp(font_length)
   lbytes font$,font_address
