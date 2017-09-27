@@ -1,12 +1,24 @@
-rem iso_upper.bas
+' iso_upper.bas
 
-rem SBASIC functions to convert ISO 8859-1
-rem characters and strings to uppercase.
+' This file is part of Sbira
+' http://programandala.net/en.program.sbira.html
 
-rem Author: Marcos Cruz (programandala.net)
+rem SBASIC functions to convert ISO 8859-1 characters and strings to uppercase.
 
-' 2017-09-19: Start: Code from Asalto y castigo
-' (http://programandala.net/es.programa.asalto_y_castigo.superbasic.html)
+rem Author: Marcos Cruz (programandala.net), 2017
+
+' Last modified 201709272316
+' See change log at the end of the file
+
+' ==============================================================
+' License
+
+' You may do whatever you want with this work, so long as you
+' retain all copyright, authorship and credit notices and this
+' license in all redistributed copies and derived works.
+' There is no warranty.
+
+' ==============================================================
 
 deffn iso_upper%(char%)
 
@@ -42,5 +54,13 @@ deffn iso_upper_1$(text$)
   ret iso_upper$(text$(1))&text$(2 to)
 
 enddef
+
+' ==============================================================
+' Change log
+
+' 2017-09-19: Start: Code extracted from Asalto y castigo
+' (http://programandala.net/es.programa.asalto_y_castigo.superbasic.html).
+'
+' 2017-09-27: Update file header.
 
 ' vim: filetype=sbim

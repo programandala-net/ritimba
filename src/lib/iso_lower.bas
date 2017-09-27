@@ -1,11 +1,24 @@
-rem iso_lower.bas
+' iso_lower.bas
 
-rem SBASIC functions to convert ISO 8859-1
-rem characters and strings to lowercase.
+' This file is part of Sbira
+' http://programandala.net/en.program.sbira.html
 
-rem Author: Marcos Cruz (programandala.net)
+rem SBASIC functions to convert ISO 8859-1 characters and strings to lowercase.
 
-' 2017-09-19: Start.
+rem Author: Marcos Cruz (programandala.net), 2017
+
+' Last modified 201709272314
+' See change log at the end of the file
+
+' ==============================================================
+' License
+
+' You may do whatever you want with this work, so long as you
+' retain all copyright, authorship and credit notices and this
+' license in all redistributed copies and derived works.
+' There is no warranty.
+
+' ==============================================================
 
 deffn iso_lower%(char%)
 
@@ -41,5 +54,12 @@ deffn iso_lower_1$(text$)
   ret iso_lower$(text$(1))&text$(2 to)
 
 enddef
+
+' ==============================================================
+' Change log
+
+' 2017-09-19: Start.
+'
+' 2017-09-27: Update file header.
 
 ' vim: filetype=sbim

@@ -1,9 +1,14 @@
-rem 'zx_beep' procedure for S*BASIC
-rem that simulates the ZX Spectrum's 'beep' command
+' zx_beep.bas
 
-rem Version 0.4.0+201709181828
+' This file is part of Sbira
+' http://programandala.net/en.program.sbira.html
 
-' Author: Marcos Cruz (programandala.net), 2017
+rem A procedure that simulates the ZX Spectrum's 'beep' command.
+
+rem Author: Marcos Cruz (programandala.net), 2017
+
+' Last modified 201709272306
+' See change log at the end of the file
 
 ' ==============================================================
 ' License
@@ -44,6 +49,8 @@ rem Version 0.4.0+201709181828
 
 defproc zx_beep(duration,tone%)
 
+  ' Simulate the ZX Spectrum BASIC command `beep`.
+
   loc pitch%
 
   repeat zx_beep_busy:\
@@ -59,7 +66,9 @@ enddef
 
 defproc init_zx_beep
 
-  loc i,middle_c_pitch%
+  ' Init the data used by `zx_beep`.
+
+  loc i%,middle_c_pitch%
 
   let zx_beep_tempo=2.1
     ' The greater, the longer notes.
@@ -72,8 +81,8 @@ defproc init_zx_beep
   zx_beep_last_pitch%=0
 
   rep count_data
-    read i
-    if i=-1:\
+    read i%
+    if i%=-1:\
       exit count_data
     let zx_beep_last_pitch%=zx_beep_last_pitch%+1
   endrep count_data
@@ -82,11 +91,11 @@ defproc init_zx_beep
 
   restore @zx_beep_data
 
-  for i=0 to zx_beep_last_pitch%
-    read ql_pitch%(i)
-    if ql_pitch%(i)=middle_c_pitch%:\
-      let zx_beep_middle_c_offset%=i
-  endfor i
+  for i%=0 to zx_beep_last_pitch%
+    read ql_pitch%(i%)
+    if ql_pitch%(i%)=middle_c_pitch%:\
+      let zx_beep_middle_c_offset%=i%
+  endfor i%
 
 enddef
 
@@ -157,5 +166,14 @@ data 237     ' 046.24 ' F#
 data 252     ' 043.65 ' F 
 
 data -1 ' end of data
+
+' ==============================================================
+' Change log
+
+' 2017-09-18: Start. First working version.
+'
+' 2017-09-20: Integrate into the new library project.
+'
+' 2017-09-27: Update file header. Convert `i` to `i%`.
 
 ' vim: filetype=sbim
