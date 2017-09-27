@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-09-09
+:revdate: 2017-09-27
 
 In <<en,English>> below.
 
@@ -23,10 +23,8 @@ Sede del proyecto: http://programandala.net/es.programa.ritimba.html
 - Editor http://www.vim.org[Vim]
 - Preprocesador de S*BASIC
   http://programandala.net/es.programa.sbim.html[SBim]
-- Emulador http://terdina.net/ql/q-emulator.html[Q-emuLator],
-  corriendo en GNU/Linux con https://www.winehq.org/[Wine]
-- Emulador http://www.kilgus.net/qpc/[QPC2] corriendo en GNU/Linux con
-  Wine
+- http://programandala.net/es.programa.transfonter.html[Transfonter],
+  una herramienta para crear un juego de caracteres ISO 8859-1 para QL
 - Emulador http://www.wlenerz.com/SMSQmulator/[SMSQmulator]
 
 === Historia y estado actual
@@ -39,7 +37,7 @@ proyecto fue puesto en estado _durmiente_.
 
 En 2017-09-09 se creó un repositorio de Git a partir de las copias de
 respaldo, con el fin de preservar la evolución del código y retomar su
-desarrollo en el futuro.
+desarrollo.
 
 == [[en]]English
 
@@ -76,4 +74,4 @@ project was set to standby mode.
 
 On 2017-09-09 a Git repository was created from the development
 backups in order to preserve the evolution of the project and resume
-its development in the future.
+its development.
