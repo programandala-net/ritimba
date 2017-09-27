@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.45+201709252308"
+version$="0.1.0-dev.46+201709280020"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -2206,18 +2206,7 @@ enddef
 ' ==============================================================
 ' Screen {{{1
 
-deffn csize_width_pixels(width%)
-  sel on width%
-    =0:ret 6
-    =1:ret 8
-    =2:ret 12
-    =3:ret 16
-  endsel
-enddef
-
-deffn csize_height_pixels(height%)
-  ret height%*10+10
-enddef
+#include lib/csize_pixels.bas
 
 deffn contrast_colour%(colour%)
 
