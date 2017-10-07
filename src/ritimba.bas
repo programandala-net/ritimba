@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.47+201710071856"
+version$="0.1.0-dev.48+201710071917"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -33,6 +33,7 @@ rem http://programandala.net/es.programa.ritimba.html
 
 #include lib/iso_lower.bas
 #include lib/iso_upper.bas
+#include lib/trim.bas
 
 ' ==============================================================
 ' Main loop {{{1
@@ -1000,7 +1001,6 @@ defproc revolution
 
   loc \
     helping_group%,\
-    helping_groups%,\
     rebel_group%,\
     try_escaping%
 
@@ -1105,57 +1105,52 @@ enddef
 
 defproc ask_for_help
 
-  local i%
+  local i%,helping_groups$,k$,group_keys_prompt$
 
-  rep choose
+  pause 150
+  cls #ow%
 
-    pause 150
-    cls #ow%
+  let rebels_strength%=\
+    power%(rebel_group%)\
+    +power%(ally%(rebel_group%))
 
-    let rebels_strength%=\
-      power%(rebel_group%)\
-      +power%(ally%(rebel_group%))
+  at #ow%,5,0
+  print_l \
+    "Se han unido "&\
+    name$(rebel_group%)&\
+    " y "&\
+    name$(ally%(rebel_group%))&"."
 
-    at #ow%,5,0
-    print_l \
-      "Se han unido "&\
-      name$(rebel_group%)&\
-      " y "&\
-      name$(ally%(rebel_group%))&"."
+  print #ow%,\\"Su fuerza conjunta es ";rebels_strength%;"."
+  print #ow%,\\"¿A quién vas a pedir ayuda?"
 
-    print #ow%,\\"Su fuerza conjunta es ";rebels_strength%;"."
-    print #ow%,\\"¿A quién vas a pedir ayuda?"
-    let helping_groups%=0
-    for i%=1 to local_groups%
-      if popularity%(i%)>low%
-        print #ow%,to 6;i%;" ";name$(i%)
-        let helping_groups%=helping_groups%+1
-      endif
-    endfor i%
-
-    if helping_groups%
-      rep choose_group
-        let k$=get_key$
-        ' XXX TODO -- Improve, show the keys in the prompt
-        if k$ instr "123456":\
-          exit choose_group
-      endrep choose_group
-      if popularity%(k$)>low%
-        let helping_group%=k$:\
-        exit choose
-      else
-        cls #ow%
-        center #ow%,12,"¡Debes de estar bromeando!"
-        next choose
-      endif
-    else
-      cls #ow%
-      center #ow%,8,"¡Estás solo!"
-      key_press
+  for i%=1 to local_groups%
+    if popularity%(i%)>low%
+      print #ow%,to 6;i%;" ";name$(i%)
+      let helping_groups$=helping_groups$&i%
+      let group_keys_prompt$=group_keys_prompt$&i%&" "
     endif
-    exit choose
+  endfor i%
 
-  endrep choose
+  let group_keys_prompt$=trim_right$(group_keys_prompt$)
+
+  if len(helping_groups$)
+
+    rep
+      let k$=get_key_prompt$("["&group_keys_prompt$&"]")
+      if k$ instr helping_groups$
+        let helping_group%=k$
+        exit
+      endif
+    endrep
+
+  else
+
+    cls #ow%
+    center #ow%,8,"¡Estás solo!"
+    key_press
+
+  endif
 
 enddef
 
