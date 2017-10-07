@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.48+201710071917"
+version$="0.1.0-dev.49+201710072224"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -33,6 +33,7 @@ rem http://programandala.net/es.programa.ritimba.html
 
 #include lib/iso_lower.bas
 #include lib/iso_upper.bas
+#include lib/print_l.bas
 #include lib/trim.bas
 
 ' ==============================================================
@@ -185,20 +186,20 @@ defproc welcome
     center #ow%,1,"Bienvenido al cargo"
     paper #ow%,white%
     if first_game%
-      paragraph
-      print_l "El anterior líder de nuestra \
+      paragraph #ow%
+      print_l #ow%,"El anterior líder de nuestra \
         amada patria Ritimba \
         obtuvo una puntuación final de "&score%&"."
-      paragraph
-      print_l "Te deseamos que logres hacerlo mucho mejor."
+      paragraph #ow%
+      print_l #ow%,"Te deseamos que logres hacerlo mucho mejor."
     else
-      paragraph
-      print_l "Eres el primer presidente de nuestra \
+      paragraph #ow%
+      print_l #ow%,"Eres el primer presidente de nuestra \
         amada patria Ritimba. \
         Te deseamos que lo hagas bien."
     endif
-    paragraph
-    print_l "Para empezar podrás ver un informe del \
+    paragraph #ow%
+    print_l #ow%,"Para empezar podrás ver un informe del \
       tesoro y otro de la policía secreta."
     key_press
     treasure_report
@@ -299,12 +300,12 @@ defproc bankruptcy
 
   at #ow%,9,0
 
-  paragraph
-  print_l "Su popularidad entre el ejército y \
+  paragraph #ow%
+  print_l #ow%,"Su popularidad entre el ejército y \
     la policía secreta caerán."
 
-  paragraph
-  print_l "El poder de la policía \
+  paragraph #ow%
+  print_l #ow%,"El poder de la policía \
     y su propio poder se reducirán también."
 
   let popularity%(army%)=popularity%(army%)\
@@ -480,7 +481,7 @@ defproc audience
                  &genitive_name$(soliciting_group%)&":"
   paper #ow%,white%
   at #ow%,14,0
-  print_l "¿Está su excelencia conforme con "\
+  print_l #ow%,"¿Está su excelencia conforme con "\
     &iso_lower_1$(decision$(petition%))&"?"
   key_press
   maybe_advice petition%
@@ -495,15 +496,15 @@ defproc audience
   ' XXX FIXME -- Colours:
   paper #ow%,yellow%
   ink #ow%,black%
-  paragraph
-  print_l decision$(petition%)&"."
+  paragraph #ow%
+  print_l #ow%,decision$(petition%)&"."
 
   if not affordable%(petition%)
     cls #ow%
-    paragraph
-    print_l "No hay suficientes fondos para adoptar esta decisión."
-    paragraph
-    print_l "Su respuesta debe ser no."
+    paragraph #ow%
+    print_l #ow%,"No hay suficientes fondos para adoptar esta decisión."
+    paragraph #ow%
+    print_l #ow%,"Su respuesta debe ser no."
     pause 250
   else
     if yes_key%
@@ -591,14 +592,14 @@ defproc decision
     for i%=first_decision% to last_decision%
       if not is_decision_taken%(i%)
         let options%=options%+1
-        paragraph
-        print_l options%&". "&decision$(i%)&"."
+        paragraph #ow%
+        print_l #ow%,options%&". "&decision$(i%)&"."
       endif
     endfor i%
 
     if not options%
-      paragraph
-      print_l "Esta sección está agotada"
+      paragraph #ow%
+      print_l #ow%,"Esta sección está agotada"
       pause 150
       next choose_decision
     endif
@@ -639,7 +640,7 @@ defproc decision
           cls #ow%
           paper #ow%,white%
 
-          print_l "¿"&decision$(chosen_decision%)&"?"
+          print_l #ow%,"¿"&decision$(chosen_decision%)&"?"
 
           if yes_key%
 
@@ -712,7 +713,7 @@ defproc maybe_advice(decision%)
   wipe green%,black%,blue%
 
   at #ow%,ow_lines%/3,0
-  print_l "¿Quiere recibir consejo \
+  print_l #ow%,"¿Quiere recibir consejo \
     acerca de las consecuencias de tomar la decisión de "\
     &iso_lower_1$(decision$(decision%))&"?"
 
@@ -733,9 +734,9 @@ defproc advice(decision%)
 
   wipe yellow%,black%,yellow%
 
-  print_l "Consecuencias de "\
+  print_l #ow%,"Consecuencias de "\
     &iso_lower_1$(decision$(decision%))&":"
-  end_paragraph
+  end_paragraph #ow%
 
   under #ow%,1
   print #ow%,\"La popularidad del presidente"
@@ -951,11 +952,11 @@ defproc police_report_data
 
   paper #ow%,black%
   ink #ow%,white%
-  paragraph
-  print_l "Tu fuerza es "&strength%&"."
-  end_paragraph
-  paragraph
-  print_l "La fuerza necesaria para una revolución es "&revolution_strength%&"."
+  paragraph #ow%
+  print_l #ow%,"Tu fuerza es "&strength%&"."
+  end_paragraph #ow%
+  paragraph #ow%
+  print_l #ow%,"La fuerza necesaria para una revolución es "&revolution_strength%&"."
   key_press
 
 enddef
@@ -1115,7 +1116,7 @@ defproc ask_for_help
     +power%(ally%(rebel_group%))
 
   at #ow%,5,0
-  print_l \
+  print_l #ow%,\
     "Se han unido "&\
     name$(rebel_group%)&\
     " y "&\
@@ -1295,8 +1296,8 @@ defproc decision_treasure_report(decision%)
   if not decision_cost and not decision_monthly_cost
 
     let printout$=printout$&" no costaría dinero."
-    paragraph
-    print_l printout$
+    paragraph #ow%
+    print_l #ow%,printout$
 
   else
 
@@ -1330,8 +1331,8 @@ defproc decision_treasure_report(decision%)
 
     endif
 
-    paragraph
-    print_l printout$&"."
+    paragraph #ow%
+    print_l #ow%,printout$&"."
 
     if money+decision_cost>0:\
       ret
@@ -1343,16 +1344,16 @@ defproc decision_treasure_report(decision%)
       ret
       ' XXX TODO -- Check and factor the condition.
 
-    paragraph
-    print_l "El dinero necesario no está en el tesoro."
+    paragraph #ow%
+    print_l #ow%,"El dinero necesario no está en el tesoro."
 
     ' XXX TODO -- Combine into one condition and one message:
     if not is_decision_taken%(38):\
-      paragraph
-      print_l "Quizá los rusos pueden ayudar."
+      paragraph #ow%
+      print_l #ow%,"Quizá los rusos pueden ayudar."
     if not is_decision_taken%(39):\
-      paragraph
-      print_l "Los useños son un pueblo generoso"
+      paragraph #ow%
+      print_l #ow%,"Los useños son un pueblo generoso"
 
   endif
 
@@ -1519,7 +1520,7 @@ defproc do_news
   paper #ow%,white%
   ink #ow%,black%
   at #ow%,14,0
-  print_l_paragraph decision$(random_event%)&"."
+  print_l_paragraph #ow%,decision$(random_event%)&"."
   pause 100
   take_only_once_decision random_event%
   plot
@@ -1665,18 +1666,18 @@ defproc leftoto_wins
 
     if have_helicopter%
       at #ow%,10,0
-      print_l "Intentas escapar en helicóptero, \
+      print_l #ow%,"Intentas escapar en helicóptero, \
                pero el motor sufre una avería."
       pause 80
     endif
 
     at #ow%,12,0
-    print_l "Eres acusado de ser un enemigo del pueblo y, \
+    print_l #ow%,"Eres acusado de ser un enemigo del pueblo y, \
              tras un juicio sumarísimo,"
     pause 50
     shoot_dead_sfx
-    print_l "ejecutado."
-    end_paragraph
+    print_l #ow%,"ejecutado."
+    end_paragraph #ow%
     let alive%=0
 
   endif
@@ -1755,11 +1756,11 @@ defproc score_report
 
   if score%>record%
     let record%=score%
-    paragraph
-    print_l "Es la mayor puntuación hasta ahora."
+    paragraph #ow%
+    print_l #ow%,"Es la mayor puntuación hasta ahora."
   else
-    paragraph
-    print_l "La mayor puntuación es "&record%&"."
+    paragraph #ow%
+    print_l #ow%,"La mayor puntuación es "&record%&"."
   endif
 
   key_press
@@ -2253,7 +2254,7 @@ defproc center(channel,line%,text$)
   let length%=len(text$)
   if length%>columns%
     at #ow%,line%,0
-    print_l text$
+    print_l #ow%,text$
   else
     at #channel,line%,center_for(length%)
     print #channel,text$
@@ -2268,65 +2269,11 @@ defproc center_here(channel,text$)
   print #channel,text$(to length%)
 enddef
 
-defproc print_l(txt$)
-
-  ' Print the given text left justified from the current cursor
-  ' position of the window identified by channel ow%.
-
-  local text$,first%,last%
-  if len(txt$)
-    let text$=txt$&" "
-    let first%=1
-    for last%=1 to len(text$)
-      if text$(last%)=" "
-        print #ow%,!text$(first% to last%-1);
-        let first%=last%+1
-      endif
-    endfor last%
-  endif
-
-enddef
-
-defproc paragraph
-
-  ' Start a new paragraph.
-
-  loc i%
-  for i%=1 to paragraph_separation%:\
-    print #ow%
-  print #ow%,fill$(" ",paragraph_indentation%);
-  ' XXX FIXME -- An extra blank line is created if the
-  ' previous line occupied the whole width.
-  ' Fix with a check with `chan_b%`.
-
-enddef
-
-defproc end_paragraph
-
-  ' End the current paragraph.
-
-  print #ow%
-
-enddef
-
-defproc print_l_paragraph(txt$)
-
-  ' Print the given text left justified as a new paragraph,
-  ' in the window identified by channel ow%.
-
-  paragraph
-  print_l(txt$)
-  end_paragraph
-
-enddef
-
 defproc restore_csize
 
   csize #ow%,csize_width%,csize_height%
 
 enddef
-
-' #include lib/win.bas ' XXX TODO --
 
 ' ==============================================================
 ' Screen {{{1

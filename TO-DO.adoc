@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-09-25
+:revdate: 2017-10-07
 
 == 2017-09-19
 
@@ -46,4 +46,3 @@
 == 2017-09-24
 
 - Use `print_l` instead of `print` when possible.
-- Add a channel parameter to `print_l` and move it to the library.
