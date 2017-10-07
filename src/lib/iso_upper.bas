@@ -3,11 +3,11 @@
 ' This file is part of Sbira
 ' http://programandala.net/en.program.sbira.html
 
-rem SBASIC functions to convert ISO 8859-1 characters and strings to uppercase.
+rem Functions that convert ISO 8859-1 characters and strings to uppercase.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201709272316
+' Last modified 201709291507
 ' See change log at the end of the file
 
 ' ==============================================================

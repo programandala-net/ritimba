@@ -3,11 +3,11 @@
 ' This file is part of Sbira
 ' http://programandala.net/en.program.sbira.html
 
-rem A procedure that simulates the ZX Spectrum's 'beep' command.
+rem Procedure that simulates the ZX Spectrum's 'beep' command.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201709272306
+' Last modified 201709291507
 ' See change log at the end of the file
 
 ' ==============================================================

@@ -3,11 +3,11 @@
 ' This file is part of Sbira
 ' http://programandala.net/en.program.sbira.html
 
-rem SBASIC functions to convert `csize` parameters to pixels.
+rem Functions that convert `csize` parameters to pixels.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201709280018
+' Last modified 201709291507
 ' See change log at the end of the file
 
 ' ==============================================================
