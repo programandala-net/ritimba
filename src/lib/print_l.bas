@@ -5,14 +5,6 @@
 
 rem Procedures to print left-justified strings.
 
-' The following variables are used, and must be set by the
-' application:
-'
-'   paragraph_separation% = number of lines between paragraphs
-'
-'   paragraph_indentation% = spaces at the start of the first
-'   line of a paragraph
-
 rem Author: Marcos Cruz (programandala.net), 2017
 
 ' Last modified 201710072219
@@ -28,6 +20,11 @@ rem Author: Marcos Cruz (programandala.net), 2017
 
 ' ==============================================================
 
+let paragraph_separation% = 0
+  ' Number of lines between paragraphs.
+
+let paragraph_indentation% = 2
+  ' Spaces at the start of the first line of a paragraph.
 
 defproc print_l(channel%,text$)
 
