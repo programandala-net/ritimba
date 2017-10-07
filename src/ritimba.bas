@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.49+201710072224"
+version$="0.1.0-dev.50+201710080009"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -85,7 +85,7 @@ defproc credits
   at #ow%,1,0
   print #ow%,"Ritimba"
   print #ow%,\\"Por:"\"Marcos Cruz (programandala.net),"
-  print #ow%,\"2011, 2012, 2015, 2016, 2017"
+  print #ow%,"2011, 2012, 2015, 2016, 2017"
   print #ow%,\\"Una versión en SBASIC de"
   print #ow%,"Dictador, de Don Priestley, 1983"
 enddef
@@ -224,44 +224,22 @@ defproc treasure_report
 
 enddef
 
-defproc print_money(money)
-
-  ' XXX OLD -- See `money$()`.
-
-  ' XXX FIXME -- Remove blanks on the left.
-
-  ' XXX REMARK -- `print_using` uses commas for decimal point.
-  ' print_using #ow%,"### ### ###,##' RTD'",money*1000;
-
-  print #ow%,thousand$(money) ' XXX TMP --
-
-enddef
-
 deffn money$(ammount)
 
-  ' Return _ammount_ formatted as money.
+  ' Return `ammount` formatted as money.
 
-  ' XXX TODO --
-  '
-  ' XXX FIXME -- This does not work because when the floating point
-  ' parameter is converted to a string, the exponent format is forced,
-  ' ie. "1234567" becomes "1.234567E6".
+  loc digit%,ammount$,formatted$,digits%
 
-  loc i%,ammount$,formatted$
-  let ammount$=ammount
-  for i%=len(ammount$) to 1 step -1
-    print i%,ammount$(i%)
-    let formatted$=ammount$(i%)&formatted$
-    if not(i% mod 3) and i%<>1:\
-      let formatted$=" "&formatted$
-  endfor i%
+  let ammount$=trim_left$(idec$(ammount*1000,8,0))
+  let digits%=len(ammount$)
+
+  for digit%=1 to digits%
+    let formatted$=ammount$(digits%-digit%+1)&formatted$
+    if not(digit% mod 3) and digit%<>digits%:\
+      let formatted$=nbsp$&formatted$
+  endfor digit%
+
   ret formatted$&" "&currency$
-
-enddef
-
-deffn thousand$(amount)
-
-  return amount&nbsp$&"000 "&currency$
 
 enddef
 
@@ -277,16 +255,16 @@ defproc treasure_report_details
   else
     print #ow%,"debe ";
   endif
-  print_money abs(int(money))
+  print #ow%,money$(abs(money))
 
   at #ow%,14,1
   print #ow%,"Gastos mensuales: ";
-  print_money monthly_payment
+  print #ow%,money$(monthly_payment)
 
   if money_in_switzerland>0
     at #ow%,17,2
     print #ow%,"En Suiza: ";
-    print_money money_in_switzerland
+    print #ow%,money$(money_in_switzerland)
   endif
 
   key_press
@@ -814,7 +792,7 @@ defproc police_report
   else
 
     center #ow%,6,"¿Informe de la Policía Secreta?"
-    center #ow%,12,"(Cuesta "&thousand$(1)&")"
+    center #ow%,12,"(Cuesta "&money$(1)&")"
     if yes_key%
       let money=money-1
       actual_police_report
@@ -1310,7 +1288,7 @@ defproc decision_treasure_report(decision%)
       endif
 
       let printout$=printout$&\
-        " al tesoro "&thousand$(abs(decision_cost))
+        " al tesoro "&money$(abs(decision_cost))
 
     endif
 
@@ -1327,7 +1305,7 @@ defproc decision_treasure_report(decision%)
 
       let printout$=printout$\
         &" los gastos mensuales en "\
-        &thousand$(abs(decision_monthly_cost))
+        &money$(abs(decision_monthly_cost))
 
     endif
 
@@ -1456,11 +1434,11 @@ defproc money_transfer
 
   let amount=int(money/2)
   if amount>=1
-    print #ow%,"El tesoro tenía ";thousand$(int(money));
+    print #ow%,"El tesoro tenía ";money$(int(money));
     let money_in_switzerland=money_in_switzerland+amount
     let money=money-amount
     pause 100
-    print #ow%,\\thousand$(amount);" han sido transferidos"
+    print #ow%,\\money$(amount);" han sido transferidos"
     exit choose_decision
   else
     center #ow%,12,"Ninguna transferencia hecha"
@@ -1744,7 +1722,7 @@ defproc score_report
     if money_in_switzerland
       let money_bonus%=int(money_in_switzerland/10)
       print #ow%,\"Por tus «ahorros» en Suiza"\"(";\
-        thousand$(money_in_switzerland);"):";to bonus_col%;
+        money$(money_in_switzerland);"):";to bonus_col%;
       print_using #ow%,"####",money_bonus%
       let score%=score%+money_bonus%
     endif
