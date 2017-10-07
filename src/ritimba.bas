@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.46+201709280020"
+version$="0.1.0-dev.47+201710071856"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -998,17 +998,87 @@ enddef
 
 defproc revolution
 
-  ' XXX TODO -- Factor.
+  loc \
+    helping_group%,\
+    helping_groups%,\
+    rebel_group%,\
+    try_escaping%
 
-  loc i%,helping_group%,helping_groups%,rebel_group%,try_escaping%
+  if rebels%
+
+    revolution_alarm
+
+    if want_to_escape%
+      escape
+    else
+      fight
+    endif
+
+  endif
+
+enddef
+
+deffn want_to_escape%
+
+  loc yes%
+  cls #ow%
+  center #ow%,12,"¿Intento de escape?"
+  let yes%=yes_key%
+  cls #ow%
+  ret yes%
+
+enddef
+
+deffn rebels%
+
+  loc i%
 
   for i%=1 to main_groups%
     let rebel_group%=rnd(1 to main_groups%)
     if plan%(rebel_group%)=rebellion%:\
       exit i%
   next i%
-    ret
+    ret 0
   endfor i%
+
+  ret rebel_group%
+
+enddef
+
+defproc fight
+
+  ask_for_help
+  revolution_report
+  revolution_starts
+
+  if rebels_are_stronger%
+    the_revolution_wins
+  else
+    the_revolution_is_defeated
+  endif
+
+enddef
+
+defproc revolution_starts
+
+  wipe white%,black%,white%
+  at #ow%,12,3
+  print #ow%,"La revolución ha comenzado"
+  war_sfx
+
+enddef
+
+deffn rebels_are_stronger%
+
+  ret not(rebels_strength%<=strength%\
+         +power%(helping_group%)\
+         +rnd(-1 to 1))
+
+enddef
+
+defproc revolution_alarm
+
+  local i%
 
   wipe red%,black%,red%
   ink #ow%,white%
@@ -1018,48 +1088,26 @@ defproc revolution
     zx_beep .5,10
   wipe yellow%,black%,yellow%
 
-  center #ow%,12,"¿Intento de escape?"
-  let try_escaping%=yes_key%
+enddef
+
+defproc revolution_report
+
   cls #ow%
-  if try_escaping%
+  at #ow%,8,0
+  print #ow%,"Tu fuerza es ";strength%
+  print #ow%,\\"La fuerza de ";\
+    name$(helping_group%);" es ";\
+    power%(helping_group%)
+  print #ow%,\\"La de los revolucionarios es ";rebels_strength%
+  key_press
 
-    if is_decision_taken%(36) ' XXX TODO -- Factor.
-      ' The helicopter was bought before.
-      if rnd(0 to 2)
-        center #ow%,12,"¡Escapas en helicóptero!"
-        let escape%=1
-        ret
-      else
-        center #ow%,10,"¡El helicóptero no funciona!"
-        pause 150
-      endif
-    endif
+enddef
 
-    at #ow%,10,2
-    print #ow%,"Tienes que atravesar el"
-    at #ow%,12,6
-    print #ow%,"monte hacia Leftoto."
-    pause 200
-    cls #ow%
+defproc ask_for_help
 
-    if not int((rnd*((power%(guerrillas%)/3)+.4)))
-      at #ow%,12,0
-      print #ow%,"Las guerillas no te atraparon"
-      let escape%=1
-    else
-      wipe black%,white%,black%
-      pause 50
-      shoot_dead_sfx
-      at #ow%,12,0
-      print #ow%,"Las guerillas están celebrándolo"
-      shoot_dead_sfx
-      let alive%=0
-    endif
-    ret
+  local i%
 
-  endif ' escape
-
-  rep ask_for_help
+  rep choose
 
     pause 150
     cls #ow%
@@ -1073,9 +1121,9 @@ defproc revolution
       "Se han unido "&\
       name$(rebel_group%)&\
       " y "&\
-      name$(ally%(rebel_group%))
+      name$(ally%(rebel_group%))&"."
 
-    print #ow%,\\"Su fuerza conjunta es ";rebels_strength%
+    print #ow%,\\"Su fuerza conjunta es ";rebels_strength%;"."
     print #ow%,\\"¿A quién vas a pedir ayuda?"
     let helping_groups%=0
     for i%=1 to local_groups%
@@ -1088,51 +1136,124 @@ defproc revolution
     if helping_groups%
       rep choose_group
         let k$=get_key$
+        ' XXX TODO -- Improve, show the keys in the prompt
         if k$ instr "123456":\
           exit choose_group
       endrep choose_group
       if popularity%(k$)>low%
         let helping_group%=k$:\
-        exit ask_for_help
+        exit choose
       else
         cls #ow%
         center #ow%,12,"¡Debes de estar bromeando!"
-        next ask_for_help
+        next choose
       endif
     else
       cls #ow%
       center #ow%,8,"¡Estás solo!"
       key_press
     endif
-    exit ask_for_help
+    exit choose
 
-  endrep ask_for_help
+  endrep choose
 
+enddef
+
+defproc escape
+
+  if got_helicopter%
+    if not escape_by_helicopter%
+      escape_on_foot
+    endif
+  else
+    escape_on_foot
+  endif
+
+enddef
+
+deffn escape_by_helicopter%
+
+  if the_helicopter_works%
+    do_escape_by_helicopter
+  else
+    the_helicopter_does_not_work
+  endif
+  ret escape%
+
+enddef
+
+deffn the_helicopter_works%
+
+  ret rnd(0 to 2)
+
+enddef
+
+defproc do_escape_by_helicopter
+
+  center #ow%,12,"¡Escapas en helicóptero!"
+  let escape%=1
+
+enddef
+
+defproc the_helicopter_does_not_work
+
+  center #ow%,10,"¡El helicóptero no funciona!"
+  pause 150
+
+enddef
+
+defproc escape_on_foot
+
+  at #ow%,10,2
+  print #ow%,"Tienes que atravesar el"
+  at #ow%,12,6
+  print #ow%,"monte hacia Leftoto."
+  pause 200
   cls #ow%
 
-  at #ow%,8,0
-  print #ow%,"Tu fuerza es ";strength%
-  print #ow%,\\"La fuerza de ";\
-    name$(helping_group%);" es ";\
-    power%(helping_group%)
-  print #ow%,\\"La de los revolucionarios es ";rebels_strength%
-  pause 250
-  wipe white%,black%,white%
-  at #ow%,12,3
-  print #ow%,"La revolución ha comenzado"
-  war_sfx
-  if not(rebels_strength%<=strength%\
-         +power%(helping_group%)\
-         +rnd(-1 to 1))
-    wipe black%,white%,black%
-    at #ow%,10,7
-    print #ow%,"Has sido derrocado"
-    at #ow%,12,10
-    print #ow%,"y liquidado."
-    shoot_dead_sfx
-    let alive%=0
-    ret
+  if not int((rnd*((power%(guerrillas%)/3)+.4)))
+    do_escape_on_foot
+  else
+    the_guerrilla_catchs_you
   endif
+
+enddef
+
+defproc do_escape_on_foot
+
+  at #ow%,12,0
+  print #ow%,"Las guerillas no te atraparon"
+  let escape%=1
+
+enddef
+
+defproc the_guerrilla_catchs_you
+
+  wipe black%,white%,black%
+  pause 50
+  shoot_dead_sfx
+  at #ow%,12,0
+  print #ow%,"Las guerillas están celebrándolo"
+  shoot_dead_sfx
+  let alive%=0
+
+enddef
+
+defproc the_revolution_wins
+
+  wipe black%,white%,black%
+  at #ow%,10,7
+  print #ow%,"Has sido derrocado"
+  at #ow%,12,10
+  print #ow%,"y liquidado."
+  shoot_dead_sfx
+  let alive%=0
+
+enddef
+
+defproc the_revolution_is_defeated
+
+  local i%
 
   wipe black%,white%,black%
   at #ow%,10,2
@@ -1403,7 +1524,7 @@ defproc do_news
   paper #ow%,white%
   ink #ow%,black%
   at #ow%,14,0
-  print_l_paragraph decision$(random_event%)
+  print_l_paragraph decision$(random_event%)&"."
   pause 100
   take_only_once_decision random_event%
   plot
@@ -1700,10 +1821,13 @@ deffn get_key$
 enddef
 
 deffn yes_key%
+
   loc yes%
   let yes% = "s"==get_key_prompt$('TECLA ("S" = SÍ)')
+  cls #iw%
   zx_beep .25,10+40*yes%
   ret yes%
+
 enddef
 
 defproc key_press
@@ -1747,6 +1871,12 @@ enddef
 deffn is_decision_taken%(decision%)
     
   ret decision_data$(decision%,1)="*"
+
+enddef
+
+deffn got_helicopter%
+
+  ret is_decision_taken%(36)
 
 enddef
 
@@ -2048,7 +2178,7 @@ enddef
 
 defproc war_sfx
   ' XXX TODO
-  pause 1000
+  pause 100
 enddef
 
 defproc shoot_dead_sfx
