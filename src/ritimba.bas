@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.54+201710081647"
+version$="0.1.0-dev.55+201710081928"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1279,7 +1279,7 @@ defproc bankruptcy
 
 enddef
 
-defproc decision_treasure_report(decision%)
+defproc decision_treasury_report(decision%)
 
   loc printout$
 
@@ -2168,7 +2168,12 @@ data 7,0,none%,none%,\
 ' ==============================================================
 ' Special effects {{{1
 
-defproc zx_border(colour%) ' XXX TMP
+defproc zx_border(colour%)
+
+  border #ow%,ow_border_width%,colour%
+  paper #bw%,colour%
+  cls #bw%
+
 enddef
 
 #include lib/zx_beep.bas
@@ -2329,11 +2334,15 @@ deffn contrast_colour%(colour%)
 enddef
 
 defproc cursen_home(channel%)
+
+  loc line%
+  sel on channel%
+    =iw%:line%=iw_lines%-1
+    =ow%:line%=ow_lines%-1
+  endsel
   cursen #channel%
-  if channel%=iw%:\
-    at #iw%,iw_lines%-1,columns%-1:\
-  else \
-    at #ow%,ow_lines%-1,columns%-1
+  at #channel%,line%,columns%-1
+
 enddef
 
 deffn ow_line_y(line%)
@@ -2375,38 +2384,66 @@ enddef
 
 defproc init_windows
 
+  loc lines%
+
   let columns%=32
   let lines%=24
 
   let csize_width%=3
-  let csize_height%=scr_ylim<>256
-
-  let iw_lines%=3 ' input window lines%
-  let ow_lines%=lines%-iw_lines% ' output window lines%
-
-  let ow%=fopen("scr_") ' output window
-
-  csize #ow%,csize_width%,csize_height%
-  let char_width_pixels%=csize_width_pixels(csize_width%)
-  let char_height_pixels%=csize_height_pixels(csize_height%)
-
-  let ow_width%=columns%*char_width_pixels%
-  let ow_height%=ow_lines%*char_height_pixels%
-  let ow_x%=(scr_xlim-ow_width%)/2
-  let ow_y%=(scr_ylim-(lines%*char_height_pixels%))/2
-  window #ow%,ow_width%,ow_height%,ow_x%,ow_y%
+  let csize_height%=1
+  let char_width_pixels%=csize_width_pixels%(csize_width%)
+  let char_height_pixels%=csize_height_pixels%(csize_height%)
 
   let iw%=fopen("con_") ' input window
+  let ow%=fopen("scr_") ' output window
+  let bw%=fopen("con_") ' bottom border window
+
+  let iw_lines%=3
+  let ow_lines%=lines%-iw_lines%
+  let ow_border_width%=char_width_pixels%
 
   csize #iw%,csize_width%,csize_height%
+  csize #ow%,csize_width%,csize_height%
 
-  let iw_width%=ow_width%
+  let ow_width%=columns%*char_width_pixels%+ow_border_width%*4
+  let iw_width%=columns%*char_width_pixels%
+  let bw_width%=ow_width%
+
+  let ow_height%=ow_lines%*char_height_pixels%+ow_border_width%*2
   let iw_height%=iw_lines%*char_height_pixels%
-  let iw_x%=ow_x%
-  let iw_y%=ow_y%+ow_lines%*char_height_pixels%
+  let bw_height%=iw_height%+ow_border_width%
+
+  if windows_do_not_fit%
+    init_font
+    print_l #ow%,"Error fatal:"
+    print_l #ow%,"La resolución de pantalla es insuficiente."
+    print_l #ow%,"Este programa necesita una resolución mínima de "\
+      &ow_width%&"x"&(ow_height%+iw_height%)&"."
+    stop
+  endif
+
+  let ow_x%=(scr_xlim-ow_width%)/2
+  let ow_y%=(scr_ylim-ow_height%-iw_height%)/2
+
+  let iw_x%=(scr_xlim-iw_width%)/2
+  let iw_y%=ow_y%+ow_height%
+
+  let bw_x%=ow_x%
+  let bw_y%=iw_y%
+
+  window #ow%,ow_width%,ow_height%,ow_x%,ow_y%
   window #iw%,iw_width%,iw_height%,iw_x%,iw_y%
+  window #bw%,bw_width%,bw_height%,bw_x%,bw_y%
 
   let blank_line$=fill$(" ",columns%)
+
+enddef
+
+deffn windows_do_not_fit%
+
+  ret ow_width%>scr_xlim \
+      or \
+      (ow_height%+maximum%(iw_heigth%,bw_height%))>scr_ylim
 
 enddef
 

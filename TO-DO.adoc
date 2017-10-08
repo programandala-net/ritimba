@@ -13,8 +13,6 @@
   decisions are omitted from the list.
 - Improve the messages and layout of the final escape to Leftoto.
 - Improve the messages about the helicopter.
-- Add a ZX Spectrum border when the SMSQ screen is larger than
-  256x256.
 
 == 2017-09-22
 
@@ -48,3 +46,4 @@
   in the text.
 - Improve design of the treasure report.
 - Improve: Choose the ammount to be transfered to Switzerland.
+- Display something during the calculation of the possible allies.

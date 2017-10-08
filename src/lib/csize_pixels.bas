@@ -7,7 +7,7 @@ rem Functions that convert `csize` parameters to pixels.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201709291507
+' Last modified 201710081756
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -20,7 +20,7 @@ rem Author: Marcos Cruz (programandala.net), 2017
 
 ' ==============================================================
 
-deffn csize_width_pixels(width%)
+deffn csize_width_pixels%(width%)
   sel on width%
     =0:ret 6
     =1:ret 8
@@ -29,7 +29,7 @@ deffn csize_width_pixels(width%)
   endsel
 enddef
 
-deffn csize_height_pixels(height%)
+deffn csize_height_pixels%(height%)
   ret height%*10+10
 enddef
 
@@ -38,5 +38,7 @@ enddef
 
 ' 2017-09-28: Start: Code extracted from Ritimba
 ' (http://programandala.net/es.programa.ritimba.html).
+'
+' 2017-10-08: Convert to integer.
 
 ' vim: filetype=sbim
