@@ -4,7 +4,6 @@
 
 == 2017-09-19
 
-- Improve layout of the treasure report.
 - Clarify the symbols of the advice. Consult the original
   instructions.
 
@@ -36,7 +35,6 @@
 
 == 2017-09-23
 
-- Change "tesoro" to "Hacienda"...
 - Fix: `datum_col%` must be 30 to make "los policías secretos" fix.
   But the mark "<" should be moved to the name first.
 
@@ -48,3 +46,6 @@
 
 - Improve `center`: use a backslash to mark the prefered split points
   in the text.
+- Improve design of the treasure report.
+- Improve: Choose the ammount to be transfered to Switzerland.
+- Join the two code sections of the Treasury.

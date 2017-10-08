@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.52+201710081539"
+version$="0.1.0-dev.53+201710081617"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -62,7 +62,7 @@ defproc ritimba
       plot
       police_report
       decision
-      treasure_report
+      treasury_report
       plot
       police_report
       news
@@ -199,10 +199,10 @@ defproc welcome
         Te deseamos que lo hagas bien."
     endif
     paragraph #ow%
-    print_l #ow%,"Para empezar podrás ver un informe del \
-      tesoro y otro de la policía secreta."
+    print_l #ow%,"Para empezar podrás ver un informe de \
+      la hacienda pública y otro de la policía secreta."
     key_press
-    treasure_report
+    treasury_report
     ordinary_police_report
 
 enddef
@@ -212,15 +212,15 @@ deffn first_game%
 enddef
 
 ' ==============================================================
-' Treasure {{{1
+' Treasury {{{1
 
-defproc treasure_report
+defproc treasury_report
 
   wipe white%,green%,green%
   print #ow%,fill$("$",columns%*ow_lines%)
   ink #ow%,black%
-  center #ow%,8,"INFORME DEL TESORO"
-  treasure_report_details
+  center #ow%,8,"INFORME DE LA HACIENDA PÚBLICA"
+  treasury_report_details
 
 enddef
 
@@ -230,51 +230,63 @@ deffn money$(ammount)
 
   loc digit%,ammount$,formatted$,digits%
 
-  let ammount$=trim_left$(idec$(ammount*1000,8,0))
+  let ammount$=trim_left$(idec$(abs(ammount)*1000,8,0))
   let digits%=len(ammount$)
 
   for digit%=1 to digits%
     let formatted$=ammount$(digits%-digit%+1)&formatted$
-    if not(digit% mod 3) and digit%<>digits%:\
+    if not(digit% mod 3) and digit%<>digits%
       let formatted$=nbsp$&formatted$
+    endif
   endfor digit%
+
+  if ammount<0
+    let formatted$="-"&formatted$
+  endif
 
   ret formatted$&" "&currency$
 
 enddef
 
-defproc treasure_report_details
+defproc treasury_report_details
+
+  loc ammount$
 
   paper #ow%,blue%
   ink #ow%,white%
 
   at #ow%,12,1
-  print #ow%,"El tesoro ";
-  if int(money)>=0
-    print #ow%,"tiene ";
-  else
-    print #ow%,"debe ";
+  print #ow%,"Saldo:";
+  if money<0
+    ink #ow%,red%
   endif
-  print #ow%,money$(abs(money))
+  print_ammount ow%,money
+  ink #ow%,white%
 
   at #ow%,14,1
-  print #ow%,"Gastos mensuales: ";
-  print #ow%,money$(monthly_payment)
+  print #ow%,"Gasto mensual:";
+  print_ammount #ow%,monthly_payment
 
-  if money_in_switzerland>0
-    at #ow%,17,2
-    print #ow%,"En Suiza: ";
-    print #ow%,money$(money_in_switzerland)
-  endif
+  at #ow%,16,1
+  print #ow%,"En Suiza:";
+  print_ammount #ow%,money_in_switzerland
 
   key_press
+
+enddef
+
+defproc print_ammount(channel%,ammount)
+
+  loc ammount$
+  let ammount$=money$(ammount)
+  print #channel%,to columns%-1-len(ammount$);ammount$
 
 enddef
 
 defproc bankruptcy
 
   cls #ow%
-  center #ow%,5,"El tesoro está en bancarrota"
+  center #ow%,5,"La hacienda pública está en bancarrota."
 
   at #ow%,9,0
 
@@ -547,7 +559,7 @@ defproc decision
     ' and keep the data of their unused suboptions.
     at #ow%,08,4:print #ow%,"1. Complacer a un grupo  "
     at #ow%,10,4:print #ow%,"2. Complacer a todos     "
-    at #ow%,12,4:print #ow%,"3. Aumentar el tesoro    "
+    at #ow%,12,4:print #ow%,"3. Aumentar los ingresos "
     at #ow%,14,4:print #ow%,"4. Fortalecer a un grupo "
     at #ow%,16,4:print #ow%,"5. Asuntos privados      "
 
@@ -763,12 +775,12 @@ defproc advice(decision%)
     print #ow%,"Ningún cambio."
 
   under #ow%,1
-  print #ow%,\"El tesoro"
+  print #ow%,\"La hacienda pública"
   under #ow%,0
 
   let paragraph_separation_backup%=paragraph_separation%
   let paragraph_separation%=0
-  decision_treasure_report decision%
+  decision_treasury_report decision%
   let paragraph_separation%=paragraph_separation_backup%
 
   key_press
@@ -1300,7 +1312,7 @@ defproc decision_treasure_report(decision%)
       endif
 
       let printout$=printout$&\
-        " al tesoro "&money$(abs(decision_cost))
+        " a la hacienda pública "&money$(abs(decision_cost))
 
     endif
 
@@ -1335,7 +1347,8 @@ defproc decision_treasure_report(decision%)
       ' XXX TODO -- Check and factor the condition.
 
     paragraph #ow%
-    print_l #ow%,"El dinero necesario no está en el tesoro."
+    print_l #ow%,\
+      "La hacienda pública no dispone del dinero necesario."
 
     ' XXX TODO -- Combine into one condition and one message:
     if not is_decision_taken%(38):\
@@ -1444,18 +1457,19 @@ defproc money_transfer
   at #ow%,3,0
   print #ow%,"TRANSFERENCIA A LA CUENTA SUIZA"\\\:
 
-  let amount=int(money/2)
+  let amount=int(money/2) ' XXX TODO -- Let the player choose.
   if amount>=1
-    print #ow%,"El tesoro tenía ";money$(int(money));
+    print #ow%,"La hacienda pública tenía ";money$(int(money));
     let money_in_switzerland=money_in_switzerland+amount
     let money=money-amount
     pause 100
     print #ow%,\\money$(amount);" han sido transferidos"
-    exit choose_decision
   else
     center #ow%,12,"Ninguna transferencia hecha"
     pause 100
   endif
+
+  ' XXX TODO -- Wait for key
 
 enddef
 
