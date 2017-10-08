@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-10-07
+:revdate: 2017-10-08
 
 == 2017-09-19
 
@@ -10,7 +10,6 @@
 
 == 2017-09-21
 
-- Finish the currency notation.
 - Fix the numbers of the menu options: they do not match because old
   decisions are omitted from the list.
 - Improve the final report of the secret police, changing the title
@@ -46,3 +45,8 @@
 == 2017-09-24
 
 - Use `print_l` instead of `print` when possible.
+
+== 2017-10-08
+
+- Improve `center`: use a backslash to mark the prefered split points
+  in the text.

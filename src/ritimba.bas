@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.50+201710080009"
+version$="0.1.0-dev.51+201710081526"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -138,7 +138,7 @@ defproc tapestry(text$)
   let times%=columns%*ow_lines%/len(text$)
   for i%=1 to times%
     print #ow%,text$;" ";
-    zx_beep .01,40-i%+rnd*10
+    ' zx_beep .01,40-i%+rnd*10 ' XXX OLD
   endfor i%
 enddef
 
@@ -2227,16 +2227,52 @@ deffn center_for(width_in_chars%)
   ret (columns%-width_in_chars%)/2
 enddef
 
-defproc center(channel,line%,text$)
-  loc length%
+defproc center(channel%,line%,text$)
+
+  loc length%,\
+      i%,\
+      first_part$,\
+      first_part_length%
+
   let length%=len(text$)
+
   if length%>columns%
-    at #ow%,line%,0
-    print_l #ow%,text$
+
+    ' The text does not fit in one line.
+    ' Split it into several lines.
+
+    for i%=columns%+1 to 1 step -1
+
+      if text$(i%)=" "
+
+        let first_part$=trim$(text$(to i%-1))
+        let first_part_length%=len(first_part$)
+        at #channel%,line%,center_for(first_part_length%)
+
+        center channel%,line%+1,text$(i%+1 to)
+
+        exit i%
+
+      endif
+
+    next i%
+
+      ' No way to split the text, so print it left justified.
+
+      at #channel%,line%,0
+      print_l #channel%,text$
+
+    endfor i%
+
   else
-    at #channel,line%,center_for(length%)
-    print #channel,text$
+
+    ' The text fits in one line.
+
+    at #channel%,line%,center_for(length%)
+    print #channel%,text$
+
   endif
+
 enddef
 
 defproc center_here(channel,text$)
