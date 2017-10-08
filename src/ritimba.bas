@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.53+201710081617"
+version$="0.1.0-dev.54+201710081647"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -209,110 +209,6 @@ enddef
 
 deffn first_game%
   ret score%>0 and record%
-enddef
-
-' ==============================================================
-' Treasury {{{1
-
-defproc treasury_report
-
-  wipe white%,green%,green%
-  print #ow%,fill$("$",columns%*ow_lines%)
-  ink #ow%,black%
-  center #ow%,8,"INFORME DE LA HACIENDA PÚBLICA"
-  treasury_report_details
-
-enddef
-
-deffn money$(ammount)
-
-  ' Return `ammount` formatted as money.
-
-  loc digit%,ammount$,formatted$,digits%
-
-  let ammount$=trim_left$(idec$(abs(ammount)*1000,8,0))
-  let digits%=len(ammount$)
-
-  for digit%=1 to digits%
-    let formatted$=ammount$(digits%-digit%+1)&formatted$
-    if not(digit% mod 3) and digit%<>digits%
-      let formatted$=nbsp$&formatted$
-    endif
-  endfor digit%
-
-  if ammount<0
-    let formatted$="-"&formatted$
-  endif
-
-  ret formatted$&" "&currency$
-
-enddef
-
-defproc treasury_report_details
-
-  loc ammount$
-
-  paper #ow%,blue%
-  ink #ow%,white%
-
-  at #ow%,12,1
-  print #ow%,"Saldo:";
-  if money<0
-    ink #ow%,red%
-  endif
-  print_ammount ow%,money
-  ink #ow%,white%
-
-  at #ow%,14,1
-  print #ow%,"Gasto mensual:";
-  print_ammount #ow%,monthly_payment
-
-  at #ow%,16,1
-  print #ow%,"En Suiza:";
-  print_ammount #ow%,money_in_switzerland
-
-  key_press
-
-enddef
-
-defproc print_ammount(channel%,ammount)
-
-  loc ammount$
-  let ammount$=money$(ammount)
-  print #channel%,to columns%-1-len(ammount$);ammount$
-
-enddef
-
-defproc bankruptcy
-
-  cls #ow%
-  center #ow%,5,"La hacienda pública está en bancarrota."
-
-  at #ow%,9,0
-
-  paragraph #ow%
-  print_l #ow%,"Su popularidad entre el ejército y \
-    la policía secreta caerán."
-
-  paragraph #ow%
-  print_l #ow%,"El poder de la policía \
-    y su propio poder se reducirán también."
-
-  let popularity%(army%)=popularity%(army%)\
-                         -(popularity%(army%)>0)
-
-  let popularity%(police%)=popularity%(police%)\
-                           -(popularity%(police%)>0)
-
-  let power%(police%)=power%(police%)\
-                      -(power%(police)>0)
-
-  let strength%=strength%-(strength%>0)
-
-  pause 250
-  plot
-  police_report
-
 enddef
 
 ' ==============================================================
@@ -1280,7 +1176,108 @@ defproc the_revolution_is_defeated
 enddef
 
 ' ==============================================================
-' Treasure {{{1
+' Treasury {{{1
+
+defproc treasury_report
+
+  wipe white%,green%,green%
+  print #ow%,fill$("$",columns%*ow_lines%)
+  ink #ow%,black%
+  center #ow%,8,"INFORME DE LA HACIENDA PÚBLICA"
+  treasury_report_details
+
+enddef
+
+deffn money$(ammount)
+
+  ' Return `ammount` formatted as money.
+
+  loc digit%,ammount$,formatted$,digits%
+
+  let ammount$=trim_left$(idec$(abs(ammount)*1000,8,0))
+  let digits%=len(ammount$)
+
+  for digit%=1 to digits%
+    let formatted$=ammount$(digits%-digit%+1)&formatted$
+    if not(digit% mod 3) and digit%<>digits%
+      let formatted$=nbsp$&formatted$
+    endif
+  endfor digit%
+
+  if ammount<0
+    let formatted$="-"&formatted$
+  endif
+
+  ret formatted$&" "&currency$
+
+enddef
+
+defproc treasury_report_details
+
+  loc ammount$
+
+  paper #ow%,blue%
+  ink #ow%,white%
+
+  at #ow%,12,1
+  print #ow%,"Saldo:";
+  if money<0
+    ink #ow%,red%
+  endif
+  print_ammount ow%,money
+  ink #ow%,white%
+
+  at #ow%,14,1
+  print #ow%,"Gasto mensual:";
+  print_ammount #ow%,monthly_payment
+
+  at #ow%,16,1
+  print #ow%,"En Suiza:";
+  print_ammount #ow%,money_in_switzerland
+
+  key_press
+
+enddef
+
+defproc print_ammount(channel%,ammount)
+
+  loc ammount$
+  let ammount$=money$(ammount)
+  print #channel%,to columns%-1-len(ammount$);ammount$
+
+enddef
+
+defproc bankruptcy
+
+  cls #ow%
+  center #ow%,5,"La hacienda pública está en bancarrota."
+
+  at #ow%,9,0
+
+  paragraph #ow%
+  print_l #ow%,"Su popularidad entre el ejército y \
+    la policía secreta caerán."
+
+  paragraph #ow%
+  print_l #ow%,"El poder de la policía \
+    y su propio poder se reducirán también."
+
+  let popularity%(army%)=popularity%(army%)\
+                         -(popularity%(army%)>0)
+
+  let popularity%(police%)=popularity%(police%)\
+                           -(popularity%(police%)>0)
+
+  let power%(police%)=power%(police%)\
+                      -(power%(police)>0)
+
+  let strength%=strength%-(strength%>0)
+
+  pause 250
+  plot
+  police_report
+
+enddef
 
 defproc decision_treasure_report(decision%)
 

@@ -48,4 +48,3 @@
   in the text.
 - Improve design of the treasure report.
 - Improve: Choose the ammount to be transfered to Switzerland.
-- Join the two code sections of the Treasury.
