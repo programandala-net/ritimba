@@ -2,11 +2,6 @@
 :author: Marcos Cruz (programandala.net)
 :revdate: 2017-10-08
 
-== 2017-09-19
-
-- Clarify the symbols of the advice. Consult the original
-  instructions.
-
 == 2017-09-21
 
 - Fix the numbers of the menu options: they do not match because old
@@ -20,7 +15,7 @@
 - Fix: the score of the previous game is lost.
 - Move the data from `decision_data$()` into numeric arrays.
 - Move `csize_width_pixels` and `csize_height_pixels` to the library.
-- Fix: Two groups can be allies of other. (Solved?)
+- Fix: Two groups can be allies of other.
 - Fix the title effect in `news`.
 - Improve `money_transfer` with menu or input, more information and
   better layout.
@@ -28,13 +23,6 @@
   them.
 - Improve `center_for` and `center`: calculate the actual size of the
   text using the current `csize`.
-- Combine the ordinary advice report and the money advice report into
-  one.
-
-== 2017-09-23
-
-- Fix: `datum_col%` must be 30 to make "los policías secretos" fix.
-  But the mark "<" should be moved to the name first.
 
 == 2017-09-24
 
@@ -47,3 +35,4 @@
 - Improve design of the treasure report.
 - Improve: Choose the ammount to be transfered to Switzerland.
 - Display something during the calculation of the possible allies.
+- Wait for a key press after the news report.

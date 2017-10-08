@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.55+201710081928"
+version$="0.1.0-dev.56+201710082320"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -614,9 +614,10 @@ defproc advice(decision%)
     i%,\
     variation%,variations%,\
     datum_col%,\
-    paragraph_separation_backup%
+    paragraph_separation_backup%,\
+    deny_effect%
 
-  let datum_col%=27
+  let datum_col%=29
 
   wipe yellow%,black%,yellow%
 
@@ -634,15 +635,11 @@ defproc advice(decision%)
     let variations%=variations%+abs(variation%)
     if variation%
       print #ow%,\
-        "- Entre ";plural_name$(i%);\
+        "-Entre ";plural_name$(i%);\
         to datum_col%;"+"(1 to variation%>0);variation%;
       if soliciting_group%=i% and decision%<25
-        ' XXX TODO -- Convert into a footnote.
-        paper #ow%,red%
-        ink #ow%,yellow%
-        print #ow%,"<"
-        paper #ow%,yellow%
-        ink #ow%,black%
+        print #ow%,"*"
+        let deny_effect%=-variation%
       else
         print #ow%
       endif
@@ -651,6 +648,13 @@ defproc advice(decision%)
 
   if not variations%:\
     print #ow%,"Ningún cambio."
+
+  if deny_effect%
+    csize #ow%,csize_width%-1,csize_height%
+    print_l_paragraph #ow%,\
+      "(*) "&deny_effect%&" si la solicitud es rechazada."
+    csize #ow%,csize_width%,csize_height%
+  endif
 
   under #ow%,1
   print #ow%,\"La fuerza de los grupos"
@@ -662,7 +666,7 @@ defproc advice(decision%)
     let variations%=variations%+abs(variation%)
     if variation%
       print #ow%,\
-        "- ";iso_upper_1$(name$(i%));\
+        "-";iso_upper_1$(name$(i%));\
         to datum_col%;"+"(1 to variation%>0);variation%
     endif
   endfor i%
@@ -2003,7 +2007,7 @@ data "NMMPMMMLMIOMMMMMM",\
 data "NMDQMLMMMMMOLLLMM",\
      "Aumentar la paga de las tropas"
 data "NAMQLLMLLMMPLLKLM",\
-     "Comprar más armas y municiomes"
+     "Comprar más armas y municiones"
 
 ' ..............................
 ' Petitions from the peasants (8)
