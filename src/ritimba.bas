@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.56+201710082320"
+version$="0.1.0-dev.57+201710082342"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1480,30 +1480,36 @@ enddef
 defproc news
 
   if not rnd(0 to 2):\
-    do_news
+    latest_news
 
 enddef
 
-defproc do_news
+defproc latest_news
 
-  loc i%,random_event%,flashes%
+  loc random_event%
 
-  ' XXX TODO -- Preserve current paper and ink colours.
-
-  let flashes%=10
-
-  let random_event%=rnd(first_event% to last_event%)
-  for i%=1 to events%
-    if not is_decision_taken%(random_event%):\
-      exit i%
-    let random_event%=random_event%+1
-    if random_event%>last_event%:\
-      let random_event%=first_event%
-  next i%
-    ret
-  endfor i%
+  let random_event%=new_event%
 
   wipe white%,black%,white%
+
+  latest_news_title 10
+
+  paper #ow%,white%
+  ink #ow%,black%
+  at #ow%,14,0
+  print_l_paragraph #ow%,decision$(random_event%)&"."
+  take_only_once_decision random_event%
+
+  key_press
+
+  plot
+  police_report
+
+enddef
+
+defproc latest_news_title(flashes%)
+
+  loc i%
 
   for i%=1 to flashes%
     if i% mod 2
@@ -1522,14 +1528,26 @@ defproc do_news
     if not beeping:\
       exit
 
-  paper #ow%,white%
-  ink #ow%,black%
-  at #ow%,14,0
-  print_l_paragraph #ow%,decision$(random_event%)&"."
-  pause 100
-  take_only_once_decision random_event%
-  plot
-  police_report
+enddef
+
+deffn new_event%
+
+  ' Return a new random event.
+
+  loc i%,event%
+
+  let event%=rnd(first_event% to last_event%)
+  for i%=1 to events%
+    if not is_decision_taken%(event%)
+      exit i%
+    endif
+    let event%=event%+1
+    if event%>last_event%
+      let event%=first_event%
+    endif
+  endfor i%
+
+  ret event%
 
 enddef
 

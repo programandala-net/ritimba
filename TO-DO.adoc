@@ -12,11 +12,9 @@
 == 2017-09-22
 
 - Rename `pc%`.
-- Fix: the score of the previous game is lost.
 - Move the data from `decision_data$()` into numeric arrays.
 - Move `csize_width_pixels` and `csize_height_pixels` to the library.
 - Fix: Two groups can be allies of other.
-- Fix the title effect in `news`.
 - Improve `money_transfer` with menu or input, more information and
   better layout.
 - Improve: Calculate valid options in `decision` before displaying
@@ -35,4 +33,3 @@
 - Improve design of the treasure report.
 - Improve: Choose the ammount to be transfered to Switzerland.
 - Display something during the calculation of the possible allies.
-- Wait for a key press after the news report.
