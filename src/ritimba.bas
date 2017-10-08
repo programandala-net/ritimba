@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.51+201710081526"
+version$="0.1.0-dev.52+201710081539"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -203,7 +203,7 @@ defproc welcome
       tesoro y otro de la policía secreta."
     key_press
     treasure_report
-    actual_police_report
+    ordinary_police_report
 
 enddef
 
@@ -795,21 +795,21 @@ defproc police_report
     center #ow%,12,"(Cuesta "&money$(1)&")"
     if yes_key%
       let money=money-1
-      actual_police_report
+      ordinary_police_report
     endif
 
   endif
 
 enddef
 
-defproc actual_police_report
+defproc ordinary_police_report
 
   wipe black%,white%,black%
   print #ow%,"MES ";months%
   ink #ow%,blue%
   at #ow%,3,0
   cls #ow%,1
-  police_report_data
+  police_report_data "INFORME DE LA POLICÍA SECRETA",""
 
 enddef
 
@@ -817,18 +817,27 @@ defproc final_police_report
 
   wipe black%,white%,black%
   center #ow%,1,"FINAL"
-  police_report_data
+  police_report_data "INFORME FINAL","DE LA POLICÍA SECRETA"
 
 enddef
 
-defproc police_report_data
+defproc police_report_data(title$,title_continued$)
 
-  loc group%,line%,\
-    header_line%,data_line%,\
-    group_col%,plan_col%,popularity_col%,strength_col%
+  loc group%,\
+      line%,\
+      title_line%,\
+      header_line%,\
+      data_line%,\
+      group_col%,\
+      plan_col%,\
+      popularity_col%,\
+      strength_col%,\
+      title_continued%
 
-  let title_line%=2
-  let header_line%=title_line%+2
+  let title_continued%=len(title_continued$)>0
+
+  let title_line%=2-title_continued%
+  let header_line%=title_line%+2+title_continued%
   let data_line%=header_line%+2
 
   let group_col%=0
@@ -840,7 +849,10 @@ defproc police_report_data
   paper #ow%,black%
   ink #ow%,white%
   under #ow%,1
-  center #ow%,title_line%,"INFORME DE LA POLICÍA SECRETA"
+  center #ow%,title_line%,title$
+  if title_continued%
+    center #ow%,title_line%+1,title_continued$
+  endif
   under #ow%,0
 
   paper #ow%,black%

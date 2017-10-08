@@ -12,11 +12,9 @@
 
 - Fix the numbers of the menu options: they do not match because old
   decisions are omitted from the list.
-- Improve the final report of the secret police, changing the title
-  instead of adding "FINAL" at the top.
 - Improve the messages and layout of the final escape to Leftoto.
 - Improve the messages about the helicopter.
-- Add a ZX Spectrum border when the SMSQ screen is greater than
+- Add a ZX Spectrum border when the SMSQ screen is larger than
   256x256.
 
 == 2017-09-22
