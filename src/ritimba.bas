@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.60+201710091709"
+version$="0.1.0-dev.61+201710091721"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -134,18 +134,22 @@ defproc national_flag
 enddef
 
 defproc tapestry(text$)
+
   loc i%,times%
+
   let times%=columns%*ow_lines%/len(text$)
+
   for i%=1 to times%
-    print #ow%,text$;" ";
+    print #ow%,text$;
     ' zx_beep .01,40-i%+rnd*10 ' XXX OLD
   endfor i%
+
 enddef
 
 defproc title
   loc i%
   wipe cyan%,black%,black%
-  tapestry "Ritimba"
+  tapestry "Ritimba "
   national_flag
   for i%=1 to 50:
     zx_beep .03,i%
@@ -675,9 +679,8 @@ defproc advice(decision%)
 
   if deny_effect%
     csize #ow%,csize_width%-1,csize_height%
-    print_l #ow%,\
+    print_l_paragraph #ow%,\
       "(*) "&deny_effect%&" si la solicitud es rechazada."
-    print #ow%
     csize #ow%,csize_width%,csize_height%
   endif
 
@@ -2469,7 +2472,7 @@ defproc init_windows
   loc lines%
 
   let columns%=32
-  let lines%=24
+  let lines%=26
 
   let csize_width%=3
   let csize_height%=1
@@ -2606,6 +2609,13 @@ defproc finish ' XXX TMP --
   close
   ql_font
   rechp font_address
+enddef
+
+defproc advices
+  loc i%
+  for i%=1 to first_event%-1
+    advice i%
+  endfor
 enddef
 
 ' vim: filetype=sbim textwidth=70
