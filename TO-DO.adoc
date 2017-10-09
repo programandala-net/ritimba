@@ -36,9 +36,8 @@
 
 == 2017-10-09
 
-- Remove the empty line above the footnote in `advice`, because some
-  reports don't fit.
 - Remove `maybe_advice`.
-- Shorten the wording about the money in the advice report.
+- Shorten the wording about the money in the advice report. Remove "a
+  la hacienda pública" or replace it with "al erario público".
 - Improve wording of "sus tierras".
 - Improve the final score report.

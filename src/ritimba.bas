@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.59+201710091700"
+version$="0.1.0-dev.60+201710091709"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -675,8 +675,9 @@ defproc advice(decision%)
 
   if deny_effect%
     csize #ow%,csize_width%-1,csize_height%
-    print_l_paragraph #ow%,\
+    print_l #ow%,\
       "(*) "&deny_effect%&" si la solicitud es rechazada."
+    print #ow%
     csize #ow%,csize_width%,csize_height%
   endif
 
