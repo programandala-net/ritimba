@@ -1,16 +1,17 @@
-# Ignore the emulator SMSQmulator:
-target/SMSQ*
-target/lib/
+# Ignore the SMSQmulator config file:
+SMSQemulator.ini
 
-# But not its config file:
-!target/SMSQemulator.ini
+# Ignore the generated sources:
+boot
+*_bas
 
-# Ignore the generated sources
-target/boot
-target/*_bas
-
-# Ignore the S*BASIC extensions and font
+# Ignore the S*BASIC extensions:
 ext/
+
+# Ignore the fonts:
 *_font
+
+# Ignore the images:
+img/
 
 # vim: filetype=config

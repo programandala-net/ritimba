@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.66+201710091833"
+version$="0.1.0-dev.67+201710100008"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -25,16 +25,14 @@ rem http://programandala.net/es.programa.ritimba.html
 ' http://programandala.net/es.programa.sbim.html
 
 ' ==============================================================
-' Files and requirements {{{1
-
-' From "DIY Toolkit", (C) Simon N. Goodwin:
-'   minimum, maximum
-' (Loaded by the <boot> file.)
+' Requirements {{{1
 
 #include lib/iso_lower.bas
 #include lib/iso_upper.bas
 #include lib/print_l.bas
 #include lib/trim.bas
+
+' The SBASIC extensions are loaded by the <boot> file.
 
 ' ==============================================================
 ' Main loop {{{1
@@ -457,7 +455,7 @@ defproc reject(petitition%)
     popularity%(soliciting_group%)\
     -decision_popularity_effect%(petition%,soliciting_group%)
 
-  let popularity%(soliciting_group%)=maximum(new_popularity%,0)
+  let popularity%(soliciting_group%)=maximum%(new_popularity%,0)
 
   cls #ow%
 
@@ -605,13 +603,13 @@ defproc take_decision(decision%)
   for group%=1 to groups%
     let new_popularity%=popularity%(group%)\
       +decision_popularity_effect%(decision%,group%)
-    let popularity%(group%)=in_range(new_popularity%,0,9)
+    let popularity%(group%)=in_range%(new_popularity%,0,9)
   endfor group%
 
   for group%=1 to local_groups%
     let new_power%=power%(group%)\
       +decision_power_effect%(decision%,group%)
-    let power%(group%)=in_range(new_power%,0,9)
+    let power%(group%)=in_range%(new_power%,0,9)
   endfor group%
 
   let money=\
@@ -622,9 +620,9 @@ defproc take_decision(decision%)
 
 enddef
 
-deffn in_range(x,min,max)
+deffn in_range%(x%,min%,max%)
 
-  return maximum(minimum(x,9),0)
+  return maximum%(minimum%(x%,max%),min%)
 
 enddef
 
@@ -2414,7 +2412,7 @@ enddef
 defproc center_here(channel,text$)
   ' XXX UNDER DEVELOPMENT
   loc length%
-  let length%=minimum(len(text$),columns%)
+  let length%=minimum%(len(text$),columns%)
   at #channel,line%,center_for(length%)
   print #channel,text$(to length%)
 enddef
@@ -2639,6 +2637,35 @@ defproc advices
   for i%=1 to first_event%-1
     advice i%
   endfor
+enddef
+
+defproc all_bmp_to_pic
+  ' Convert all BMP to PIC.
+  bmp_to_pic "filename_0800x0600"
+enddef
+
+defproc bmp_to_pic(base_filename$)
+ 
+  loc pic_address,len%,width%,height%,bmp_file$,pic_file$
+ 
+  let len%=len(base_filename$)
+  let width%=base_filename$(len%-7 to len%-4)
+  let height%=base_filename$(len%-2 to)
+  
+  let bmp_file$="img_"&base_filename$&".bmp"
+  let pic_file$="img_"&base_filename$&"_pic"
+
+  window #sw%,width%,height%,0,0
+
+  wl_bmp8load #sw%,bmp_file$ ' load the BMP
+
+  ' Convert the BMP to PIC, ready for the next time.
+
+  let pic_address=wsain(#sw%)
+  wsasv #sw%,pic_address
+  s_wsa #sw%,pic_address,pic_file$
+  rechp pic_address
+
 enddef
 
 ' vim: filetype=sbim textwidth=70
