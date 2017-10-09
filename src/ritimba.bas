@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.61+201710091721"
+version$="0.1.0-dev.62+201710091748"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1765,9 +1765,8 @@ defproc score_report
 
   let score%=0
 
-  at #ow%,3,1
   wipe yellow%,black%,cyan%
-  print #ow%,"Tu puntuación como presidente"
+  center #ow%,1,"PUNTUACIÓN"
 
   let popularity_bonus%=0
   for i%=1 to groups%:\
@@ -1780,21 +1779,20 @@ defproc score_report
 
   time_bonus%=months%*3
 
-  print #ow%,\"Por el tiempo en el poder"\
-    \"(";months%;" meses):";\
+  print #ow%,\"Por ";months%;" mes";"es"(to 2*(months%<>1));" en el poder:"\
     to bonus_col%;
   print_using #ow%,"####",time_bonus%
   let score%=score%+time_bonus%
 
   if alive%
 
-    print #ow%,\"Por estar vivo:";to bonus_col%;
+    print #ow%,\"Por seguir con vida:";to bonus_col%;
     print_using #ow%,"####",alive%
     let score%=score%+alive%
 
     if money_in_switzerland
       let money_bonus%=int(money_in_switzerland/10)
-      print #ow%,\"Por tus «ahorros» en Suiza"\"(";\
+      print #ow%,\"Por los «ahorros» en Suiza"\"(";\
         money$(money_in_switzerland);"):";to bonus_col%;
       print_using #ow%,"####",money_bonus%
       let score%=score%+money_bonus%
@@ -1802,22 +1800,24 @@ defproc score_report
 
   endif
 
-  print #ow%,\\\"Total:";to bonus_col%;
+  print #ow%,\to bonus_col%;"----"
+
+  print #ow%,\"Total:";to bonus_col%;
   print_using #ow%,"####",score%
 
   if score%>record%
     let record%=score%
-    paragraph #ow%
-    print_l #ow%,"Es la mayor puntuación hasta ahora."
+    print_l_paragraph #ow%,\
+      "Sin duda estará usted satisfecho, \
+      pues es la mayor puntuación obtenida \
+      hasta hoy por un presidente de Ritimba."
   else
-    paragraph #ow%
-    print_l #ow%,"La mayor puntuación es "&record%&"."
+    print_l_paragraph #ow%,\
+      "La mayor puntuación sigue siendo "&record%&"."
   endif
 
   key_press
-  cls #ow%
   final_police_report
-  key_press
 
 enddef
 
