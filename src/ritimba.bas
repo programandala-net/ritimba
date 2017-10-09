@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.65+201710091826"
+version$="0.1.0-dev.66+201710091833"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -2482,7 +2482,7 @@ enddef
 
 defproc init_font
 
-  let font$=home_dir$&"iso8859-1_font"
+  let font$="iso8859-1_font"
   font_length=flen(\font$)
   font_address=alchp(font_length)
   lbytes font$,font_address

@@ -43,7 +43,6 @@
   decisions. It means they can be taken more than once. Improve the
   interface instead. For example change the color of the decisions
   that have been taken, and remove them from the possible inputs.
-- Use `data_use`.
 - Rename `decisions%` and family. The decisions are only a part of the
   data, like petitions and events. Better yet: Separate data into
   three arrays.
