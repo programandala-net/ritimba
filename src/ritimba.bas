@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.57+201710082342"
+version$="0.1.0-dev.58+201710091327"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1806,6 +1806,9 @@ enddef
 
 deffn get_key_prompt$(prompt$)
 
+  ' Display the given prompt in the input window and return the
+  ' pressed key.
+
   rep dont_press_now
 
     if inkey$(#iw%)="":\
@@ -1841,10 +1844,19 @@ enddef
 
 deffn yes_key%
 
-  loc yes%
-  let yes% = "s"==get_key_prompt$('TECLA ("S" = SÍ)')
+  loc key$,yes%
+
+  repeat
+    let key$ = get_key_prompt$('¿Sí o No?')
+    if key$ instr "NSns"
+      exit
+    endif
+  endrep
+
+  let yes%=(key$=="s")
   cls #iw%
   zx_beep .25,10+40*yes%
+
   ret yes%
 
 enddef
