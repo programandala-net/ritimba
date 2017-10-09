@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.63+201710091811"
+version$="0.1.0-dev.64+201710091813"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -368,7 +368,7 @@ defproc audience
         =0,1 ' no or yes?
           exit
         =2
-         advice(petition%) 
+         advice(petition%)
       endsel
 
     endrep
@@ -1343,13 +1343,12 @@ defproc decision_treasury_report(decision%)
     if decision_cost
 
       if decision_cost>0
-        let printout$=printout$&" aportaría"
+        let printout$=printout$&" aportaría "
       else
-        let printout$=printout$&" costaría"
+        let printout$=printout$&" costaría "
       endif
 
-      let printout$=printout$&\
-        " a la hacienda pública "&money$(abs(decision_cost))
+      let printout$=printout$&money$(abs(decision_cost))
 
     endif
 
@@ -1959,7 +1958,7 @@ defproc restore_decisions
 enddef
 
 deffn is_decision_taken%(decision%)
-    
+
   ret decision_data$(decision%,1)="*"
 
 enddef
@@ -1971,19 +1970,19 @@ deffn got_helicopter%
 enddef
 
 deffn decision_cost%(decision%)
-    
+
   ret code(decision_data$(decision%,2))-code("M")
 
 enddef
 
 deffn decision_monthly_cost%(decision%)
-    
+
   ret code(decision_data$(decision%,3))-code("M")
 
 enddef
 
 deffn decision_popularity_effect%(decision%,group%)
-    
+
   ret code(decision_data$(decision%,group%+3))-code("M")
 
 enddef
@@ -2045,7 +2044,7 @@ defproc init_data
       member$(i%)
   endfor i%
 
-  
+
   ' XXX TODO -- Not needed except to play again, what
   ' needs more restoration.
   restore_decisions

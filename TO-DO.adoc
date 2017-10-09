@@ -37,8 +37,6 @@
 == 2017-10-09
 
 - Remove `maybe_advice`.
-- Shorten the wording about the money in the advice report. Remove "a
-  la hacienda pública" or replace it with "al erario público".
 - Improve wording of "sus tierras". Better yet: Add an additional
   wording to be used in the advice report.
 - Remove the mark "(*)" from the descriptions of the presidential
@@ -50,3 +48,4 @@
   data, like petitions and events. Better yet: Separate data into
   three arrays.
 - Change the term "revolution" to the more precise "rebellion".
+- Check `actual_war`.
