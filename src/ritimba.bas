@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.58+201710091327"
+version$="0.1.0-dev.59+201710091700"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -340,65 +340,87 @@ enddef
 
 defproc audience
 
-  loc i%,petition%
+  loc petition%,soliciting_group%,decision%
 
-  wipe yellow%,black%,yellow%
-  paper #ow%,green%
-  at #ow%,5,0
-  cls #ow%,1
-  paper #ow%,white%
-  ink #ow%,black%
-  center #ow%,3,"UNA AUDIENCIA"
+  prepare_audience
 
-  if not petitions_left%:\
+  rep
+
+    rep
+
+      expose_petition
+
+      let decision%=decision_option%
+
+      sel on decision%
+        =0,1 ' no or yes?
+          exit
+        =2
+         advice(petition%) 
+      endsel
+
+    endrep
+
+    if decision%=0
+      reject petition%
+      exit
+    else
+      if affordable%(petition%)
+        take_decision petition%
+        exit
+      else
+        ' XXX TODO -- Improve.
+        cls #ow%
+        print_l_paragraph #ow%,\
+          "No hay suficientes fondos para adoptar esta decisión."
+        print_l_paragraph #ow%,"Su respuesta debe ser no."
+        key_press
+      endif
+    endif
+
+  endrep
+
+enddef
+
+defproc expose_petition
+
+    wipe yellow%,black%,yellow%
+    paper #ow%,green%
+    at #ow%,5,0
+    cls #ow%,1
+    paper #ow%,white%
+    ink #ow%,black%
+    center #ow%,3,"UNA AUDIENCIA"
+
+    paper #ow%,yellow%
+    ink #ow%,black%
+    center #ow%,10,"Petición "\
+                   &genitive_name$(soliciting_group%)&":"
+    paper #ow%,white%
+    at #ow%,14,0
+    print_l #ow%,"¿Está su excelencia conforme con "\
+      &iso_lower_1$(decision$(petition%))&"?"
+
+enddef
+
+defproc prepare_audience
+
+  ' Determine the petition and the soliciting group.
+
+  if not petitions_left%
     restore_petitions
+  endif
 
   rep choose_petition
     let petition%=rnd(1 to petitions%)
-    if not is_decision_taken%(petition%):\
+    if not is_decision_taken%(petition%)
       exit choose_petition
+    endif
   endrep choose_petition
 
   mark_decision_taken petition%
+
   let soliciting_group%=int((petition%-1)/groups%)+1
-  paper #ow%,yellow%
-  ink #ow%,black%
-  center #ow%,10,"Petición "\
-                 &genitive_name$(soliciting_group%)&":"
-  paper #ow%,white%
-  at #ow%,14,0
-  print_l #ow%,"¿Está su excelencia conforme con "\
-    &iso_lower_1$(decision$(petition%))&"?"
-  key_press
-  maybe_advice petition%
-
-  ' XXX FIXME -- Layout, colour...:
-
-  cls #ow%
-  paper #ow%,white%
-  center #ow%,1,"DECISIÓN"
-  center #ow%,3,"Petición "\
-                &genitive_name$(soliciting_group%)
-  ' XXX FIXME -- Colours:
-  paper #ow%,yellow%
-  ink #ow%,black%
-  paragraph #ow%
-  print_l #ow%,decision$(petition%)&"."
-
-  if not affordable%(petition%)
-    cls #ow%
-    paragraph #ow%
-    print_l #ow%,"No hay suficientes fondos para adoptar esta decisión."
-    paragraph #ow%
-    print_l #ow%,"Su respuesta debe ser no."
-    pause 250
-  else
-    if yes_key%
-      take_decision petition%
-    else
-      reject petition%
-    endif
-  endif
 
 enddef
 
@@ -595,6 +617,8 @@ deffn in_range(x,min,max)
 enddef
 
 defproc maybe_advice(decision%)
+
+  ' XXX OLD
 
   wipe green%,black%,blue%
 
@@ -1847,7 +1871,7 @@ deffn yes_key%
   loc key$,yes%
 
   repeat
-    let key$ = get_key_prompt$('¿Sí o No?')
+    let key$ = get_key_prompt$('Sí | No')
     if key$ instr "NSns"
       exit
     endif
@@ -1855,7 +1879,7 @@ deffn yes_key%
 
   let yes%=(key$=="s")
   cls #iw%
-  zx_beep .25,10+40*yes%
+  zx_beep .25,10+40*yes% ' XXX TODO -- Improve.
 
   ret yes%
 
@@ -1864,6 +1888,29 @@ enddef
 defproc key_press
   loc key$
   let key$=get_key$
+enddef
+
+deffn decision_option%
+
+  ' Wait for a decision. Display the three options in the input window
+  ' (yes, no, and advice) and return its value (No=0, Yes=1,
+  ' Advice=2).
+
+  loc key$,decision%
+
+  repeat
+    let key$ = get_key_prompt$('Sí  |  No  |  Consejo')
+    if key$ instr "CNScns"
+      exit
+    endif
+  endrep
+
+  let decision%=(key$ instr "NnSsCc") div 2
+  cls #iw%
+  zx_beep .25,10+40*decision% ' XXX TODO -- Improve.
+
+  ret decision%
+
 enddef
 
 ' ==============================================================
