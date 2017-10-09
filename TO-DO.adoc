@@ -48,4 +48,3 @@
   data, like petitions and events. Better yet: Separate data into
   three arrays.
 - Change the term "revolution" to the more precise "rebellion".
-- Check `actual_war`.

@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.64+201710091813"
+version$="0.1.0-dev.65+201710091826"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1591,10 +1591,17 @@ enddef
 
 defproc war
 
-  if \
-       popularity%(leftoto%)<=low%\
-    and power%(leftoto%)>=low%:\
+  if risk_of_war%
     possible_war
+  endif
+
+enddef
+
+deffn risk_of_war%
+
+    ret \
+        popularity%(leftoto%)<=low%\
+    and power%(leftoto%)>=low%
 
 enddef
 
@@ -1608,6 +1615,8 @@ defproc possible_war
     threat_of_war
   endif
 
+  key_press
+
 enddef
 
 defproc threat_of_war
@@ -1617,11 +1626,12 @@ defproc threat_of_war
   loc i%
 
   wipe black%,white%,cyan%
-  center #ow%,6,"Amenaza de guerra contra Leftoto"
-  center #ow%,10,"Tu popularidad en Ritimba"
-  center #ow%,12,"aumentará"
-  for i%=1 to main_groups%,police%:\
+  center #ow%,6,"Amenazas a Leftoto con la guerra"
+  center #ow%,10,"Tu popularidad crece en Ritimba"
+
+  for i%=1 to main_groups%,police%
     increase_popularity i%
+  endfor i%
 
 enddef
 
@@ -1659,11 +1669,17 @@ defproc actual_war
   print #ow%,"Una corta y decisiva guerra"
   war_sfx
 
-  if leftoto_strength%+rnd(-1 to 1)<ritimba_strength%
+  if ritimba_wins%
     ritimba_wins
   else
     leftoto_wins
   endif
+
+enddef
+
+deffn ritimba_wins%
+
+  ret leftoto_strength%+rnd(-1 to 1)<ritimba_strength%
 
 enddef
 
@@ -1704,12 +1720,12 @@ enddef
 
 defproc leftoto_wins
 
+  ' XXX TODO -- Improve texts.
+
   wipe black%,white%,black%
   center #ow%,7,"Victoria de Leftoto"
 
   if have_helicopter% and rnd(0 to 2)
-
-    ' XXX TODO -- Improve texts.
 
     ' Escape
 
@@ -1720,16 +1736,16 @@ defproc leftoto_wins
 
   else
 
-    ' XXX TODO -- Improve texts.
-
     if have_helicopter%
       at #ow%,10,0
-      print_l #ow%,"Intentas escapar en helicóptero, \
-               pero el motor sufre una avería."
+      print_l_paragraph #ow%,\
+        "Intentas escapar en helicóptero, \
+        pero el motor sufre una avería."
       pause 80
     endif
 
     at #ow%,12,0
+    paragraph #ow%
     print_l #ow%,"Eres acusado de ser un enemigo del pueblo y, \
              tras un juicio sumarísimo,"
     pause 50
