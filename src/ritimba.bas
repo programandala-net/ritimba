@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.62+201710091748"
+version$="0.1.0-dev.63+201710091811"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -81,13 +81,21 @@ ritimba
 ' Presentation {{{1
 
 defproc credits
+
   wipe black%,white%,blue%
   at #ow%,1,0
-  print #ow%,"Ritimba"
-  print #ow%,\\"Por:"\"Marcos Cruz (programandala.net),"
-  print #ow%,"2011, 2012, 2015, 2016, 2017"
-  print #ow%,\\"Una versión en SBASIC de"
-  print #ow%,"Dictador, de Don Priestley, 1983"
+
+  print_l_paragraph #ow%,"Ritimba "&version$
+
+  print_l_paragraph #ow%,\
+    "Por: \
+    Marcos Cruz (programandala.net), \
+    2011, 2012, 2015, 2016, 2017."
+
+  print_l_paragraph #ow%,\
+    "Una versión en SBASIC para SMSQ/E del \
+    «Dictator» de Don Priestley para ZX Spectrum (1983)."
+
 enddef
 
 defproc national_flag
