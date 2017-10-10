@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.67+201710100008"
+version$="0.1.0-dev.68+201710100139"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -2554,11 +2554,17 @@ deffn windows_do_not_fit%
 enddef
 
 defproc init_screen
-  if disp_type<>32:\
-    mode 32
+
+  ' XXX OLD
+  ' if disp_type<>32
+  '   mode 32
+  ' endif
+
   colour_ql
+
   let paragraph_separation%=1
   let paragraph_indentation%=0
+
 enddef
 
 defproc init_once
@@ -2640,8 +2646,21 @@ defproc advices
 enddef
 
 defproc all_bmp_to_pic
+
   ' Convert all BMP to PIC.
-  bmp_to_pic "filename_0800x0600"
+
+  loc pw%
+
+  let pw%=fopen("scr_")
+
+  bmp_to_pic "army_084x045"
+  bmp_to_pic "dollar_042x072"
+  bmp_to_pic "landowners_090x045"
+  bmp_to_pic "peasants_096x045"
+  bmp_to_pic "police_072x042"
+
+  close #pw%
+
 enddef
 
 defproc bmp_to_pic(base_filename$)
@@ -2649,21 +2668,23 @@ defproc bmp_to_pic(base_filename$)
   loc pic_address,len%,width%,height%,bmp_file$,pic_file$
  
   let len%=len(base_filename$)
-  let width%=base_filename$(len%-7 to len%-4)
+  let width%=base_filename$(len%-6 to len%-4)
   let height%=base_filename$(len%-2 to)
   
-  let bmp_file$="img_"&base_filename$&".bmp"
-  let pic_file$="img_"&base_filename$&"_pic"
+  let bmp_file$=datad$&"img_"&base_filename$&".bmp"
+  let pic_file$=datad$&"img_"&base_filename$&"_pic"
 
-  window #sw%,width%,height%,0,0
+  window #pw%,width%,height%,0,0
 
-  wl_bmp8load #sw%,bmp_file$ ' load the BMP
+  print bmp_file$,width%;"x";height%
+
+  wl_bmp8load #pw%,bmp_file$ ' load the BMP
 
   ' Convert the BMP to PIC, ready for the next time.
 
-  let pic_address=wsain(#sw%)
-  wsasv #sw%,pic_address
-  s_wsa #sw%,pic_address,pic_file$
+  let pic_address=wsain(#pw%)
+  wsasv #pw%,pic_address
+  s_wsa #pw%,pic_address,pic_file$
   rechp pic_address
 
 enddef
