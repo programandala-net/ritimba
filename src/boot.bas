@@ -3,7 +3,7 @@ rem This file is part of Ritimba
 rem http://programandala.net/es.programa.ritimba.html
 rem Copyright (C) 2011,2012,2015,2016,2017 Marcos Cruz (programandala.net)
 
-' Last modified 201710100008
+' Last modified 201710110018
 
 ' ==============================================================
 ' Windows and files
@@ -20,9 +20,10 @@ data_use home_dir$
 ' Requirements
 
 ' From "DIY Toolkit", by Simon N. Goodwin, 1988-1994:
-' `minimum%`, `maximum%`, `maximum`.
+' `minimum%`, `maximum%`, `maximum`, `chan_w%`.
 
 lrespr "ext_minmax_code"
+lrespr "ext_chans_code"
 
 ' From BMPCVT, by Wolfgang Lenerz, 2002:
 ' `wl_bmp3load`.

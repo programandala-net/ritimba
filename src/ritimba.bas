@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.68+201710100139"
+version$="0.1.0-dev.69+201710110018"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -29,8 +29,10 @@ rem http://programandala.net/es.programa.ritimba.html
 
 #include lib/iso_lower.bas
 #include lib/iso_upper.bas
+#include lib/pic.bas
 #include lib/print_l.bas
 #include lib/trim.bas
+#include lib/win.bas
 
 ' The SBASIC extensions are loaded by the <boot> file.
 
@@ -358,7 +360,7 @@ defproc audience
 
     rep
 
-      expose_petition
+      expose_petition soliciting_group%
 
       let decision%=decision_option%
 
@@ -394,28 +396,52 @@ enddef
 
 defproc expose_petition
 
-    wipe yellow%,black%,yellow%
-    paper #ow%,green%
-    at #ow%,5,0
-    cls #ow%,1
-    paper #ow%,white%
-    ink #ow%,black%
-    center #ow%,3,"UNA AUDIENCIA"
+  wipe yellow%,black%,yellow%
+  paper #ow%,green%
+  at #ow%,5,0
+  cls #ow%,1
+  paper #ow%,white%
+  ink #ow%,black%
+  center #ow%,3,"UNA AUDIENCIA"
 
-    paper #ow%,yellow%
-    ink #ow%,black%
-    center #ow%,10,"Petición "\
-                   &genitive_name$(soliciting_group%)&":"
-    paper #ow%,white%
-    at #ow%,14,0
-    print_l #ow%,"¿Está su excelencia conforme con "\
-      &iso_lower_1$(decision$(petition%))&"?"
+  display_icons soliciting_group%
+
+  paper #ow%,yellow%
+  ink #ow%,black%
+  center #ow%,10,"Petición "\
+                 &genitive_name$(soliciting_group%)&":"
+  paper #ow%,white%
+  at #ow%,14,0
+  print_l #ow%,"¿Está su excelencia conforme con "\
+    &iso_lower_1$(decision$(petition%))&"?"
+
+enddef
+
+defproc display_icons(group%)
+
+  ' Display the audience icons of the given group.
+
+  loc icons%,x%,y%,last_x%,icon_image$,icon_width%
+
+  let icons%=4
+  let icon_image$=icon_file$(icon$(group%))
+  let icon_width%=pic_width%(icon_image$)
+
+  at #ow%,6,0
+  let y%=win_ypos%(#ow%)
+  let last_x%=ow_width%-ow_border_x_width%-icon_width%
+
+  for x%=0 to last_x% step last_x% div (icons%-1)
+    load_pic_win #ow%,icon_image$,x%,y%
+  endfor
 
 enddef
 
 defproc prepare_audience
 
   ' Determine the petition and the soliciting group.
+
+  ' XXX TODO -- Factor. Convert it into a function.
 
   if not petitions_left%
     restore_petitions
@@ -686,7 +712,7 @@ defproc advice(decision%)
   if deny_effect%
     csize #ow%,csize_width%-1,csize_height%
     print_l_paragraph #ow%,\
-      "(*) "&deny_effect%&" si la solicitud es rechazada."
+      "(*) "&deny_effect%&" si la petición es rechazada."
     csize #ow%,csize_width%,csize_height%
   endif
 
@@ -2032,7 +2058,7 @@ defproc init_data
     genitive_name$(groups%,21),\
     member$(groups%,15)
 
-  restore
+  restore @plot_data
 
   for i%=1 to decisions%:
     read decision_data$(i%),x$
@@ -2044,6 +2070,8 @@ defproc init_data
       let decision$(i%)=x$
     endif
   endfor i%
+
+  restore @groups_data
 
   for i%=1 to groups%
     read \
@@ -2058,9 +2086,16 @@ defproc init_data
       member$(i%)
   endfor i%
 
+  dim icon$(main_groups%,10)
+
+  restore @icons_data
+
+  for i%=1 to main_groups%
+    read icon$(i%)
+  endfor i%
 
   ' XXX TODO -- Not needed except to play again, what
-  ' needs more restoration.
+  ' needs more restoration:
   restore_decisions
 
   let money=1000
@@ -2090,6 +2125,8 @@ enddef
 ' Fields 02..17 contain a letter ("G".."S") which represents a
 ' number calculated from its ASCII code, being "M" zero.
 ' Examples: ... "K"=-1, "L"=-1,"M"=0, "N"=1...
+
+label @plot_data
 
 ' ..............................
 ' Petitions from the army (8)
@@ -2222,6 +2259,8 @@ data "NMMMMMMMMMMMILKMM",\
 ' plural_name$(i%)
 ' genitive_name$(i%)
 
+label @groups_data
+
 data 7,6,none%,none%,\
      "el ejército",\
      "ejército",\
@@ -2270,6 +2309,12 @@ data 7,0,none%,none%,\
      "los useños",\
      "de Usa",\
      "useño"
+
+label @icons_data
+
+data "army"
+data "landowners"
+data "peasants"
 
 ' ==============================================================
 ' Special effects {{{1
@@ -2475,6 +2520,10 @@ defproc ql_font
   fonts 0
 enddef
 
+deffn icon_file$(icon_id$)
+  ret datad$&"img_"&icon_id$&"_icon_pic"
+enddef
+
 ' ==============================================================
 ' Init {{{1
 
@@ -2511,11 +2560,14 @@ defproc init_windows
   csize #iw%,csize_width%,csize_height%
   csize #ow%,csize_width%,csize_height%
 
-  let ow_width%=columns%*char_width_pixels%+ow_border_width%*4
+  let ow_border_x_width%=ow_border_width%*4
+  let ow_border_y_width%=ow_border_width%*2
+
+  let ow_width%=columns%*char_width_pixels%+ow_border_x_width%
   let iw_width%=columns%*char_width_pixels%
   let bw_width%=ow_width%
 
-  let ow_height%=ow_lines%*char_height_pixels%+ow_border_width%*2
+  let ow_height%=ow_lines%*char_height_pixels%+ow_border_y_width%
   let iw_height%=iw_lines%*char_height_pixels%
   let bw_height%=iw_height%+ow_border_width%
 
@@ -2555,12 +2607,8 @@ enddef
 
 defproc init_screen
 
-  ' XXX OLD
-  ' if disp_type<>32
-  '   mode 32
-  ' endif
-
   colour_ql
+  palette_ql yellow%,$C0C000
 
   let paragraph_separation%=1
   let paragraph_indentation%=0
@@ -2686,6 +2734,33 @@ defproc bmp_to_pic(base_filename$)
   wsasv #pw%,pic_address
   s_wsa #pw%,pic_address,pic_file$
   rechp pic_address
+
+enddef
+
+defproc lp(x%,y%)
+
+  ' Test the loading of PIC files in the screen.
+
+  load_pic datad$&"img_army_icon_pic",x%,y%
+
+enddef
+
+defproc lpw(x%,y%)
+
+  ' Test the loading of PIC files in a window.
+
+  load_pic_win #ow%,datad$&"img_army_icon_pic",x%,y%
+
+enddef
+
+defproc checkw
+
+  loc i%
+
+  for i%=0 to 10
+    at #ow%,i%,i%
+    print #ow%,win_xpos%(#ow%);",",win_ypos%(#ow%)
+  endfor
 
 enddef
 
