@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.69+201710110018"
+version$="0.1.0-dev.70+201710110044"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -2313,8 +2313,8 @@ data 7,0,none%,none%,\
 label @icons_data
 
 data "army"
-data "landowners"
 data "peasants"
+data "landowners"
 
 ' ==============================================================
 ' Special effects {{{1
