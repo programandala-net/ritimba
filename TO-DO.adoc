@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-10-11
+:revdate: 2017-10-12
 
 == 2017-09-21
 
@@ -50,8 +50,6 @@
   border as a margin.
 - Improve the news alarm after the original.
 - Extend the description of events.
-- Use a block or window as background of the petitions. Now the used
-  space is irregular.
 - Improve the police report: Mark groups with low popularity and
   enough power.
 - Homogenize terms: "tu/usted/su excelencia"...

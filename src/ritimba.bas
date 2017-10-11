@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.78+201710112312"
+version$="0.1.0-dev.79+201710120116"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -27,12 +27,14 @@ rem http://programandala.net/es.programa.ritimba.html
 ' ==============================================================
 ' Requirements {{{1
 
+#include lib/csize_pixels.bas
 #include lib/iso_lower.bas
 #include lib/iso_upper.bas
 #include lib/pic.bas
 #include lib/print_l.bas
 #include lib/trim.bas
 #include lib/win.bas
+#include lib/zx_beep.bas
 
 ' The SBASIC extensions are loaded by the <boot> file.
 
@@ -380,7 +382,7 @@ defproc expose_petition
   cls #ow%,1
   paper #ow%,white%
   ink #ow%,black%
-  center #ow%,3,"UNA AUDIENCIA"
+  center #ow%,3,"AUDIENCIA"
 
   display_audience_icons soliciting_group%
 
@@ -388,10 +390,12 @@ defproc expose_petition
   ink #ow%,black%
   center #ow%,10,"Petición "\
                  &genitive_name$(soliciting_group%)&":"
+
   paper #ow%,bright_yellow%
-  at #ow%,14,0
+  clear_lines #ow%,14,15 ' all petitions need at least 2 lines
   print_l #ow%,"¿Está su excelencia conforme con "\
     &iso_lower_1$(issue$(petition%))&"?"
+  cls #ow%,4 ' clear the rest of the possible third line
 
 enddef
 
@@ -2341,8 +2345,6 @@ defproc zx_border(colour%)
 
 enddef
 
-#include lib/zx_beep.bas
-
 defproc war_sfx
   ' XXX TODO
   pause 100
@@ -2485,8 +2487,6 @@ enddef
 ' ==============================================================
 ' Screen {{{1
 
-#include lib/csize_pixels.bas
-
 deffn contrast_colour%(colour%)
 
   sel on colour%
@@ -2539,6 +2539,20 @@ enddef
 
 deffn icon_file$(icon_id$)
   ret datad$&"img_"&icon_id$&"_icon_pic"
+enddef
+
+defproc clear_lines(channel%,first_line%,last_line%)
+
+  ' Clear the given range of lines of window `channel%`.  At the end
+  ' the cursor is at the start of `first_line%`.
+
+  loc i%
+
+  for i%=last_line% to first_line% step -1
+    at #channel%,i%,0
+    cls #channel%,3
+  endfor
+
 enddef
 
 ' ==============================================================
