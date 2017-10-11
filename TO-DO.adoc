@@ -55,7 +55,6 @@
 - Improve the police report: Mark groups with low popularity and
   enough power.
 - Homogenize terms: "tu/usted/su excelencia"...
-- Show the national flag and play the national anthem first, as a
-  splash screen.  Improve its background and title.
+- Improve the title of the splash screen.
 - Improve the welcome screen: Simulate a document that must be
   subscribed. Add the player name to a score table.

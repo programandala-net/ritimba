@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.77+201710112305"
+version$="0.1.0-dev.78+201710112312"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -45,9 +45,9 @@ defproc ritimba
 
   init_once
   rep
-    credits
-    key_press
     init_data
+    splash_screen
+    credits
     welcome
     rep game
       new_month
@@ -96,6 +96,15 @@ defproc credits
     "Una versión en SBASIC para SMSQ/E del \
     «Dictator» de Don Priestley para ZX Spectrum (1983)."
 
+  key_press
+
+enddef
+
+defproc splash_screen
+  wipe black%,bright_white%,black%
+  center #ow%,5,"RITIMBA"
+  national_flag
+  national_anthem
 enddef
 
 defproc national_flag
@@ -141,19 +150,6 @@ defproc national_flag
 
 enddef
 
-defproc title
-  loc i%
-  wipe cyan%,black%,cyan%
-  national_flag
-  for i%=1 to 50:
-    zx_beep .03,i%
-  paper #ow%,white%
-  ink #ow%,black%
-  center #ow%,3," Pulsa una tecla y gobernarás "
-  center #ow%,5," Ritimba "
-  national_anthem
-enddef
-
 defproc national_anthem
   loc times%,note%,pitch%,tune$
   let tune$="KPKKMKIHK`KMRPOMOP"
@@ -176,7 +172,6 @@ enddef
 
 defproc welcome
 
-    title
     wipe white%,black%,blue%
     paper #ow%,cyan%
     center #ow%,1,"Bienvenido al cargo"
