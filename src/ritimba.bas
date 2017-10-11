@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.73+201710112018"
+version$="0.1.0-dev.74+201710112056"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -66,7 +66,7 @@ defproc ritimba
       plot
       police_report
       news
-      revolution
+      rebellion
       if not alive% or escape%:\
         exit game
     endrep game
@@ -229,7 +229,7 @@ enddef
 defproc new_month
 
   let low%=rnd(2 to 4)
-  let revolution_strength%=rnd(10 to 12)
+  let rebellion_strength%=rnd(10 to 12)
   let months%=months%+1
 
   wipe yellow%,black%,yellow%
@@ -266,7 +266,7 @@ defproc plot
         if not(main_group%=ally_group% \
                or popularity%(ally_group%)>low%)
           if power%(ally_group%)+power%(main_group%)\
-             >=revolution_strength%
+             >=rebellion_strength%
             let plan%(main_group%)=rebellion%
             let ally%(main_group%)=ally_group%
             exit ally_group%
@@ -917,7 +917,7 @@ defproc police_report_data(title$,title_continued$)
   print_l #ow%,"Tu fuerza es "&strength%&"."
   end_paragraph #ow%
   paragraph #ow%
-  print_l #ow%,"La fuerza necesaria para una revolución es "&revolution_strength%&"."
+  print_l #ow%,"La fuerza necesaria para una rebelión es "&rebellion_strength%&"."
   key_press
 
 enddef
@@ -957,9 +957,9 @@ defproc police_report_not_avalaible
 enddef
 
 ' ==============================================================
-' Revolution {{{1
+' Rebellion {{{1
 
-defproc revolution
+defproc rebellion
 
   loc \
     helping_group%,\
@@ -968,7 +968,7 @@ defproc revolution
 
   if rebels%
 
-    revolution_alarm
+    rebellion_alarm
 
     if want_to_escape%
       escape
@@ -1011,22 +1011,22 @@ enddef
 defproc fight
 
   ask_for_help
-  revolution_report
-  revolution_starts
+  rebellion_report
+  rebellion_starts
 
   if rebels_are_stronger%
-    the_revolution_wins
+    the_rebellion_wins
   else
-    the_revolution_is_defeated
+    the_rebellion_is_defeated
   endif
 
 enddef
 
-defproc revolution_starts
+defproc rebellion_starts
 
   wipe white%,black%,white%
   at #ow%,12,3
-  print #ow%,"La revolución ha comenzado"
+  print #ow%,"La rebelión ha comenzado"
   war_sfx
 
 enddef
@@ -1039,20 +1039,20 @@ deffn rebels_are_stronger%
 
 enddef
 
-defproc revolution_alarm
+defproc rebellion_alarm
 
   local i%
 
   wipe red%,black%,red%
   ink #ow%,white%
-  center #ow%,10,"REVOLUCIÓN"
+  center #ow%,10,"REBELIÓN"
   for i%=1 to 5:\
     zx_beep .5,20:\
     zx_beep .5,10
 
 enddef
 
-defproc revolution_report
+defproc rebellion_report
 
   cls #ow%
   at #ow%,8,0
@@ -1060,7 +1060,7 @@ defproc revolution_report
   print #ow%,\\"La fuerza de ";\
     name$(helping_group%);" es ";\
     power%(helping_group%)
-  print #ow%,\\"La de los revolucionarios es ";rebels_strength%
+  print #ow%,\\"La de los rebeldes es ";rebels_strength%
   key_press
 
 enddef
@@ -1196,7 +1196,7 @@ defproc the_guerrilla_catchs_you
 
 enddef
 
-defproc the_revolution_wins
+defproc the_rebellion_wins
 
   wipe black%,white%,black%
   at #ow%,10,7
@@ -1208,7 +1208,7 @@ defproc the_revolution_wins
 
 enddef
 
-defproc the_revolution_is_defeated
+defproc the_rebellion_is_defeated
 
   local i%
 
@@ -1221,7 +1221,7 @@ defproc the_revolution_is_defeated
     print #ow%,blank_line$
   endfor i%
   at #ow%,10,0
-  print #ow%,"¿Castigas a los revolucionarios?"
+  print #ow%,"¿Castigas a los rebeldes?"
   if yes_key%
     for n=1 to 3:\
       shoot_dead_sfx:\
@@ -2132,7 +2132,7 @@ defproc init_data
   let alive%=1
   let months%=0
   let pc%=0 ' XXX TODO -- What for?
-  let revolution_strength%=10
+  let rebellion_strength%=10
 
 enddef
 
