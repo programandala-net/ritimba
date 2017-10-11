@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.72+201710112000"
+version$="0.1.0-dev.73+201710112018"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -233,12 +233,11 @@ defproc new_month
   let months%=months%+1
 
   wipe yellow%,black%,yellow%
-  paper #ow%,cyan%
-  ink #ow%,white%
   at #ow%,10,12
-  print #ow%,"MES  ";
-  paper #ow%,white%
+  paper #ow%,cyan%
   ink #ow%,black%
+  print #ow%,"MES  ";
+  paper #ow%,bright_white%
   print #ow%,months%
   pause 50
   plot
@@ -410,7 +409,7 @@ defproc expose_petition
   ink #ow%,black%
   center #ow%,10,"Petición "\
                  &genitive_name$(soliciting_group%)&":"
-  paper #ow%,white%
+  paper #ow%,bright_yellow%
   at #ow%,14,0
   print_l #ow%,"¿Está su excelencia conforme con "\
     &iso_lower_1$(decision$(petition%))&"?"
@@ -502,8 +501,8 @@ defproc decision
 
     print #ow%,fill$("*",columns%*ow_lines%)
 
-    paper #ow%,blue%
-    ink #ow%,white%
+    paper #ow%,bright_blue%
+    ink #ow%,bright_white%
     center #ow%,3,"DECISIÓN PRESIDENCIAL"
 
     paper #ow%,yellow%
@@ -859,7 +858,7 @@ defproc police_report_data(title$,title_continued$)
 
     let line%=data_line%+group%-1
 
-    paper #ow%,white%
+    paper #ow%,bright_white%
     ink #ow%,black%
     at #ow%,line%,group_col%
     print #ow%,group%
@@ -984,7 +983,8 @@ enddef
 deffn want_to_escape%
 
   loc yes%
-  cls #ow%
+
+  wipe yellow%,black%,yellow%
   center #ow%,12,"¿Intento de escape?"
   let yes%=yes_key%
   cls #ow%
@@ -1049,7 +1049,6 @@ defproc revolution_alarm
   for i%=1 to 5:\
     zx_beep .5,20:\
     zx_beep .5,10
-  wipe yellow%,black%,yellow%
 
 enddef
 
@@ -1247,6 +1246,7 @@ defproc treasury_report
   wipe white%,green%,green%
   print #ow%,fill$("$",columns%*ow_lines%)
   display_treasury_graph
+  paper #ow%,bright_white%
   ink #ow%,black%
   center #ow%,8,"INFORME DE LA HACIENDA PÚBLICA"
   treasury_report_details
@@ -1304,16 +1304,16 @@ defproc treasury_report_details
 
   loc ammount$
 
-  paper #ow%,blue%
-  ink #ow%,white%
+  paper #ow%,bright_blue%
+  ink #ow%,bright_white%
 
   at #ow%,12,1
   print #ow%,"Saldo:";
   if money<0
-    ink #ow%,red%
+    ink #ow%,bright_red%
   endif
   print_ammount ow%,money
-  ink #ow%,white%
+  ink #ow%,bright_white%
 
   at #ow%,14,1
   print #ow%,"Gasto mensual:";
@@ -1874,7 +1874,9 @@ defproc score_report
   print #ow%,\to bonus_col%;"----"
 
   print #ow%,\"Total:";to bonus_col%;
+  paper #ow%,bright_yellow%
   print_using #ow%,"####",score%
+  paper #ow%,yellow%
 
   if score%>record%
     let record%=score%

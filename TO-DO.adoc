@@ -47,3 +47,11 @@
   data, like petitions and events. Better yet: Separate data into
   three arrays.
 - Change the term "revolution" to the more precise "rebellion".
+
+== 2017-10-11
+
+- Don't repeat the national anthem. and wait for a key only when it's
+  finished.
+- Simplify the windows layout: Use a background window to simulate the
+  ZX Spectrum border. Then the output window can use its own internal
+  border as a margin.
