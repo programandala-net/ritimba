@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.71+201710111943"
+version$="0.1.0-dev.72+201710112000"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -2500,7 +2500,10 @@ enddef
 deffn contrast_colour%(colour%)
 
   sel on colour%
-    =black%,blue%,red%,purple%:\
+    =black%,\
+     blue%,brigth_blue%,\
+     red%,brigth_red%,\
+     purple%,brigth_purple%:\
       ret white%
     =remainder:\
       ret black%
@@ -2631,9 +2634,15 @@ enddef
 
 defproc init_screen
 
-  colour_ql
-  palette_ql yellow%,$C0C000
-  palette_ql green%,$00C000
+  colour_pal
+
+  palette_8 blue%,$0000D7   ' ZX Spectrum
+  palette_8 red%,$D70000    ' ZX Spectrum
+  palette_8 purple%,$D700D7 ' ZX Spectrum
+  palette_8 green%,$00C000  ' modified
+  palette_8 cyan%,$00D7D7,  ' ZX Spectrum
+  palette_8 yellow%,$C0C000 ' modified
+  palette_8 white%,$D7D7D7  ' ZX Spectrum
 
   let paragraph_separation%=1
   let paragraph_indentation%=0
@@ -2656,13 +2665,20 @@ enddef
 defproc init_constants
 
   let black%=0
-  let blue%=1
-  let red%=2
-  let purple%=3
-  let green%=4
-  let cyan%=5
-  let yellow%=6
-  let white%=7
+  let bright_white%=1
+  let bright_red%=2
+  let bright_green%=3
+  let bright_blue%=4
+  let bright_purple%=5
+  let bright_yellow%=6
+  let bright_cyan%=7
+  let blue%=8
+  let red%=9
+  let purple%=10
+  let green%=11
+  let cyan%=12
+  let yellow%=13
+  let white%=14
 
   let petitions%=24
   let decisions%=49

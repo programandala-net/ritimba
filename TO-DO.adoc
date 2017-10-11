@@ -47,8 +47,3 @@
   data, like petitions and events. Better yet: Separate data into
   three arrays.
 - Change the term "revolution" to the more precise "rebellion".
-
-
-== 2017-10-11
-
-- Extend palette with bright colors.
