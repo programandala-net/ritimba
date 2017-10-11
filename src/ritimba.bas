@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.70+201710110044"
+version$="0.1.0-dev.71+201710111943"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -404,7 +404,7 @@ defproc expose_petition
   ink #ow%,black%
   center #ow%,3,"UNA AUDIENCIA"
 
-  display_icons soliciting_group%
+  display_audience_icons soliciting_group%
 
   paper #ow%,yellow%
   ink #ow%,black%
@@ -417,7 +417,7 @@ defproc expose_petition
 
 enddef
 
-defproc display_icons(group%)
+defproc display_audience_icons(group%)
 
   ' Display the audience icons of the given group.
 
@@ -1246,9 +1246,33 @@ defproc treasury_report
 
   wipe white%,green%,green%
   print #ow%,fill$("$",columns%*ow_lines%)
+  display_treasury_graph
   ink #ow%,black%
   center #ow%,8,"INFORME DE LA HACIENDA PÚBLICA"
   treasury_report_details
+
+enddef
+
+defproc display_treasury_graph
+
+  ' Display the heading graph of the treasury report.
+
+  loc icons%,x%,y%,first_x%,last_x%,icon_image$,icon_width%
+
+  let icons%=8
+  let icon_image$=icon_file$("dollar")
+  let icon_width%=pic_width%(icon_image$)
+
+  at #ow%,2,1
+  let y%=win_ypos%(#ow%)
+  let first_x%=win_xpos%(#ow%) div 2
+  let last_x%=ow_width%-ow_border_x_width%-icon_width%-first_x%
+
+  for x%=first_x% \
+         to last_x% \
+         step (last_x%-first_x%) div (icons%-1)
+    load_pic_win #ow%,icon_image$,x%,y%
+  endfor
 
 enddef
 
@@ -2609,6 +2633,7 @@ defproc init_screen
 
   colour_ql
   palette_ql yellow%,$C0C000
+  palette_ql green%,$00C000
 
   let paragraph_separation%=1
   let paragraph_indentation%=0
@@ -2616,6 +2641,7 @@ defproc init_screen
 enddef
 
 defproc init_once
+
   randomise
   init_constants
   init_screen
@@ -2624,6 +2650,7 @@ defproc init_once
   init_zx_beep
   let score%=0
   let record%=0
+
 enddef
 
 defproc init_constants

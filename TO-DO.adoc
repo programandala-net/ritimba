@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-10-09
+:revdate: 2017-10-11
 
 == 2017-09-21
 
@@ -47,3 +47,8 @@
   data, like petitions and events. Better yet: Separate data into
   three arrays.
 - Change the term "revolution" to the more precise "rebellion".
+
+
+== 2017-10-11
+
+- Extend palette with bright colors.
