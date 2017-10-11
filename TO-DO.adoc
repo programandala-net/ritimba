@@ -45,8 +45,6 @@
 
 == 2017-10-11
 
-- Don't repeat the national anthem. and wait for a key only when it's
-  finished.
 - Simplify the windows layout: Use a background window to simulate the
   ZX Spectrum border. Then the output window can use its own internal
   border as a margin.
@@ -57,3 +55,7 @@
 - Improve the police report: Mark groups with low popularity and
   enough power.
 - Homogenize terms: "tu/usted/su excelencia"...
+- Show the national flag and play the national anthem first, as a
+  splash screen.  Improve its background and title.
+- Improve the welcome screen: Simulate a document that must be
+  subscribed. Add the player name to a score table.

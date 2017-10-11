@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.76+201710112241"
+version$="0.1.0-dev.77+201710112305"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -93,8 +93,8 @@ defproc credits
     2011, 2012, 2015, 2016, 2017."
 
   print_l_paragraph #ow%,\
-    "Una versi√≥n en SBASIC para SMSQ/E del \
-    ¬´Dictator¬ª de Don Priestley para ZX Spectrum (1983)."
+    "Una versiÛn en SBASIC para SMSQ/E del \
+    ´Dictatorª de Don Priestley para ZX Spectrum (1983)."
 
 enddef
 
@@ -141,53 +141,37 @@ defproc national_flag
 
 enddef
 
-defproc tapestry(text$)
-
-  loc i%,times%
-
-  let times%=columns%*ow_lines%/len(text$)
-
-  for i%=1 to times%
-    print #ow%,text$;
-    ' zx_beep .01,40-i%+rnd*10 ' XXX OLD
-  endfor i%
-
-enddef
-
 defproc title
   loc i%
-  wipe cyan%,black%,black%
-  tapestry "Ritimba "
+  wipe cyan%,black%,cyan%
   national_flag
   for i%=1 to 50:
     zx_beep .03,i%
   paper #ow%,white%
   ink #ow%,black%
-  center #ow%,3," Pulsa una tecla y gobernar√°s "
+  center #ow%,3," Pulsa una tecla y gobernar·s "
   center #ow%,5," Ritimba "
   national_anthem
 enddef
 
 defproc national_anthem
-  loc i%,pitch,tune$
+  loc times%,note%,pitch%,tune$
   let tune$="KPKKMKIHK`KMRPOMOP"
-  cursen_home #iw%
-  rep listen
-    for i%=1 to len(tune$)
+  for times%=1 to 2
+    for note%=1 to len(tune$)
       if len(inkey$(#iw%)):\
-        exit listen
-      let pitch=code(tune$(i%))-80
-      if pitch=16
+        exit times%
+      let pitch%=code(tune$(note%))-80
+      if pitch%=16
         beep
         pause 20
       else
-        zx_beep .5,pitch
+        zx_beep .5,pitch%
       endif
-    endfor i%
+    endfor note%
     beep
     pause 30
-  endrep listen
-  curdis #iw%
+  endfor times%
 enddef
 
 defproc welcome
@@ -199,9 +183,9 @@ defproc welcome
     paper #ow%,white%
     if first_game%
       paragraph #ow%
-      print_l #ow%,"El anterior l√≠der de nuestra \
+      print_l #ow%,"El anterior lÌder de nuestra \
         amada patria Ritimba \
-        obtuvo una puntuaci√≥n final de "&score%&"."
+        obtuvo una puntuaciÛn final de "&score%&"."
       paragraph #ow%
       print_l #ow%,"Te deseamos que logres hacerlo mucho mejor."
     else
@@ -211,8 +195,8 @@ defproc welcome
         Te deseamos que lo hagas bien."
     endif
     paragraph #ow%
-    print_l #ow%,"Para empezar podr√°s ver un informe de \
-      la hacienda p√∫blica y otro de la polic√≠a secreta."
+    print_l #ow%,"Para empezar podr·s ver un informe de \
+      la hacienda p˙blica y otro de la policÌa secreta."
     key_press
     treasury_report
     ordinary_police_report
@@ -323,7 +307,7 @@ defproc successful_assassination
 
   ' XXX TODO -- Improve.
   wipe black%,white%,black%
-  center #ow%,12,"¬°Est√° usted muerto!"
+  center #ow%,12,"°Est· usted muerto!"
   zx_beep 3,-40
   let alive%=0
 
@@ -383,7 +367,7 @@ defproc audience
         ' XXX TODO -- Improve.
         cls #ow%
         print_l_paragraph #ow%,\
-          "No hay suficientes fondos para adoptar esta decisi√≥n."
+          "No hay suficientes fondos para adoptar esta decisiÛn."
         print_l_paragraph #ow%,"Su respuesta debe ser no."
         key_press
       endif
@@ -407,11 +391,11 @@ defproc expose_petition
 
   paper #ow%,yellow%
   ink #ow%,black%
-  center #ow%,10,"Petici√≥n "\
+  center #ow%,10,"PeticiÛn "\
                  &genitive_name$(soliciting_group%)&":"
   paper #ow%,bright_yellow%
   at #ow%,14,0
-  print_l #ow%,"¬øEst√° su excelencia conforme con "\
+  print_l #ow%,"øEst· su excelencia conforme con "\
     &iso_lower_1$(issue$(petition%))&"?"
 
 enddef
@@ -503,7 +487,7 @@ defproc decision
 
     paper #ow%,bright_blue%
     ink #ow%,bright_white%
-    center #ow%,3,"DECISI√ìN PRESIDENCIAL"
+    center #ow%,3,"DECISI”N PRESIDENCIAL"
 
     paper #ow%,yellow%
     ink #ow%,black%
@@ -542,7 +526,7 @@ defproc decision
 
     if not options%
       paragraph #ow%
-      print_l #ow%,"Esta secci√≥n est√° agotada"
+      print_l #ow%,"Esta secciÛn est· agotada"
       pause 150
       next choose_decision
     endif
@@ -583,7 +567,7 @@ defproc decision
           cls #ow%
           paper #ow%,white%
 
-          print_l #ow%,"¬ø"&issue$(chosen_decision%)&"?"
+          print_l #ow%,"ø"&issue$(chosen_decision%)&"?"
 
           if yes_key%
 
@@ -658,8 +642,8 @@ defproc maybe_advice(decision%)
   wipe green%,black%,blue%
 
   at #ow%,ow_lines%/3,0
-  print_l #ow%,"¬øQuiere recibir consejo \
-    acerca de las consecuencias de tomar la decisi√≥n de "\
+  print_l #ow%,"øQuiere recibir consejo \
+    acerca de las consecuencias de tomar la decisiÛn de "\
     &iso_lower_1$(issue$(decision%))&"?"
 
   if yes_key%:\
@@ -706,12 +690,12 @@ defproc advice(decision%)
   endfor i%
 
   if not variations%:\
-    print #ow%,"Ning√∫n cambio."
+    print #ow%,"Ning˙n cambio."
 
   if deny_effect%
     csize #ow%,csize_width%-1,csize_height%
     print_l_paragraph #ow%,\
-      "(*) "&deny_effect%&" si la petici√≥n es rechazada."
+      "(*) "&deny_effect%&" si la peticiÛn es rechazada."
     csize #ow%,csize_width%,csize_height%
   endif
 
@@ -731,10 +715,10 @@ defproc advice(decision%)
   endfor i%
 
   if not variations%:\
-    print #ow%,"Ning√∫n cambio."
+    print #ow%,"Ning˙n cambio."
 
   under #ow%,1
-  print #ow%,\"La hacienda p√∫blica"
+  print #ow%,\"La hacienda p˙blica"
   under #ow%,0
 
   let paragraph_separation_backup%=paragraph_separation%
@@ -762,7 +746,7 @@ defproc police_report
 
   else
 
-    center #ow%,6,"¬øInforme de la Polic√≠a Secreta?"
+    center #ow%,6,"øInforme de la PolicÌa Secreta?"
     center #ow%,12,"(Cuesta "&money$(1)&")"
     if yes_key%
       let money=money-1
@@ -780,7 +764,7 @@ defproc ordinary_police_report
   ink #ow%,blue%
   at #ow%,3,0
   cls #ow%,1
-  police_report_data "INFORME DE LA POLIC√çA SECRETA",""
+  police_report_data "INFORME DE LA POLICÕA SECRETA",""
 
 enddef
 
@@ -788,7 +772,7 @@ defproc final_police_report
 
   wipe black%,white%,black%
   center #ow%,1,"FINAL"
-  police_report_data "INFORME FINAL","DE LA POLIC√çA SECRETA"
+  police_report_data "INFORME FINAL","DE LA POLICÕA SECRETA"
 
 enddef
 
@@ -879,7 +863,7 @@ defproc police_report_data(title$,title_continued$)
       ink #ow%,red%
       sel on plan%(group%)
         =rebellion%
-          print #ow%,"Rebeli√≥n"
+          print #ow%,"RebeliÛn"
           restore_csize
           at #ow%,line%,ally_col%
           paper #ow%,white%
@@ -917,7 +901,7 @@ defproc police_report_data(title$,title_continued$)
   print_l #ow%,"Tu fuerza es "&strength%&"."
   end_paragraph #ow%
   paragraph #ow%
-  print_l #ow%,"La fuerza necesaria para una rebeli√≥n es "&rebellion_strength%&"."
+  print_l #ow%,"La fuerza necesaria para una rebeliÛn es "&rebellion_strength%&"."
   key_press
 
 enddef
@@ -936,18 +920,18 @@ enddef
 
 defproc police_report_not_avalaible
 
-  center #ow%,6,"INFORME DE LA POLIC√çA SECRETA"
+  center #ow%,6,"INFORME DE LA POLICÕA SECRETA"
   center #ow%,10,"NO DISPONIBLE"
 
   if popularity%(police%)<=low%
-    print #ow%,\\"Tu popularidad entre la polic√≠a es ";\
+    print #ow%,\\"Tu popularidad entre la policÌa es ";\
       popularity%(police%);"."
   endif
 
   if power%(police%)<=low%
-    print #ow%,to 3\\"El poder de la polic√≠a es ";\
+    print #ow%,to 3\\"El poder de la policÌa es ";\
       power%(police%);"."
-        ' XXX TODO -- Prevent "polic√≠a" twice.
+        ' XXX TODO -- Prevent "policÌa" twice.
   endif
 
   if money<=0
@@ -990,7 +974,7 @@ deffn want_to_escape%
   loc yes%
 
   wipe yellow%,black%,yellow%
-  center #ow%,12,"¬øIntento de escape?"
+  center #ow%,12,"øIntento de escape?"
   let yes%=yes_key%
   cls #ow%
   ret yes%
@@ -1034,7 +1018,7 @@ defproc rebellion_starts
 
   wipe white%,black%,white%
   at #ow%,12,3
-  print #ow%,"La rebeli√≥n ha comenzado"
+  print #ow%,"La rebeliÛn ha comenzado"
   war_sfx
 
 enddef
@@ -1053,7 +1037,7 @@ defproc rebellion_alarm
 
   wipe red%,black%,red%
   ink #ow%,white%
-  center #ow%,10,"REBELI√ìN"
+  center #ow%,10,"REBELI”N"
   for i%=1 to 5:\
     zx_beep .5,20:\
     zx_beep .5,10
@@ -1092,7 +1076,7 @@ defproc ask_for_help
     name$(ally%(rebel_group%))&"."
 
   print #ow%,\\"Su fuerza conjunta es ";rebels_strength%;"."
-  print #ow%,\\"¬øA qui√©n vas a pedir ayuda?"
+  print #ow%,\\"øA quiÈn vas a pedir ayuda?"
 
   for i%=1 to local_groups%
     if popularity%(i%)>low%
@@ -1117,7 +1101,7 @@ defproc ask_for_help
   else
 
     cls #ow%
-    center #ow%,8,"¬°Est√°s solo!"
+    center #ow%,8,"°Est·s solo!"
     key_press
 
   endif
@@ -1155,14 +1139,14 @@ enddef
 
 defproc do_escape_by_helicopter
 
-  center #ow%,12,"¬°Escapas en helic√≥ptero!"
+  center #ow%,12,"°Escapas en helicÛptero!"
   let escape%=1
 
 enddef
 
 defproc the_helicopter_does_not_work
 
-  center #ow%,10,"¬°El helic√≥ptero no funciona!"
+  center #ow%,10,"°El helicÛptero no funciona!"
   pause 150
 
 enddef
@@ -1198,7 +1182,7 @@ defproc the_guerrilla_catchs_you
   pause 50
   shoot_dead_sfx
   at #ow%,12,0
-  print #ow%,"Las guerillas est√°n celebr√°ndolo"
+  print #ow%,"Las guerillas est·n celebr·ndolo"
   shoot_dead_sfx
   let alive%=0
 
@@ -1229,7 +1213,7 @@ defproc the_rebellion_is_defeated
     print #ow%,blank_line$
   endfor i%
   at #ow%,10,0
-  print #ow%,"¬øCastigas a los rebeldes?"
+  print #ow%,"øCastigas a los rebeldes?"
   if yes_key%
     for n=1 to 3:\
       shoot_dead_sfx:\
@@ -1256,7 +1240,7 @@ defproc treasury_report
   display_treasury_graph
   paper #ow%,bright_white%
   ink #ow%,black%
-  center #ow%,8,"INFORME DE LA HACIENDA P√öBLICA"
+  center #ow%,8,"INFORME DE LA HACIENDA P⁄BLICA"
   treasury_report_details
 
 enddef
@@ -1346,17 +1330,17 @@ enddef
 defproc bankruptcy
 
   cls #ow%
-  center #ow%,5,"La hacienda p√∫blica est√° en bancarrota."
+  center #ow%,5,"La hacienda p˙blica est· en bancarrota."
 
   at #ow%,9,0
 
   paragraph #ow%
-  print_l #ow%,"Su popularidad entre el ej√©rcito y \
-    la polic√≠a secreta caer√°n."
+  print_l #ow%,"Su popularidad entre el ejÈrcito y \
+    la policÌa secreta caer·n."
 
   paragraph #ow%
-  print_l #ow%,"El poder de la polic√≠a \
-    y su propio poder se reducir√°n tambi√©n."
+  print_l #ow%,"El poder de la policÌa \
+    y su propio poder se reducir·n tambiÈn."
 
   let popularity%(army%)=popularity%(army%)\
                          -(popularity%(army%)>0)
@@ -1386,11 +1370,11 @@ defproc decision_treasury_report(decision%)
   let decision_cost=10*decision_cost%(decision%)
   let decision_monthly_cost=decision_monthly_cost%(decision%)
 
-  let printout$="Esta decisi√≥n"
+  let printout$="Esta decisiÛn"
 
   if not decision_cost and not decision_monthly_cost
 
-    let printout$=printout$&" no costar√≠a dinero."
+    let printout$=printout$&" no costarÌa dinero."
     paragraph #ow%
     print_l #ow%,printout$
 
@@ -1399,9 +1383,9 @@ defproc decision_treasury_report(decision%)
     if decision_cost
 
       if decision_cost>0
-        let printout$=printout$&" aportar√≠a "
+        let printout$=printout$&" aportarÌa "
       else
-        let printout$=printout$&" costar√≠a "
+        let printout$=printout$&" costarÌa "
       endif
 
       let printout$=printout$&money$(abs(decision_cost))
@@ -1414,9 +1398,9 @@ defproc decision_treasury_report(decision%)
     if decision_monthly_cost
 
       if decision_monthly_cost<0
-        let printout$=printout$&" aumentar√≠a"
+        let printout$=printout$&" aumentarÌa"
       else
-        let printout$=printout$&" reducir√≠a"
+        let printout$=printout$&" reducirÌa"
       endif
 
       let printout$=printout$\
@@ -1440,15 +1424,15 @@ defproc decision_treasury_report(decision%)
 
     paragraph #ow%
     print_l #ow%,\
-      "La hacienda p√∫blica no dispone del dinero necesario."
+      "La hacienda p˙blica no dispone del dinero necesario."
 
     ' XXX TODO -- Combine into one condition and one message:
     if not is_decision_taken%(38):\
       paragraph #ow%
-      print_l #ow%,"Quiz√° los rusos pueden ayudar."
+      print_l #ow%,"Quiz· los rusos pueden ayudar."
     if not is_decision_taken%(39):\
       paragraph #ow%
-      print_l #ow%,"Los use√±os son un pueblo generoso"
+      print_l #ow%,"Los useÒos son un pueblo generoso"
 
   endif
 
@@ -1486,7 +1470,7 @@ defproc ask_for_loan(decision%)
 
   wipe yellow%,black%,red%
   paper #ow%,red%
-  print #ow%,\"SOLICITUD DE PR√âSTAMO EXTRANJERO"
+  print #ow%,\"SOLICITUD DE PR…STAMO EXTRANJERO"
   center #ow%,12,"ESPERA"
   pause 50
   if country=usa%
@@ -1496,7 +1480,7 @@ defproc ask_for_loan(decision%)
   endif
   at #ow%,12,0
   if country=usa%
-    print #ow%,"Los use√±os";
+    print #ow%,"Los useÒos";
   else
     print #ow%,"Los rusos";
   endif
@@ -1508,11 +1492,11 @@ defproc ask_for_loan(decision%)
       ' Concatenate strings and print the result with `print_l`.
 
     print #ow%,"opinan que es demasiado pronto \
-      para conceder ayudas ec√≥nomicas."
+      para conceder ayudas ecÛnomicas."
   else
     if is_decision_taken%(decision%)
       at #ow%,12,2
-      print #ow%,"Te deniegan un nuevo pr√©stamo."
+      print #ow%,"Te deniegan un nuevo prÈstamo."
     else
 
       ' XXX FIXME -- Run-time error in this expression:
@@ -1524,9 +1508,9 @@ defproc ask_for_loan(decision%)
 
       if popularity%(country)<=low%
         at #ow%,12,12
-        print #ow%,'Te dicen que no, sin ninguna explicaci√≥n.'
+        print #ow%,'Te dicen que no, sin ninguna explicaciÛn.'
       else
-        print #ow%," te conceder√°n"
+        print #ow%," te conceder·n"
         let loan=popularity%(7+x%)*30+rnd(0 to 200)
         at #ow%,14,7
         print #ow%,y%;nbsp$&"000 "&currency$
@@ -1551,7 +1535,7 @@ defproc money_transfer
 
   let amount=int(money/2) ' XXX TODO -- Let the player choose.
   if amount>=1
-    print #ow%,"La hacienda p√∫blica ten√≠a ";money$(int(money));
+    print #ow%,"La hacienda p˙blica tenÌa ";money$(int(money));
     let money_in_switzerland=money_in_switzerland+amount
     let money=money-amount
     pause 100
@@ -1610,7 +1594,7 @@ defproc latest_news_title(flashes%)
       paper #ow%,black%
       ink #ow%,white%
     endif
-    center #ow%,10,"NOTICIA DE √öLTIMA HORA"
+    center #ow%,10,"NOTICIA DE ⁄LTIMA HORA"
     if i%<>flashes%:\
       zx_beep .6,30
   endfor i%
@@ -1787,7 +1771,7 @@ defproc leftoto_wins
 
     cls #ow%
     at #ow%,12,3
-    print #ow%,"¬°Escapas en helic√≥ptero!"
+    print #ow%,"°Escapas en helicÛptero!"
     let escape%=1
 
   else
@@ -1795,15 +1779,15 @@ defproc leftoto_wins
     if have_helicopter%
       at #ow%,10,0
       print_l_paragraph #ow%,\
-        "Intentas escapar en helic√≥ptero, \
-        pero el motor sufre una aver√≠a."
+        "Intentas escapar en helicÛptero, \
+        pero el motor sufre una averÌa."
       pause 80
     endif
 
     at #ow%,12,0
     paragraph #ow%
     print_l #ow%,"Eres acusado de ser un enemigo del pueblo y, \
-             tras un juicio sumar√≠simo,"
+             tras un juicio sumarÌsimo,"
     pause 50
     shoot_dead_sfx
     print_l #ow%,"ejecutado."
@@ -1845,7 +1829,7 @@ defproc score_report
   let score%=0
 
   wipe yellow%,black%,cyan%
-  center #ow%,1,"PUNTUACI√ìN"
+  center #ow%,1,"PUNTUACI”N"
 
   let popularity_bonus%=0
   for i%=1 to groups%:\
@@ -1871,7 +1855,7 @@ defproc score_report
 
     if money_in_switzerland
       let money_bonus%=int(money_in_switzerland/10)
-      print #ow%,\"Por los ¬´ahorros¬ª en Suiza"\"(";\
+      print #ow%,\"Por los ´ahorrosª en Suiza"\"(";\
         money$(money_in_switzerland);"):";to bonus_col%;
       print_using #ow%,"####",money_bonus%
       let score%=score%+money_bonus%
@@ -1889,12 +1873,12 @@ defproc score_report
   if score%>record%
     let record%=score%
     print_l_paragraph #ow%,\
-      "Sin duda estar√° usted satisfecho, \
-      pues es la mayor puntuaci√≥n obtenida \
+      "Sin duda estar· usted satisfecho, \
+      pues es la mayor puntuaciÛn obtenida \
       hasta hoy por un presidente de Ritimba."
   else
     print_l_paragraph #ow%,\
-      "La mayor puntuaci√≥n sigue siendo "&record%&"."
+      "La mayor puntuaciÛn sigue siendo "&record%&"."
   endif
 
   key_press
@@ -1956,7 +1940,7 @@ deffn yes_key%
   loc key$,yes%
 
   repeat
-    let key$ = get_key_prompt$('S√≠ | No')
+    let key$ = get_key_prompt$('SÌ | No')
     if key$ instr "NSns"
       exit
     endif
@@ -1984,7 +1968,7 @@ deffn decision_option%
   loc key$,decision%
 
   repeat
-    let key$ = get_key_prompt$('S√≠  |  No  |  Consejo')
+    let key$ = get_key_prompt$('SÌ  |  No  |  Consejo')
     if key$ instr "CNScns"
       exit
     endif
@@ -2169,39 +2153,39 @@ label @plot_data
 data "NMHQJLMMMMMPKLMMM",\
      "Instaurar el servicio militar obligatorio"
 data "NMMPMJMMMMMNMLMMM",\
-     "Requisar tierras para construir un pol√≠gono de tiro"
+     "Requisar tierras para construir un polÌgono de tiro"
 data "NCMPLNMLMLMNMNIMM",\
      "Atacar las bases de la guerilla"
 data "NEMPLMMIMLMNMNKMM",\
      "Atacar la base de la guerrilla en Leftoto"
 data "NMMQONMMIMMNMNMMJ",\
-     "Destituir al jefe de la polic√≠a secreta"
+     "Destituir al jefe de la policÌa secreta"
 data "NMMPMMMLMIOMMMMMM",\
      "Echar a los militares rusos"
 data "NMDQMLMMMMMOLLLMM",\
      "Aumentar la paga de las tropas"
 data "NAMQLLMLLMMPLLKLM",\
-     "Comprar m√°s armas y municiones"
+     "Comprar m·s armas y municiones"
 
 ' ..............................
 ' Petitions from the peasants (8)
 
 data "NMMLONMMMMMLMMLMM",\
-     "Poner freno a los abusos del ej√©rcito"
+     "Poner freno a los abusos del ejÈrcito"
 data "NMMMQIMNMMMMOLMMM",\
-     "Aumentar el salario m√≠nimo"
+     "Aumentar el salario mÌnimo"
 data "NMPNQOMMIMMNNNNMJ",\
-     "Acabar con la polic√≠a secreta"
+     "Acabar con la policÌa secreta"
 data "NMMMPKMKMMMMOKMMM",\
-     "Detener la inmigraci√≥n de Leftoto"
+     "Detener la inmigraciÛn de Leftoto"
 data "NCELQKMOLNMMNLLMM",\
      "Poner escuela gratis para todos"
 data "NMMMQJMNLNMMPJMML",\
      "Legalizar los sindicatos"
 data "NMMLQKMNLMMMOLLMM",\
-     "Liberar a su l√≠der encarcelado"
+     "Liberar a su lÌder encarcelado"
 data "NMSMPLMMMMMMMMLMM",\
-     "Iniciar una loter√≠a p√∫blica"
+     "Iniciar una loterÌa p˙blica"
 
 ' ..............................
 ' Petitions from the landowners (8)
@@ -2209,13 +2193,13 @@ data "NMSMPLMMMMMMMMLMM",\
 data "NMMKMPMMMMMLMMMMM",\
      "Prohibir el uso militar de sus tierras"
 data "NMMMIQMLMLMMKONMM",\
-     "Bajar el salario m√≠nimo"
+     "Bajar el salario mÌnimo"
 data "NWHMMPMNMOIMMNMMM",\
-     "Nacionalizar las empresas use√±as"
+     "Nacionalizar las empresas useÒas"
 data "NMRMMPMJMLMMNOMLM",\
      "Tasar las importaciones de leftoto"
 data "NMQNNPMMIMMNMNNMK",\
-     "Cortar los gastos de la polic√≠a secreta"
+     "Cortar los gastos de la policÌa secreta"
 data "NMHMMQMMMMMMMOMMM",\
      "Bajar el impuesto sobre la tierra"
 data "NMMKLPMMMMMLLNNMM",\
@@ -2227,58 +2211,58 @@ data "NACNNPMJMONMMPMKM",\
 ' Decisions
 
 data "NMMQLLMMLMMNMMLML",\
-     "Nombrar ministro al jefe del ej√©rcito"
+     "Nombrar ministro al jefe del ejÈrcito"
 data "NLILQNMOMNMMMMLMM",\
      "Construir hospitales para los trabajadores"
 data "NMMLKQMMLLMLLOMML",\
      "Dar poderes a los terratenientes"
 data "NRMKMMMQMKNLMMLPM",\
-     "Vender armas use√±as a Leftoto"
+     "Vender armas useÒas a Leftoto"
 data "NYMMMLMLMKPMMMMMM",\
-     "Vender derechos a empresas use√±as"
+     "Vender derechos a empresas useÒas"
 data "NMWKMMMMMPJMMMMNM",\
      "Alquilar a Rusia una base naval"
 data "NMENPPMMMMMLMMLMM",\
      "Bajar los impuestos"
 data "NEMPPPMMMMMMMMLMM",\
-     "Hacer una campa√±a de imagen presidencial"
+     "Hacer una campaÒa de imagen presidencial"
 data "NMUPPPMMDMMONNNMD",\
-     "Reducir el poder de la polic√≠a secreta"
+     "Reducir el poder de la policÌa secreta"
 data "NMGJJJMMUMMLLLLMU",\
-     "Aumentar el poder de la polic√≠a secreta"
+     "Aumentar el poder de la policÌa secreta"
 data "NIMKLLMMLMMKMMMML",\
-     "Aumentar el n√∫mero de guardaespaldas (*)"
+     "Aumentar el n˙mero de guardaespaldas (*)"
 data "NAMIIJMMKMMMMMMMM",\
-     "Comprar un helic√≥ptero para una posible huida del pa√≠s"
+     "Comprar un helicÛptero para una posible huida del paÌs"
 data "NMMMMMMMMMMMMMMMM",\
      "Hacer una transferencia a la cuenta presidencial \
      en un banco suizo (*)"
 data "NMMMMMMMMMMMMMMMM",\
-     "Solicitar un pr√©stamo a los rusos"
+     "Solicitar un prÈstamo a los rusos"
 data "NMMMMMMMMMMMMMMMM",\
-     "Solicitar un pr√©stamo a los use√±os"
+     "Solicitar un prÈstamo a los useÒos"
 data "NZMNNPMGMKMMMMMMM",\
      "Nacionalizar las empresas de Leftoto"
 data "NHMPMMMJMLMRMMKKL",\
-     "Comprar armas para el ej√©rcito"
+     "Comprar armas para el ejÈrcito"
 data "NMMMPLMMLMMMRLPML",\
      "Legalizar las asociaciones campesinas"
 data "NMMLLPMMLMMLLRLML",\
-     "Permitir que los terratenientes tengan ej√©rcitos privados"
+     "Permitir que los terratenientes tengan ejÈrcitos privados"
 
 ' ..............................
 ' Events
 
 data "NMMMMMMMIMMMMMQMI",\
-     "Los archivos de la polic√≠a secreta han sido robados"
+     "Los archivos de la policÌa secreta han sido robados"
 data "NMMMMMMMMMMLMMVMM",\
-     "Cuba est√° entrenando a las guerillas"
+     "Cuba est· entrenando a las guerillas"
 data "NMMMMMMMMMMIMMOMN",\
-     "Un barrac√≥n del ej√©rcito ha explotado"
+     "Un barracÛn del ejÈrcito ha explotado"
 data "NMMMMMMMMMMMMJMKM",\
-     "El precio de los pl√°tanos ha ca√≠do un 98%"
+     "El precio de los pl·tanos ha caÌdo un 98%"
 data "NMMMMMMMMMMMMOMIM",\
-     "El jefe del estado mayor del ej√©rcito se ha fugado a Leftoto"
+     "El jefe del estado mayor del ejÈrcito se ha fugado a Leftoto"
 data "NMMMMMMMMMMMILKMM",\
      "Se ha declarado una epidemia entre los campesinos"
 
@@ -2297,10 +2281,10 @@ data "NMMMMMMMMMMMILKMM",\
 label @groups_data
 
 data 7,6,none%,none%,\
-     "el ej√©rcito",\
-     "ej√©rcito",\
+     "el ejÈrcito",\
+     "ejÈrcito",\
      "los militares",\
-     "del ej√©rcito",\
+     "del ejÈrcito",\
      "militar"
 data 7,6,none%,none%,\
      "los campesinos",\
@@ -2327,11 +2311,11 @@ data 7,6,none%,none%,\
      "de Leftoto",\
      "leftotano"
 data 7,6,none%,none%,\
-     "la polic√≠a secreta",\
-     "polic√≠a secreta",\
-     "los polic√≠as secretos",\
-     "de la polic√≠a secreta",\
-     "polic√≠a secreto"
+     "la policÌa secreta",\
+     "policÌa secreta",\
+     "los policÌas secretos",\
+     "de la policÌa secreta",\
+     "policÌa secreto"
 data 7,0,none%,none%,\
      "Rusia",\
      "rusos",\
@@ -2340,10 +2324,10 @@ data 7,0,none%,none%,\
      "ruso"
 data 7,0,none%,none%,\
      "Usa",\
-     "use√±os",\
-     "los use√±os",\
+     "useÒos",\
+     "los useÒos",\
      "de Usa",\
-     "use√±o"
+     "useÒo"
 
 label @icons_data
 
@@ -2612,8 +2596,8 @@ defproc init_windows
   if windows_do_not_fit%
     init_font
     print_l #ow%,"Error fatal:"
-    print_l #ow%,"La resoluci√≥n de pantalla es insuficiente."
-    print_l #ow%,"Este programa necesita una resoluci√≥n m√≠nima de "\
+    print_l #ow%,"La resoluciÛn de pantalla es insuficiente."
+    print_l #ow%,"Este programa necesita una resoluciÛn mÌnima de "\
       &ow_width%&"x"&(ow_height%+iw_height%)&"."
     stop
   endif
