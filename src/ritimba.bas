@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.74+201710112056"
+version$="0.1.0-dev.75+201710112110"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -412,7 +412,7 @@ defproc expose_petition
   paper #ow%,bright_yellow%
   at #ow%,14,0
   print_l #ow%,"¿Está su excelencia conforme con "\
-    &iso_lower_1$(decision$(petition%))&"?"
+    &iso_lower_1$(issue$(petition%))&"?"
 
 enddef
 
@@ -536,7 +536,7 @@ defproc decision
       if not is_decision_taken%(i%)
         let options%=options%+1
         paragraph #ow%
-        print_l #ow%,options%&". "&decision$(i%)&"."
+        print_l #ow%,options%&". "&issue$(i%)&"."
       endif
     endfor i%
 
@@ -583,7 +583,7 @@ defproc decision
           cls #ow%
           paper #ow%,white%
 
-          print_l #ow%,"¿"&decision$(chosen_decision%)&"?"
+          print_l #ow%,"¿"&issue$(chosen_decision%)&"?"
 
           if yes_key%
 
@@ -660,7 +660,7 @@ defproc maybe_advice(decision%)
   at #ow%,ow_lines%/3,0
   print_l #ow%,"¿Quiere recibir consejo \
     acerca de las consecuencias de tomar la decisión de "\
-    &iso_lower_1$(decision$(decision%))&"?"
+    &iso_lower_1$(issue$(decision%))&"?"
 
   if yes_key%:\
     advice decision%
@@ -681,7 +681,7 @@ defproc advice(decision%)
   wipe yellow%,black%,yellow%
 
   print_l #ow%,"Consecuencias de "\
-    &iso_lower_1$(decision$(decision%))&":"
+    &iso_lower_1$(issue$(decision%))&":"
   end_paragraph #ow%
 
   under #ow%,1
@@ -1580,7 +1580,7 @@ defproc latest_news
   paper #ow%,white%
   ink #ow%,black%
   at #ow%,14,0
-  print_l_paragraph #ow%,decision$(random_event%)&"."
+  print_l_paragraph #ow%,issue$(random_event%)&"."
   take_only_once_decision random_event%
 
   key_press
@@ -1997,7 +1997,7 @@ defproc mark_decision_taken(decision%)
 
   ' Mark a decision taken.
 
-  let decision_data$(decision%,1)="*"
+  let issue_data$(decision%,1)="*"
 
 enddef
 
@@ -2008,7 +2008,7 @@ defproc restore_petitions
   loc i%
 
   for i%=1 to petitions%:\
-    let decision_data$(i%,1)="N"
+    let issue_data$(i%,1)="N"
 
 enddef
 
@@ -2018,14 +2018,14 @@ defproc restore_decisions
 
   loc i%
 
-  for i%=1 to decisions%:\
-    let decision_data$(i%,1)="N"
+  for i%=1 to issues%:\
+    let issue_data$(i%,1)="N"
 
 enddef
 
 deffn is_decision_taken%(decision%)
 
-  ret decision_data$(decision%,1)="*"
+  ret issue_data$(decision%,1)="*"
 
 enddef
 
@@ -2037,25 +2037,25 @@ enddef
 
 deffn decision_cost%(decision%)
 
-  ret code(decision_data$(decision%,2))-code("M")
+  ret code(issue_data$(decision%,2))-code("M")
 
 enddef
 
 deffn decision_monthly_cost%(decision%)
 
-  ret code(decision_data$(decision%,3))-code("M")
+  ret code(issue_data$(decision%,3))-code("M")
 
 enddef
 
 deffn decision_popularity_effect%(decision%,group%)
 
-  ret code(decision_data$(decision%,group%+3))-code("M")
+  ret code(issue_data$(decision%,group%+3))-code("M")
 
 enddef
 
 deffn decision_power_effect%(decision%,group%)
 
-  ret code(decision_data$(decision%,group%+11))-code("M")
+  ret code(issue_data$(decision%,group%+11))-code("M")
 
 enddef
 
@@ -2066,9 +2066,10 @@ defproc init_data
 
   loc x$ ' XXX TMP --
 
-  let decision_name_max_len%=70
-  dim decision_data$(decisions%,17)
-  dim decision$(decisions%,decision_name_max_len%)
+  let issue_max_len%=70
+  dim \
+    issue$(issues%,issue_max_len%),\
+    issue_data$(issues%,17)
 
   ' XXX TODO -- Calculate max lengths.
   let max_short_name_len%=17
@@ -2086,14 +2087,14 @@ defproc init_data
 
   restore @plot_data
 
-  for i%=1 to decisions%:
-    read decision_data$(i%),x$
-    if len(x$)>decision_name_max_len%
+  for i%=1 to issues%:
+    read issue_data$(i%),x$
+    if len(x$)>issue_max_len%
       ' XXX TMP --
-      print "ERROR: decision name too long:"\x$
+      print "ERROR: issue name too long:"\x$
       stop
     else
-      let decision$(i%)=x$
+      let issue$(i%)=x$
     endif
   endfor i%
 
@@ -2140,11 +2141,11 @@ enddef
 ' Petitions, decisions and events data
 
 ' XXX REMARK --
-' Character fields in decision_data$():
+' Character fields in issue_data$():
 
 ' 01: decision already taken ("N"=no, "*"=yes)
-' 02: cost
-' 03: monthly cost
+' 02: cost (in thousands)
+' 03: monthly cost (in thousands)
 ' 04..11: +/- popularity for groups 1-8
 ' 12..17 +/- power for groups% 1-6 (..."K"=-1, "L"=-1,"M"=0, "N"=1...)
 
@@ -2682,8 +2683,8 @@ defproc init_constants
   let yellow%=13
   let white%=14
 
+  let issues%=49
   let petitions%=24
-  let decisions%=49
 
   let groups%=8
   let main_groups%=3  ' only the groups that can rebel

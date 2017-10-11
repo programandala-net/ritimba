@@ -12,9 +12,8 @@
 == 2017-09-22
 
 - Rename `pc%`.
-- Move the data from `decision_data$()` into numeric arrays.
+- Move the data from `issue_data$()` into numeric arrays.
 - Move `csize_width_pixels` and `csize_height_pixels` to the library.
-- Fix: Two groups can be allies of other.
 - Improve `money_transfer` with menu or input, more information and
   better layout.
 - Improve: Calculate valid options in `decision` before displaying
@@ -43,9 +42,6 @@
   decisions. It means they can be taken more than once. Improve the
   interface instead. For example change the color of the decisions
   that have been taken, and remove them from the possible inputs.
-- Rename `decisions%` and family. The decisions are only a part of the
-  data, like petitions and events. Better yet: Separate data into
-  three arrays.
 
 == 2017-10-11
 
@@ -59,3 +55,5 @@
 - Use a block or window as background of the petitions. Now the used
   space is irregular.
 - Fix `escape_on_foot`: clear input window.
+- Improve the police report: Mark groups with low popularity and
+  enough power.
