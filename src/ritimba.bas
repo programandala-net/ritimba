@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.75+201710112110"
+version$="0.1.0-dev.76+201710112241"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -962,11 +962,16 @@ enddef
 defproc rebellion
 
   loc \
-    helping_group%,\
-    rebel_group%,\
-    try_escaping%
+    loyal_group%,\
+    rebel_group%
 
   if rebels%
+    unavoidable_rebellion
+  endif
+
+enddef
+
+defproc unavoidable_rebellion
 
     rebellion_alarm
 
@@ -976,11 +981,11 @@ defproc rebellion
       fight
     endif
 
-  endif
-
 enddef
 
 deffn want_to_escape%
+
+  ' Ask the player to escape. Return 1 (yes) or 0 (no).
 
   loc yes%
 
@@ -994,6 +999,9 @@ enddef
 
 deffn rebels%
 
+  ' Do a random search among all groups.  If a rebel group is found,
+  ' return its number.  Otherwise return zero.
+
   loc i%
 
   for i%=1 to main_groups%
@@ -1001,7 +1009,7 @@ deffn rebels%
     if plan%(rebel_group%)=rebellion%:\
       exit i%
   next i%
-    ret 0
+    let rebel_group%=0
   endfor i%
 
   ret rebel_group%
@@ -1034,7 +1042,7 @@ enddef
 deffn rebels_are_stronger%
 
   ret not(rebels_strength%<=strength%\
-         +power%(helping_group%)\
+         +power%(loyal_group%)\
          +rnd(-1 to 1))
 
 enddef
@@ -1058,8 +1066,8 @@ defproc rebellion_report
   at #ow%,8,0
   print #ow%,"Tu fuerza es ";strength%
   print #ow%,\\"La fuerza de ";\
-    name$(helping_group%);" es ";\
-    power%(helping_group%)
+    name$(loyal_group%);" es ";\
+    power%(loyal_group%)
   print #ow%,\\"La de los rebeldes es ";rebels_strength%
   key_press
 
@@ -1067,7 +1075,7 @@ enddef
 
 defproc ask_for_help
 
-  local i%,helping_groups$,k$,group_keys_prompt$
+  local i%,loyal_groups$,k$,group_keys_prompt$
 
   pause 150
   cls #ow%
@@ -1089,19 +1097,19 @@ defproc ask_for_help
   for i%=1 to local_groups%
     if popularity%(i%)>low%
       print #ow%,to 6;i%;" ";name$(i%)
-      let helping_groups$=helping_groups$&i%
+      let loyal_groups$=loyal_groups$&i%
       let group_keys_prompt$=group_keys_prompt$&i%&" "
     endif
   endfor i%
 
   let group_keys_prompt$=trim_right$(group_keys_prompt$)
 
-  if len(helping_groups$)
+  if len(loyal_groups$)
 
     rep
       let k$=get_key_prompt$("["&group_keys_prompt$&"]")
-      if k$ instr helping_groups$
-        let helping_group%=k$
+      if k$ instr loyal_groups$
+        let loyal_group%=k$
         exit
       endif
     endrep
@@ -1231,7 +1239,7 @@ defproc the_rebellion_is_defeated
     let popularity%(ally%(rebel_group%))=0
     let power%(ally%(rebel_group%))=0
   endif
-  let power%(helping_group%)=9
+  let power%(loyal_group%)=9
   let pc%=months%+2
   plot
   police_report
