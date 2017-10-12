@@ -25,7 +25,7 @@
 
 - Improve `center`: use a backslash to mark the prefered split points
   in the text.
-- Improve design of the treasure report.
+- Improve design of the treasury report.
 - Improve: Choose the ammount to be transfered to Switzerland.
 - Display something during the calculation of the possible allies.
 

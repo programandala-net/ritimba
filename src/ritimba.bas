@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.80+201710121701"
+version$="0.1.0-dev.81+201710121756"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -118,13 +118,13 @@ defproc national_flag
 
   let flag_width%=22  ' in chars
   let flag_height%=12 ' in chars
-  let flag_x%=center_for(flag_width%)
+  let flag_x%=center_for%(flag_width%)
   let flag_y%=8
 
   let stars_width%=4  ' in chars
   let stars_height%=4 ' in chars
   let stars_row$=fill$("*",stars_width%)
-  let stars_x%=center_for(stars_width%)
+  let stars_x%=center_for%(stars_width%)
   let stars_y%=flag_y%+(flag_height%-stars_height%)/2
 
   let bar_colour%=green%
@@ -477,49 +477,19 @@ defproc decision
 
   loc i%,\
     chosen_decision%,\
-    option%,\
-    options%,\
-    first_decision%,\
-    last_decision%
+    section%,\
+    options%
 
   rep choose_decision
 
-    wipe red%,yellow%,blue%
-
-    print #ow%,fill$("*",columns%*ow_lines%)
-
-    paper #ow%,bright_blue%
-    ink #ow%,bright_white%
-    center #ow%,3,"DECISIÓN PRESIDENCIAL"
-
-    paper #ow%,yellow%
-    ink #ow%,black%
-    ' XXX TODO -- Store these options in an array,
-    ' reuse them as titles of the lower level,
-    ' and keep the data of their unused suboptions.
-    at #ow%,08,4:print #ow%,"1. Complacer a un grupo  "
-    at #ow%,10,4:print #ow%,"2. Complacer a todos     "
-    at #ow%,12,4:print #ow%,"3. Aumentar los ingresos "
-    at #ow%,14,4:print #ow%,"4. Fortalecer a un grupo "
-    at #ow%,16,4:print #ow%,"5. Asuntos privados      "
-
-    let option%=code(get_key$)-code("0")
+    let section%=decision_section%
     cls #ow%
-    sel on option%
-      ' XXX TODO -- Store these values in an array.
-      =1:let first_decision%=25:let last_decision%=30
-      =2:let first_decision%=31:let last_decision%=33
-      =3:let first_decision%=38:let last_decision%=40
-      =4:let first_decision%=41:let last_decision%=43
-      =5:let first_decision%=34:let last_decision%=37
-      =remainder:ret
-    endsel
 
     ' XXX TODO -- Calculate valid options before displaying them.
 
-    at #ow%,(20-((last_decision%-first_decision%)*3))*.5,0
+    at #ow%,(20-((last_decision%(section%)-first_decision%(section%))*3))*.5,0
     let options%=0
-    for i%=first_decision% to last_decision%
+    for i%=first_decision%(section%) to last_decision%(section%)
       if not is_decision_taken%(i%)
         let options%=options%+1
         paragraph #ow%
@@ -540,11 +510,11 @@ defproc decision
       next choose_decision
     endif
 
-    if k$<1 or k$>last_decision%-first_decision%+1
+    if k$<1 or k$>last_decision%(section%)-first_decision%(section%)+1
       next choose_decision
     endif
 
-    let chosen_decision%=first_decision%+k$-1
+    let chosen_decision%=first_decision%(section%)+k$-1
 
     if is_decision_taken%(chosen_decision%)
       next choose_decision
@@ -596,6 +566,49 @@ defproc decision
     endsel
 
   endrep choose_decision
+
+enddef
+
+deffn decision_section%
+
+  ' Display the sections of the presidential decisions, wait for a
+  ' valid key press and return the corresponding section number.
+
+  loc i%,col%,zero%,key$,valid_keys$,prompt$
+
+  let zero%=code("0")
+
+  wipe red%,yellow%,blue%
+
+  print #ow%,fill$("*",columns%*ow_lines%)
+
+  paper #ow%,bright_blue%
+  ink #ow%,bright_white%
+  center #ow%,3,"DECISIÓN PRESIDENCIAL"
+
+  paper #ow%,yellow%
+  ink #ow%,black%
+
+  let col%=center_for%(3+section_max_len%)
+
+  for i%=1 to decision_sections%
+    at #ow%,8+i%*2,col%
+    print #ow%,i%&". "&decision_section$(i%)
+    valid_keys$=valid_keys$&chr$(i%+zero%)
+  endfor
+
+  let prompt$="1 .. "&valid_keys$(len(valid_keys$))
+
+  rep
+
+    key$=get_key_prompt$(prompt$)
+    if key$ instr valid_keys$
+      exit
+    endif
+
+  endrep
+
+  ret key$
 
 enddef
 
@@ -2183,6 +2196,23 @@ defproc init_data
     read icon$(i%)
   endfor i%
 
+  let decision_sections%=5
+  let section_max_len%=21
+
+  dim \
+    decision_section$(decision_sections%,section_max_len%),\
+    first_decision%(decision_sections%),\
+    last_decision%(decision_sections%)
+
+  restore @decisions_data
+
+  for i%=1 to decision_sections%
+    read \
+      decision_section$(i%),\
+      first_decision%(i%),\
+      last_decision%(i%)
+  endfor
+
   ' XXX TODO -- Not needed except to play again, what
   ' needs more restoration:
   restore_decisions
@@ -2405,6 +2435,16 @@ data "army"
 data "peasants"
 data "landowners"
 
+label @decisions_data
+
+' Data: section title, first decision, last decision
+
+data "Complacer a un grupo ",25,30
+data "Complacer a todos    ",31,33
+data "Aumentar los ingresos",38,40
+data "Fortalecer a un grupo",41,43
+data "Asuntos privados     ",34,37
+
 ' ==============================================================
 ' Special effects {{{1
 
@@ -2489,8 +2529,8 @@ defproc wipe(paper_colour%,ink_colour%,border_colour%)
 
 enddef
 
-deffn center_for(width_in_chars%)
-  ret (columns%-width_in_chars%)/2
+deffn center_for%(width_in_chars%)
+  ret (columns%-width_in_chars%) div 2
 enddef
 
 defproc center(channel%,line%,text$)
@@ -2513,7 +2553,7 @@ defproc center(channel%,line%,text$)
 
         let first_part$=trim$(text$(to i%-1))
         let first_part_length%=len(first_part$)
-        at #channel%,line%,center_for(first_part_length%)
+        at #channel%,line%,center_for%(first_part_length%)
 
         center channel%,line%+1,text$(i%+1 to)
 
@@ -2534,7 +2574,7 @@ defproc center(channel%,line%,text$)
 
     ' The text fits in one line.
 
-    at #channel%,line%,center_for(length%)
+    at #channel%,line%,center_for%(length%)
     print #channel%,text$
 
   endif
@@ -2545,7 +2585,7 @@ defproc center_here(channel,text$)
   ' XXX UNDER DEVELOPMENT
   loc length%
   let length%=minimum%(len(text$),columns%)
-  at #channel,line%,center_for(length%)
+  at #channel,line%,center_for%(length%)
   print #channel,text$(to length%)
 enddef
 
