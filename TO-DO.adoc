@@ -49,7 +49,6 @@
 - Improve the texts and layout of the denied police report.
 - Improve the choosing of the loyal group. Improve the numbering of
   the list and the prompt. Count the loyal groups in advance.
-- Fix "la/s guerrilla/s".
 - Rewrite `celebration`.
 - Check and improve `ask_for_loan`.
 - Fix "fuerza/poder".

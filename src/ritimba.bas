@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.83+201710121859"
+version$="0.1.0-dev.84+201710121909"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1215,7 +1215,7 @@ defproc escape_on_foot
   pause 200
   cls #ow%
 
-  if not int((rnd*((power%(guerrillas%)/3)+.4)))
+  if not int((rnd*((power%(guerrilla%)/3)+.4)))
     do_escape_on_foot
   else
     the_guerrilla_catchs_you
@@ -1227,7 +1227,7 @@ defproc do_escape_on_foot
 
   at #ow%,12,0
   print_l_paragraph #ow%,\
-    "Milagrosamente, las guerillas no logran atraparlo."
+    "Milagrosamente, la guerrilla no logra atraparlo."
   let escape%=1
 
 enddef
@@ -1239,7 +1239,7 @@ defproc the_guerrilla_catchs_you
   at #ow%,12,0
   paragraph #ow%
   print_l #ow%,\
-    "Por desgracia, las guerillas lo encuentran \
+    "Por desgracia, la guerrilla lo encuentra \
     antes de que llegue a la frontera..."
   pause 50
   shoot_dead_sfx
@@ -2281,7 +2281,7 @@ data "NMHQJLMMMMMPKLMMM",\
 data "NMMPMJMMMMMNMLMMM",\
      "Requisar tierras para construir un polígono de tiro"
 data "NCMPLNMLMLMNMNIMM",\
-     "Atacar las bases de la guerilla"
+     "Atacar las bases de la guerrilla"
 data "NEMPLMMIMLMNMNKMM",\
      "Atacar la base de la guerrilla en Leftoto"
 data "NMMQONMMIMMNMNMMJ",\
@@ -2382,7 +2382,7 @@ data "NMMLLPMMLMMLLRLML",\
 data "NMMMMMMMIMMMMMQMI",\
      "Los archivos de la policía secreta han sido robados"
 data "NMMMMMMMMMMLMMVMM",\
-     "Cuba está entrenando a las guerillas"
+     "Cuba está entrenando a la guerrilla"
 data "NMMMMMMMMMMIMMOMN",\
      "Un barracón del ejército ha explotado"
 data "NMMMMMMMMMMMMJMKM",\
@@ -2425,7 +2425,7 @@ data 7,6,none%,none%,\
      "de los terratenientes",\
      "terrateniente"
 data 0,6,none%,none%,\
-     "la guerilla",\
+     "la guerrilla",\
      "guerrilla",\
      "los guerrilleros",\
      "de la guerrilla",\
@@ -2835,7 +2835,7 @@ defproc init_constants
   let army%=1
   let peasants%=2
   let landowners%=3
-  let guerrillas%=4
+  let guerrilla%=4
   let leftoto%=5
   let police%=6
   let russia%=7
