@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.79+201710120116"
+version$="0.1.0-dev.80+201710121701"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -276,8 +276,9 @@ defproc try_assassination
 
   wipe black%,white%,black%
   center #ow%,8,"INTENTO DE MAGNICIDIO"
-  center #ow%,10,"por un "&member$(group%)&""
+  center #ow%,10,"por un "&member$(group%)
   pause 50
+
   cls #ow%
   shoot_dead_sfx
   pause 50
@@ -288,6 +289,8 @@ defproc try_assassination
     failed_assassination
   endif
 
+  key_press
+
 enddef
 
 defproc failed_assassination
@@ -296,7 +299,7 @@ defproc failed_assassination
   wipe white%,black%,black%
   paper #ow%,white%
   ink #ow%,black%
-  center #ow%,12,"Intento fallido"
+  center #ow%,12,"Intento fallido."
 
 enddef
 
@@ -304,7 +307,7 @@ defproc successful_assassination
 
   ' XXX TODO -- Improve.
   wipe black%,white%,black%
-  center #ow%,12,"¡Está usted muerto!"
+  center #ow%,12,"El asesino ha logrado su objetivo."
   zx_beep 3,-40
   let alive%=0
 
@@ -365,7 +368,8 @@ defproc audience
         cls #ow%
         print_l_paragraph #ow%,\
           "No hay suficientes fondos para adoptar esta decisión."
-        print_l_paragraph #ow%,"Su respuesta debe ser no."
+        print_l_paragraph #ow%,\
+          "La respuesta de su excelencia debe ser no."
         key_press
       endif
     endif
@@ -897,7 +901,7 @@ defproc police_report_data(title$,title_continued$)
   paper #ow%,black%
   ink #ow%,white%
   paragraph #ow%
-  print_l #ow%,"Tu fuerza es "&strength%&"."
+  print_l #ow%,"La fuerza de su excelencia es "&strength%&"."
   end_paragraph #ow%
   paragraph #ow%
   print_l #ow%,"La fuerza necesaria para una rebelión es "&rebellion_strength%&"."
@@ -922,19 +926,22 @@ defproc police_report_not_avalaible
   center #ow%,6,"INFORME DE LA POLICÍA SECRETA"
   center #ow%,10,"NO DISPONIBLE"
 
+  at #ow%,12,0
   if popularity%(police%)<=low%
-    print #ow%,\\"Tu popularidad entre la policía es ";\
-      popularity%(police%);"."
+    print_l_paragraph #ow%,\
+      "La popularidad de su excelencia entre la policía es "&\
+      popularity%(police%)&"."
   endif
 
   if power%(police%)<=low%
-    print #ow%,to 3\\"El poder de la policía es ";\
-      power%(police%);"."
-        ' XXX TODO -- Prevent "policía" twice.
+    print_l_paragraph #ow%,\
+      "El poder de la policía es "&\
+      power%(police%)&"."
   endif
 
   if money<=0
-    print #ow%,to 3\\"No tienes dinero para pagar un informe."
+    print_l_paragraph #ow%,\
+    "Su excelencia no tiene dinero para pagar el informe."
   endif
 
 enddef
@@ -1016,8 +1023,7 @@ enddef
 defproc rebellion_starts
 
   wipe white%,black%,white%
-  at #ow%,12,3
-  print #ow%,"La rebelión ha comenzado"
+  center #ow%,12,"La rebelión ha comenzado"
   war_sfx
 
 enddef
@@ -1047,11 +1053,20 @@ defproc rebellion_report
 
   cls #ow%
   at #ow%,8,0
-  print #ow%,"Tu fuerza es ";strength%
-  print #ow%,\\"La fuerza de ";\
-    name$(loyal_group%);" es ";\
-    power%(loyal_group%)
-  print #ow%,\\"La de los rebeldes es ";rebels_strength%
+
+  print_l_paragraph #ow%,\
+    "La fuerza de su excelencia es "&strength%&"."
+
+  if loyal_group%
+    print_l_paragraph #ow%,\
+      "La fuerza de "&\
+      name$(loyal_group%)&" es "&\
+      power%(loyal_group%)&"."
+  endif
+
+  print_l_paragraph #ow%,\
+    "La fuerza de los rebeldes es "&rebels_strength%&"."
+
   key_press
 
 enddef
@@ -1068,14 +1083,17 @@ defproc ask_for_help
     +power%(ally%(rebel_group%))
 
   at #ow%,5,0
-  print_l #ow%,\
+  print_l_paragraph #ow%,\
     "Se han unido "&\
     name$(rebel_group%)&\
     " y "&\
     name$(ally%(rebel_group%))&"."
 
-  print #ow%,\\"Su fuerza conjunta es ";rebels_strength%;"."
-  print #ow%,\\"¿A quién vas a pedir ayuda?"
+  print_l_paragraph #ow%,\
+    "Su fuerza conjunta es "&rebels_strength%&"."
+
+  print_l_paragraph #ow%,\
+    "¿A quién va a pedir ayuda su excelencia?"
 
   for i%=1 to local_groups%
     if popularity%(i%)>low%
@@ -1152,10 +1170,9 @@ enddef
 
 defproc escape_on_foot
 
-  at #ow%,10,2
-  print #ow%,"Tienes que atravesar el"
-  at #ow%,12,6
-  print #ow%,"monte hacia Leftoto."
+  at #ow%,8,0
+  print_l_paragraph #ow%,\
+    "Su excelencia tiene que atravesar el monte a pie hacia Leftoto..."
   pause 200
   cls #ow%
 
@@ -1170,7 +1187,8 @@ enddef
 defproc do_escape_on_foot
 
   at #ow%,12,0
-  print #ow%,"Las guerillas no te atraparon"
+  print_l_paragraph #ow%,\
+    "Milagrosamente, las guerillas no logran atraparlo."
   let escape%=1
 
 enddef
@@ -1179,10 +1197,16 @@ defproc the_guerrilla_catchs_you
 
   wipe black%,white%,black%
   pause 50
-  shoot_dead_sfx
   at #ow%,12,0
-  print #ow%,"Las guerillas están celebrándolo"
+  paragraph #ow%
+  print_l #ow%,\
+    "Por desgracia, las guerillas lo encuentran \
+    antes de que llegue a la frontera..."
+  pause 50
   shoot_dead_sfx
+  print_l #ow%,\
+    "y lo ejecutan."
+  end_paragraph #ow%
   let alive%=0
 
 enddef
@@ -1190,11 +1214,10 @@ enddef
 defproc the_rebellion_wins
 
   wipe black%,white%,black%
-  at #ow%,10,7
-  print #ow%,"Has sido derrocado"
-  at #ow%,12,10
-  print #ow%,"y liquidado."
+  center #ow%,10,"Su excelencia es capturado..."
+  pause 50
   shoot_dead_sfx
+  center #ow%,12,"y ejecutado."
   let alive%=0
 
 enddef
@@ -1203,29 +1226,57 @@ defproc the_rebellion_is_defeated
 
   local i%
 
-  wipe black%,white%,black%
-  at #ow%,10,2
-  print #ow%,"La revuelta ha sido sofocada."
-  at #ow%,0,0
-  for i%=1 to ow_lines%-1
-    paper #ow%,rnd(1 to 5)
-    print #ow%,blank_line$
-  endfor i%
-  at #ow%,10,0
-  print #ow%,"¿Castigas a los rebeldes?"
+  wipe white%,black%,white%
+  celebration
+  paper #ow%,bright_white%
+  center #ow%,10,"¡La rebelión ha sido sofocada!"
+
+  at #ow%,12,0
+  print_l #ow%,\
+    "¿Ordena su excelencia castigar a los rebeldes?"
+  cls #ow%,4
+
   if yes_key%
-    for n=1 to 3:\
-      shoot_dead_sfx:\
-      pause .1
-    let popularity%(rebel_group%)=0
-    let power%(rebel_group%)=0
-    let popularity%(ally%(rebel_group%))=0
-    let power%(ally%(rebel_group%))=0
+    punish_the_rebels
   endif
+
   let power%(loyal_group%)=9
   let pc%=months%+2
+
   plot
   police_report
+
+enddef
+
+defproc celebration
+
+  ' XXX TODO -- Rewrite. Do something different.
+
+  loc i%
+
+  at #ow%,0,0
+
+  for i%=0 to ow_lines%-1
+    at #ow%,i%,0
+    paper #ow%,rnd(1 to 14)
+    cls #ow%,3
+  endfor i%
+
+enddef
+
+defproc punish_the_rebels
+
+  local i%
+
+  for i%=1 to 3
+    shoot_dead_sfx
+    pause .1
+  endfor i%
+
+  let popularity%(rebel_group%)=0
+  let power%(rebel_group%)=0
+  let popularity%(ally%(rebel_group%))=0
+  let power%(ally%(rebel_group%))=0
 
 enddef
 
@@ -1328,18 +1379,23 @@ enddef
 
 defproc bankruptcy
 
+  ' XXX TODO -- Improve.
+
   cls #ow%
-  center #ow%,5,"La hacienda pública está en bancarrota."
+  at #ow%,5,0
+
+  print_l_paragraph #ow%,\
+    "La hacienda pública está en bancarrota."
 
   at #ow%,9,0
 
-  paragraph #ow%
-  print_l #ow%,"Su popularidad entre el ejército y \
+  print_l_paragraph #ow%,\
+    "La popularidad de su excelencia entre el ejército y \
     la policía secreta caerán."
 
-  paragraph #ow%
-  print_l #ow%,"El poder de la policía \
-    y su propio poder se reducirán también."
+  print_l_paragraph #ow%,\
+    "El poder de la policía \
+    y el propio poder de su excelencia se reducirán también."
 
   let popularity%(army%)=popularity%(army%)\
                          -(popularity%(army%)>0)
@@ -1352,7 +1408,7 @@ defproc bankruptcy
 
   let strength%=strength%-(strength%>0)
 
-  pause 250
+  key_press
   plot
   police_report
 
@@ -1463,14 +1519,14 @@ defproc ask_for_loan(decision%)
   loc country,loan
 
   sel on decision% ' XXX TODO -- Improve.
-    =38:let country=russian
+    =38:let country=russia%
     =39:let country=usa%
   endsel
 
   wipe yellow%,black%,red%
   paper #ow%,red%
-  print #ow%,\"SOLICITUD DE PRÉSTAMO EXTRANJERO"
-  center #ow%,12,"ESPERA"
+  center #ow%,1,"SOLICITUD DE PRÉSTAMO EXTRANJERO"
+  center #ow%,12,"ESPERE"
   pause 50
   if country=usa%
     tune "2m1j3f3j3m4r1 2v1t3r3j3l4m"
@@ -1529,22 +1585,28 @@ defproc money_transfer
   loc amount
 
   cls #ow%
-  at #ow%,3,0
-  print #ow%,"TRANSFERENCIA A LA CUENTA SUIZA"\\\:
+  centor #ow%,1,"TRANSFERENCIA A LA CUENTA SUIZA"
 
   let amount=int(money/2) ' XXX TODO -- Let the player choose.
+  at #ow%,12,0
+  paragraph #ow%
   if amount>=1
-    print #ow%,"La hacienda pública tenía ";money$(int(money));
+    print_l #ow%,\
+      "La hacienda pública tenía "&money$(int(money))&","
     let money_in_switzerland=money_in_switzerland+amount
     let money=money-amount
     pause 100
-    print #ow%,\\money$(amount);" han sido transferidos"
+    print_l #ow%,\
+      "de los cuales "&money$(amount)&" han sido transferidos."
   else
-    center #ow%,12,"Ninguna transferencia hecha"
+    print_l #ow%,\
+      "No hay fondos. \
+      La transferencia no puede realizarse."
     pause 100
   endif
+  end_paragraph #ow%
 
-  ' XXX TODO -- Wait for key
+  key_press
 
 enddef
 
@@ -1665,8 +1727,13 @@ defproc threat_of_war
   loc i%
 
   wipe black%,white%,cyan%
-  center #ow%,6,"Amenazas a Leftoto con la guerra"
-  center #ow%,10,"Tu popularidad crece en Ritimba"
+  at #ow%,6,0
+  print_l_paragraph #ow%,\
+    "Su excelencia amenaza a Leftoto con la guerra."
+
+  at #ow%,10,0
+  print_l_paragraph #ow%,\
+    "La popularidad de su excelencia crece en Ritimba."
 
   for i%=1 to main_groups%,police%
     increase_popularity i%
@@ -1692,20 +1759,23 @@ defproc actual_war
 
   wipe red%,black%,black%
 
-  center #ow%,8,"Leftoto nos invade" ' XXX TODO -- Improve.
+  center #ow%,8,"¡Leftoto invade Ritimba!" ' XXX TODO -- Improve.
 
   let ritimba_strength%=ritimba_current_strength%
 
-  at #ow%,12,1
-  print #ow%,"La fuerza de Ritimba es ";ritimba_strength%
+  at #ow%,12,0
+  print_l_paragraph #ow%,\
+    "La fuerza de Ritimba es "&ritimba_strength%&"."
 
   let leftoto_strength%=leftoto_current_strength%
 
-  at #ow%,14,1
-  print #ow%,"La fuerza de Leftoto es ";leftoto_strength%
+  at #ow%,14,0
+  print_l_paragraph #ow%,\
+    "La fuerza de Leftoto es "&leftoto_strength%&"."
 
-  at #ow%,18,3
-  print #ow%,"Una corta y decisiva guerra"
+  at #ow%,16,0
+  print_l_paragraph #ow%,"Una corta y decisiva guerra."
+
   war_sfx
 
   if ritimba_wins%
@@ -1718,7 +1788,7 @@ enddef
 
 deffn ritimba_wins%
 
-  ret leftoto_strength%+rnd(-1 to 1)<ritimba_strength%
+  ret (leftoto_strength%+rnd(-1 to 1))<ritimba_strength%
 
 enddef
 
@@ -1768,9 +1838,9 @@ defproc leftoto_wins
 
     ' Escape
 
-    cls #ow%
-    at #ow%,12,3
-    print #ow%,"¡Escapas en helicóptero!"
+    at #ow%,10,0
+    print_l_paragraph #ow%,\
+      "Su excelencia logra escapar en helicóptero."
     let escape%=1
 
   else
@@ -1778,15 +1848,16 @@ defproc leftoto_wins
     if have_helicopter%
       at #ow%,10,0
       print_l_paragraph #ow%,\
-        "Intentas escapar en helicóptero, \
+        "Su excelencia intenta escapar en helicóptero, \
         pero el motor sufre una avería."
       pause 80
     endif
 
     at #ow%,12,0
     paragraph #ow%
-    print_l #ow%,"Eres acusado de ser un enemigo del pueblo y, \
-             tras un juicio sumarísimo,"
+    print_l #ow%,\
+      "Su excelencia es acusado de ser un enemigo del pueblo y, \
+      tras un juicio sumarísimo,"
     pause 50
     shoot_dead_sfx
     print_l #ow%,"ejecutado."

@@ -21,10 +21,6 @@
 - Improve `center_for` and `center`: calculate the actual size of the
   text using the current `csize`.
 
-== 2017-09-24
-
-- Use `print_l` instead of `print` when possible.
-
 == 2017-10-08
 
 - Improve `center`: use a backslash to mark the prefered split points
@@ -52,7 +48,16 @@
 - Extend the description of events.
 - Improve the police report: Mark groups with low popularity and
   enough power.
-- Homogenize terms: "tu/usted/su excelencia"...
 - Improve the title of the splash screen.
 - Improve the welcome screen: Simulate a document that must be
   subscribed. Add the player name to a score table.
+
+== 2017-10-12
+
+- Improve the texts and layout of the denied police report.
+- Improve the choosing of the loyal group. Improve the numbering of
+  the list and the prompt. Count the loyal groups in advance.
+- Fix "la/s guerrilla/s".
+- Rewrite `celebration`.
+- Check and improve `ask_for_loan`.
+- Fix "fuerza/poder".
