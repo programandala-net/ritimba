@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.81+201710121756"
+version$="0.1.0-dev.82+201710121804"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -2015,7 +2015,7 @@ deffn get_key_prompt$(prompt$)
 enddef
 
 deffn get_key$
-  ret get_key_prompt$("TECLA")
+  ret get_key_prompt$("...")
 enddef
 
 deffn yes_key%
