@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.82+201710121804"
+version$="0.1.0-dev.83+201710121859"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -475,52 +475,21 @@ enddef
 
 defproc decision
 
-  loc i%,\
-    chosen_decision%,\
-    section%,\
-    options%
+  loc section%,chosen_decision%
 
   rep choose_decision
 
     let section%=decision_section%
-    cls #ow%
-
-    ' XXX TODO -- Calculate valid options before displaying them.
-
-    at #ow%,(20-((last_decision%(section%)-first_decision%(section%))*3))*.5,0
-    let options%=0
-    for i%=first_decision%(section%) to last_decision%(section%)
-      if not is_decision_taken%(i%)
-        let options%=options%+1
-        paragraph #ow%
-        print_l #ow%,options%&". "&issue$(i%)&"."
-      endif
-    endfor i%
-
-    if not options%
-      paragraph #ow%
-      print_l #ow%,"Esta sección está agotada"
-      pause 150
-      next choose_decision
+    if section%=0
+      exit choose_decision
     endif
 
-    let k$=get_key$
-
-    if not k$ instr "0123456"
-      next choose_decision
-    endif
-
-    if k$<1 or k$>last_decision%(section%)-first_decision%(section%)+1
-      next choose_decision
-    endif
-
-    let chosen_decision%=first_decision%(section%)+k$-1
-
-    if is_decision_taken%(chosen_decision%)
-      next choose_decision
-    endif
-
+    let chosen_decision%=decision%(section%)
+    
     sel on chosen_decision%
+
+      =0
+       next choose_decision
 
       =37
         money_transfer
@@ -531,6 +500,9 @@ defproc decision
         exit choose_decision
 
       =remainder
+
+        ' XXX TODO -- Rewrite to avoid `maybe_advice`. Integrate the
+        ' advice into the menu, as in the audiences.
 
         maybe_advice chosen_decision%
 
@@ -574,7 +546,7 @@ deffn decision_section%
   ' Display the sections of the presidential decisions, wait for a
   ' valid key press and return the corresponding section number.
 
-  loc i%,col%,zero%,key$,valid_keys$,prompt$
+  loc i%,col%,digit$,zero%,key$,valid_keys$,prompt$
 
   let zero%=code("0")
 
@@ -594,21 +566,75 @@ deffn decision_section%
   for i%=1 to decision_sections%
     at #ow%,8+i%*2,col%
     print #ow%,i%&". "&decision_section$(i%)
-    valid_keys$=valid_keys$&chr$(i%+zero%)
+    let digit$=chr$(i%+zero%)
+    let valid_keys$=valid_keys$&digit$
+    let prompt$=prompt$&digit$&" | "
   endfor
+  let prompt$=prompt$&"..."
 
-  let prompt$="1 .. "&valid_keys$(len(valid_keys$))
+  key$=get_key_prompt$(prompt$)
+  if key$ instr valid_keys$
+    ret key$
+  else
+    ret 0
+  endif
 
-  rep
+enddef
 
-    key$=get_key_prompt$(prompt$)
-    if key$ instr valid_keys$
-      exit
+deffn decision%(section%)
+
+  loc i%,\
+      option%,\     ' output
+      options$,\    ' valid digits
+      key$,\      ' user input
+      prompt$
+
+  cls #ow%
+
+  at #ow%,(20-((last_decision%(section%)-first_decision%(section%))*3))*.5,0
+
+  for i%=first_decision%(section%) to last_decision%(section%)
+    if is_decision_taken%(i%)
+      ink #ow%,white% ' XXX TMP --
+    else
+      ink #ow%,black%
+      let options$=\
+        options$\
+        &decision_index%(i%)
+      let prompt$=\
+        prompt$\
+        &if$(len(prompt$)," | ","")\
+        &decision_index%(i%)
+    endif
+    print_l_paragraph #ow%,\
+      decision_index%(i%)&". "\
+      &issue$(i%)&"."
+  endfor i%
+
+  if len(options$)
+
+    let key$=get_key_prompt$(prompt$&" | ...")
+    if key$ instr options$
+      let option%=first_decision%(section%)+key$-1
+    else
+      let option%=0
     endif
 
-  endrep
+  else
 
-  ret key$
+    print_l_paragraph #ow%,"Esta sección está agotada."
+    key_press
+    let option%=0
+
+  endif
+
+  ret option%
+
+enddef
+
+deffn decision_index%(i%)
+
+  ret i%-first_decision%(section%)+1
 
 enddef
 
@@ -2331,12 +2357,12 @@ data "NMUPPPMMDMMONNNMD",\
 data "NMGJJJMMUMMLLLLMU",\
      "Aumentar el poder de la policía secreta"
 data "NIMKLLMMLMMKMMMML",\
-     "Aumentar el número de guardaespaldas (*)"
+     "Aumentar el número de guardaespaldas"
 data "NAMIIJMMKMMMMMMMM",\
      "Comprar un helicóptero para una posible huida del país"
 data "NMMMMMMMMMMMMMMMM",\
      "Hacer una transferencia a la cuenta presidencial \
-     en un banco suizo (*)"
+     en un banco suizo"
 data "NMMMMMMMMMMMMMMMM",\
      "Solicitar un préstamo a los rusos"
 data "NMMMMMMMMMMMMMMMM",\
@@ -2499,13 +2525,12 @@ enddef
 '     ret result_if_false
 ' enddef
 
-' deffn if$(flag,result_if_true$,result_if_false$)
-'   ' XXX REMARK -- Not used.
-'   if flag:\
-'     ret result_if_true$:\
-'   else:\
-'     ret result_if_false$
-' enddef
+deffn if$(flag,true$,false$)
+  if flag:\
+    ret true$:\
+  else:\
+    ret false$
+enddef
 
 ' ==============================================================
 ' Text output {{{1

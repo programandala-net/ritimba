@@ -4,8 +4,6 @@
 
 == 2017-09-21
 
-- Fix the numbers of the menu options: they do not match because old
-  decisions are omitted from the list.
 - Improve the messages and layout of the final escape to Leftoto.
 - Improve the messages about the helicopter.
 
@@ -16,8 +14,6 @@
 - Move `csize_width_pixels` and `csize_height_pixels` to the library.
 - Improve `money_transfer` with menu or input, more information and
   better layout.
-- Improve: Calculate valid options in `decision` before displaying
-  them.
 - Improve `center_for` and `center`: calculate the actual size of the
   text using the current `csize`.
 
@@ -34,10 +30,6 @@
 - Remove `maybe_advice`.
 - Improve wording of "sus tierras". Better yet: Add an additional
   wording to be used in the advice report.
-- Remove the mark "(*)" from the descriptions of the presidential
-  decisions. It means they can be taken more than once. Improve the
-  interface instead. For example change the color of the decisions
-  that have been taken, and remove them from the possible inputs.
 
 == 2017-10-11
 
@@ -61,3 +53,4 @@
 - Rewrite `celebration`.
 - Check and improve `ask_for_loan`.
 - Fix "fuerza/poder".
+- Pretty the submenus of presidential decisions.
