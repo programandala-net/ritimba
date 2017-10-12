@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.84+201710121909"
+version$="0.1.0-dev.85+201710122253"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1330,7 +1330,7 @@ defproc treasury_report
   paper #ow%,bright_white%
   ink #ow%,black%
   center #ow%,8,"INFORME DE LA HACIENDA PÚBLICA"
-  treasury_report_details
+  treasury_report_data
 
 enddef
 
@@ -1381,7 +1381,7 @@ deffn money$(ammount)
 
 enddef
 
-defproc treasury_report_details
+defproc treasury_report_data
 
   loc ammount$
 
@@ -1655,26 +1655,21 @@ enddef
 defproc news
 
   if not rnd(0 to 2):\
-    latest_news
+    newsflash
 
 enddef
 
-defproc latest_news
+defproc newsflash
 
-  loc random_event%
+  loc event%
 
-  let random_event%=new_event%
+  let event%=new_event%
 
   wipe white%,black%,white%
 
-  latest_news_title 10
-
-  paper #ow%,white%
-  ink #ow%,black%
-  at #ow%,14,0
-  print_l_paragraph #ow%,issue$(random_event%)&"."
-  take_only_once_decision random_event%
-
+  newsflash_title 10
+  newsflash_contents event%
+  take_only_once_decision event%
   key_press
 
   plot
@@ -1682,11 +1677,35 @@ defproc latest_news
 
 enddef
 
-defproc latest_news_title(flashes%)
+defproc newsflash_contents(event%)
 
-  loc i%
+  ' Display the contents of the given newsflash.
+
+  paper #ow%,bright_white%
+  ink #ow%,black%
+  at #ow%,14,0
+  cls #ow%,3 ' clear the line
+  print_l #ow%,issue$(event%)&"."
+  cls #ow%,4 ' clear the rest of the line
+
+enddef
+
+defproc newsflash_title(flashes%)
+
+  ' Credit:
+  ' The siren sound is borrowed from:
+  '
+  ' SOUNDbytes
+  ' By Mike Jonas and Ed Kingsley
+  ' http://www.dilwyn.me.uk/sound/
+  ' http://www.dilwyn.me.uk/sound/soundbytes.zip
+
+  loc i%,grad_y%
+
+  let grad_y% = 1
 
   for i%=1 to flashes%
+  
     if i% mod 2
       paper #ow%,white%
       ink #ow%,black%
@@ -1694,14 +1713,14 @@ defproc latest_news_title(flashes%)
       paper #ow%,black%
       ink #ow%,white%
     endif
+ 
     center #ow%,10,"NOTICIA DE ÚLTIMA HORA"
-    if i%<>flashes%:\
-      zx_beep .6,30
-  endfor i%
 
-  repeat:\
-    if not beeping:\
-      exit
+    beep 10000,6,17,-1,grad_y%
+    let grad_y% = -grad_y%
+    pause 25
+
+  endfor i%
 
 enddef
 
@@ -2555,7 +2574,9 @@ defproc wipe(paper_colour%,ink_colour%,border_colour%)
 enddef
 
 deffn center_for%(width_in_chars%)
+
   ret (columns%-width_in_chars%) div 2
+
 enddef
 
 defproc center(channel%,line%,text$)

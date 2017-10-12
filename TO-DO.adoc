@@ -14,7 +14,7 @@
 - Move `csize_width_pixels` and `csize_height_pixels` to the library.
 - Improve `money_transfer` with menu or input, more information and
   better layout.
-- Improve `center_for` and `center`: calculate the actual size of the
+- Improve `center_for%` and `center`: calculate the actual size of the
   text using the current `csize`.
 
 == 2017-10-08
@@ -36,7 +36,6 @@
 - Simplify the windows layout: Use a background window to simulate the
   ZX Spectrum border. Then the output window can use its own internal
   border as a margin.
-- Improve the news alarm after the original.
 - Extend the description of events.
 - Improve the police report: Mark groups with low popularity and
   enough power.
@@ -52,4 +51,4 @@
 - Rewrite `celebration`.
 - Check and improve `ask_for_loan`.
 - Fix "fuerza/poder".
-- Pretty the submenus of presidential decisions.
+- Tidy the submenus of presidential decisions.
