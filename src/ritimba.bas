@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.90+201710132018"
+version$="0.1.0-dev.91+201710140019"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -691,9 +691,7 @@ defproc advice(decision%)
     &iso_lower_1$(issue$(decision%))&":"
   end_paragraph #ow%
 
-  under #ow%,1
-  print #ow%,\"La popularidad del presidente"
-  under #ow%,0
+  advice_section "La popularidad del presidente"
 
   let variations%=0
   for i%=1 to groups%
@@ -722,9 +720,7 @@ defproc advice(decision%)
     csize #ow%,csize_width%,csize_height%
   endif
 
-  under #ow%,1
-  print #ow%,\"La fuerza de los grupos"
-  under #ow%,0
+  advice_section "La fuerza de los grupos"
 
   let variations%=0
   for i%=1 to local_groups%
@@ -740,9 +736,7 @@ defproc advice(decision%)
   if not variations%:\
     print #ow%,"Ningún cambio."
 
-  under #ow%,1
-  print #ow%,\"La hacienda pública"
-  under #ow%,0
+  advice_section "La hacienda pública"
 
   let paragraph_separation_backup%=paragraph_separation%
   let paragraph_separation%=0
@@ -751,6 +745,14 @@ defproc advice(decision%)
 
   key_press
   cls #ow%
+
+enddef
+
+defproc advice_section(title$)
+
+  under #ow%,1
+  print #ow%,\title$
+  under #ow%,0
 
 enddef
 
