@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-10-13
+:revdate: 2017-10-14
 
 == 2017-09-21
 
@@ -45,7 +45,6 @@
 - Improve the choosing of the loyal group. Improve the numbering of
   the list and the prompt. Count the loyal groups in advance.
 - Rewrite `celebration`.
-- Check and improve `ask_for_loan`.
 - Fix "fuerza/poder".
 - Tidy the submenus of presidential decisions.
 - Improve the Y/N of a presidential decision after the petitions:
@@ -62,3 +61,7 @@
 - Add the icon of the secret police.
 - Fix: sometimes the combined power of the rebels is zero.
 - Add option: Escape.
+
+== 2017-10-14
+
+- Improve design of `ask_for_loan`.

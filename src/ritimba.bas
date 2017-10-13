@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.91+201710140019"
+version$="0.1.0-dev.92+201710140036"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1543,64 +1543,65 @@ enddef
 
 defproc ask_for_loan(decision%)
 
-  loc country,loan
+  loc country%,\
+      loan,\
+      answer$,\
+      answer_line%
 
-  sel on decision% ' XXX TODO -- Improve.
-    =38:let country=russia%
-    =39:let country=usa%
+  let answer_line%=12
+
+  sel on decision%
+    =38:let country%=russia%
+    =39:let country%=usa%
   endsel
 
   wipe yellow%,black%,red%
+
   paper #ow%,red%
   center #ow%,1,"SOLICITUD DE PRÉSTAMO EXTRANJERO"
-  center #ow%,12,"ESPERE"
+  center #ow%,answer_line%,"ESPERE"
   pause 50
-  if country=usa%
+
+  if country%=usa%
     tune "2m1j3f3j3m4r1 2v1t3r3j3l4m"
   else
     tune "2g2d3i4d2 2g2d3i4d"
   endif
-  at #ow%,12,0
-  if country=usa%
-    print #ow%,"Los useños";
-  else
-    print #ow%,"Los rusos";
-  endif
 
-  if months%<int(rnd*5)+3
-    at #ow%,12,2
+  if months%<rnd(3 to 7)
 
-      ' XXX FIXME -- This position overrides the previous text.
-      ' Concatenate strings and print the result with `print_l`.
-
-    print #ow%,"opinan que es demasiado pronto \
+    let answer$="opinan que es demasiado pronto \
       para conceder ayudas ecónomicas."
+
   else
+
     if is_decision_taken%(decision%)
-      at #ow%,12,2
-      print #ow%,"Te deniegan un nuevo préstamo."
+
+      let answer$="te deniegan un nuevo préstamo"
+
     else
 
-      ' XXX FIXME -- Run-time error in this expression:
-      ' 2016-01-22: again:
-      ' country=0
-      ' popularity_field%=1
-      ' low%=3
-      ' popularity%(country) = character nul
-
-      if popularity%(country)<=low%
-        at #ow%,12,12
-        print #ow%,'Te dicen que no, sin ninguna explicación.'
+      if popularity%(country%)<=low%
+        let answer$="dicen que no, sin ninguna explicación"
       else
-        print #ow%," te concederán"
-        let loan=popularity%(7+x%)*30+rnd(0 to 200)
-        at #ow%,14,7
-        print #ow%,y%;nbsp$&"000 "&currency$
+        let loan=popularity%(country%)*30+rnd(0 to 199)
+        let answer$="conceden un préstamo de "\
+          &money$(loan)
         let money=money+loan
-        mark_decision_taken 38+x%
+        mark_decision_taken decision%
       endif
+
     endif
+
   endif
+
+  clear_lines #ow%,answer_line%,answer_line%+1
+    ' all answers need at least 2 lines
+  at #ow%,answer_line%-1,0
+  print_l_paragraph #ow%,\
+    iso_upper_1$(plural_name$(country%))&" "&answer$&"."
+  cls #ow%,4 ' clear the rest of the possible third line
+
   key_press
 
 enddef
