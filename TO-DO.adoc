@@ -24,7 +24,6 @@
 
 == 2017-10-09
 
-- Remove `maybe_advice`.
 - Improve wording of "sus tierras". Better yet: Add an additional
   wording to be used in the advice report.
 
@@ -49,6 +48,9 @@
 - Check and improve `ask_for_loan`.
 - Fix "fuerza/poder".
 - Tidy the submenus of presidential decisions.
+- Improve the Y/N of a presidential decision after the petitions:
+  combine with advice report and adapt the valid options if the
+  decision is not affordable.
 
 == 2017-10-13
 

@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.89+201710132009"
+version$="0.1.0-dev.90+201710132018"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -501,10 +501,7 @@ defproc decision
 
       =remainder
 
-        ' XXX TODO -- Rewrite to avoid `maybe_advice`. Integrate the
-        ' advice into the menu, as in the audiences.
-
-        maybe_advice chosen_decision%
+        advice chosen_decision%
 
         if affordable%(chosen_decision%)
 
@@ -674,22 +671,6 @@ enddef
 deffn in_range%(x%,min%,max%)
 
   return maximum%(minimum%(x%,max%),min%)
-
-enddef
-
-defproc maybe_advice(decision%)
-
-  ' XXX OLD
-
-  wipe green%,black%,blue%
-
-  at #ow%,ow_lines%/3,0
-  print_l #ow%,"¿Quiere recibir consejo \
-    acerca de las consecuencias de tomar la decisión de "\
-    &iso_lower_1$(issue$(decision%))&"?"
-
-  if yes_key%:\
-    advice decision%
 
 enddef
 
