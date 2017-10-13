@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.87+201710131932"
+version$="0.1.0-dev.88+201710132004"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1019,8 +1019,13 @@ deffn want_to_escape%
   loc yes%
 
   wipe yellow%,black%,yellow%
-  center #ow%,12,"¿Intento de escape?"
+  at #ow%,ow_lines% div 2,0
+  paper #ow%,bright_yellow%
+  cls #ow%,3
+  print_l #ow%,"¿Desea su excelencia intentar escapar del país?"
+  cls #ow%,4
   let yes%=yes_key%
+  paper #ow%,yellow%
   cls #ow%
   ret yes%
 
