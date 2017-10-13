@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.86+201710131857"
+version$="0.1.0-dev.87+201710131932"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1980,7 +1980,12 @@ enddef
 
 defproc score_report
 
-  loc i%,popularity_bonus%,time_bonus%,money_bonus%,bonus_col%
+  loc i%,\
+      popularity_bonus%,\
+      time_bonus%,\
+      money_bonus%,\
+      alive_bonus%,\
+      bonus_col%
 
   let bonus_col%=28 ' colum where bonus are displayed
 
@@ -2007,9 +2012,10 @@ defproc score_report
 
   if alive%
 
+    let alive_bonus%=alive%*10
     print #ow%,\"Por seguir con vida:";to bonus_col%;
-    print_using #ow%,"####",alive%
-    let score%=score%+alive%
+    print_using #ow%,"####",alive_bonus%
+    let score%=score%+alive_bonus%
 
     if money_in_switzerland
       let money_bonus%=money_in_switzerland div 10

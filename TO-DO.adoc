@@ -57,7 +57,6 @@
 - Improve the look of `money_transfer`.
 - Possible improvement of `get_key_prompt$`: Get the valid keys from
   the prompt (uppercase letters and digits).
-- Fix the score: In the original, being alive adds 10 points.
 - Add the icon of the secret police.
 - Fix: sometimes the combined power of the rebels is zero.
 - Add option: Escape.
