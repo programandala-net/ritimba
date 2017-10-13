@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.88+201710132004"
+version$="0.1.0-dev.89+201710132009"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -2093,6 +2093,8 @@ deffn get_key_prompt$(prompt$)
     zx_beep .01,20
 
   endrep press_now
+
+  paper #iw%,prompt_colour_1%
 
   curdis #iw%
 
