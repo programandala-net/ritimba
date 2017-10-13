@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-10-12
+:revdate: 2017-10-13
 
 == 2017-09-21
 
@@ -12,8 +12,6 @@
 - Rename `pc%`.
 - Move the data from `issue_data$()` into numeric arrays.
 - Move `csize_width_pixels` and `csize_height_pixels` to the library.
-- Improve `money_transfer` with menu or input, more information and
-  better layout.
 - Improve `center_for%` and `center`: calculate the actual size of the
   text using the current `csize`.
 
@@ -22,7 +20,6 @@
 - Improve `center`: use a backslash to mark the prefered split points
   in the text.
 - Improve design of the treasury report.
-- Improve: Choose the ammount to be transfered to Switzerland.
 - Display something during the calculation of the possible allies.
 
 == 2017-10-09
@@ -52,3 +49,15 @@
 - Check and improve `ask_for_loan`.
 - Fix "fuerza/poder".
 - Tidy the submenus of presidential decisions.
+
+== 2017-10-13
+
+- Rewrite the final text of the score report.
+- Fix: Clear the input window before the escape to Leftoto.
+- Improve the look of `money_transfer`.
+- Possible improvement of `get_key_prompt$`: Get the valid keys from
+  the prompt (uppercase letters and digits).
+- Fix the score: In the original, being alive adds 10 points.
+- Add the icon of the secret police.
+- Fix: sometimes the combined power of the rebels is zero.
+- Add option: Escape.

@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.85+201710122253"
+version$="0.1.0-dev.86+201710131857"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -485,7 +485,7 @@ defproc decision
     endif
 
     let chosen_decision%=decision%(section%)
-    
+
     sel on chosen_decision%
 
       =0
@@ -1624,28 +1624,58 @@ defproc money_transfer
   loc amount
 
   cls #ow%
-  centor #ow%,1,"TRANSFERENCIA A LA CUENTA SUIZA"
+  center #ow%,1,"TRANSFERENCIA"
+  center #ow%,2,"A LA CUENTA EN SUIZA"
 
-  let amount=int(money/2) ' XXX TODO -- Let the player choose.
-  at #ow%,12,0
-  paragraph #ow%
-  if amount>=1
-    print_l #ow%,\
-      "La hacienda pública tenía "&money$(int(money))&","
-    let money_in_switzerland=money_in_switzerland+amount
-    let money=money-amount
-    pause 100
-    print_l #ow%,\
-      "de los cuales "&money$(amount)&" han sido transferidos."
+  if money
+    do_money_transfer
   else
     print_l #ow%,\
       "No hay fondos. \
       La transferencia no puede realizarse."
-    pause 100
   endif
-  end_paragraph #ow%
 
   key_press
+
+enddef
+
+defproc do_money_transfer
+
+  loc amount
+
+  at #ow%,4,0
+
+  print_l_paragraph #ow%,\
+    "La hacienda pública tiene "&money$(money)&"."
+
+  print_l_paragraph #ow%,\
+    "¿Qué cantidad desea su excelencia \
+    transferir a la cuenta en Suiza?"
+
+  print #ow%
+  print #ow%,"1. Todo."
+  print #ow%,"2. La mitad ("&money$(money div 2)&")"
+  print #ow%,"3. Un tercio ("&money$(money div 3)&")"
+  print #ow%,"4. Un cuarto ("&money$(money div 4)&")"
+  print #ow%,"5. Un quinto ("&money$(money div 5)&")"
+
+  let key$=get_key_prompt$("1 | 2 | 3 | 4 | 5 | ...")
+
+  at #ow%,3,0
+  cls #ow%,2
+
+  if key$ instr "12345"
+
+    let amount=money div key$
+    let money_in_switzerland=money_in_switzerland+amount
+    let money=money-amount
+
+    at #ow%,4,0
+
+    print_l_paragraph #ow%,\
+      money$(amount)&" han sido transferidos a la cuenta Suiza."
+
+  endif
 
 enddef
 
@@ -1705,7 +1735,7 @@ defproc newsflash_title(flashes%)
   let grad_y% = 1
 
   for i%=1 to flashes%
-  
+
     if i% mod 2
       paper #ow%,white%
       ink #ow%,black%
@@ -1713,7 +1743,7 @@ defproc newsflash_title(flashes%)
       paper #ow%,black%
       ink #ow%,white%
     endif
- 
+
     center #ow%,10,"NOTICIA DE ÚLTIMA HORA"
 
     beep 10000,6,17,-1,grad_y%
@@ -1982,7 +2012,7 @@ defproc score_report
     let score%=score%+alive%
 
     if money_in_switzerland
-      let money_bonus%=int(money_in_switzerland/10)
+      let money_bonus%=money_in_switzerland div 10
       print #ow%,\"Por los «ahorros» en Suiza"\"(";\
         money$(money_in_switzerland);"):";to bonus_col%;
       print_using #ow%,"####",money_bonus%
@@ -2528,24 +2558,16 @@ enddef
 ' ==============================================================
 ' Stock code {{{1
 
-' deffn on_(flag,result_if_false,result_if_true)
+' deffn if%(flag%,true%,false%)
 '   ' XXX REMARK -- Not used.
-'   if flag:\
-'     ret result_if_true:\
+'   if flag%:\
+'     ret true%:\
 '   else:\
-'     ret result_if_false
+'     ret false%
 ' enddef
 
-' deffn if_(flag,result_if_true,result_if_false)
-'   ' XXX REMARK -- Not used.
-'   if flag:\
-'     ret result_if_true:\
-'   else:\
-'     ret result_if_false
-' enddef
-
-deffn if$(flag,true$,false$)
-  if flag:\
+deffn if$(flag%,true$,false$)
+  if flag%:\
     ret true$:\
   else:\
     ret false$
@@ -2916,13 +2938,13 @@ defproc all_bmp_to_pic
 enddef
 
 defproc bmp_to_pic(base_filename$)
- 
+
   loc pic_address,len%,width%,height%,bmp_file$,pic_file$
- 
+
   let len%=len(base_filename$)
   let width%=base_filename$(len%-6 to len%-4)
   let height%=base_filename$(len%-2 to)
-  
+
   let bmp_file$=datad$&"img_"&base_filename$&".bmp"
   let pic_file$=datad$&"img_"&base_filename$&"_pic"
 
