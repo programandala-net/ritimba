@@ -9,7 +9,7 @@ rem Authors:
 rem Simon n Goodwin, 1988
 rem Adapted to Sbira by Marcos Cruz (programandala.net), 2017
 
-' Last modified 201710110022
+' Last modified 201710141326
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -127,13 +127,23 @@ deffn win_csize_height%
 enddef
 
 deffn win_line%(chan%)
-  ' XXX TODO --
-  ret win_ypos%(chan%)/win_csize_height%(chan%)
+  ' Return current cursor Y coordinate of window `chan%`.
+  ret win_ypos%(chan%)/win_cursor_height%(chan%)
 enddef
 
 deffn win_column%(chan%)
-  ' XXX TODO --
-  ret win_xpos%(chan%)/win_csize_width%(chan%)
+  ' Return current cursor X coordinate of window `chan%`.
+  ret win_xpos%(chan%)/win_cursor_width%(chan%)
+enddef
+
+deffn win_lines%(chan%)
+  ' Return current number of lines.
+  ret win_height%(chan%)/win_cursor_height%(chan%)
+enddef
+
+deffn win_columns%(chan%)
+  ' Return current number of columns.
+  ret win_width%(chan%)/win_cursor_width%(chan%)
 enddef
 
 ' ==============================================================
@@ -150,5 +160,8 @@ enddef
 ' `win_csize_heigth%`.
 '
 ' 2017-10-10: Improve documentation.  Fix `win_cursor_width%`.
+'
+' 2017-10-14: Finish `win_line%` and `win_column%`. Add
+' `win_lines%` and `win_columns%`.
 
 ' vim: filetype=sbim
