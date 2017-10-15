@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.92+201710140036"
+version$="0.1.0-dev.93+201710151405"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -178,30 +178,56 @@ defproc welcome
     paper #ow%,cyan%
     center #ow%,1,"Bienvenido al cargo"
     paper #ow%,white%
-    if first_game%
+
+    if first_president%
+
+      print_l_paragraph #ow%,\
+        "Su excelencia es el primer presidente \
+        de nuestra amada patria Ritimba."
       paragraph #ow%
-      print_l #ow%,"El anterior líder de nuestra \
-        amada patria Ritimba \
-        obtuvo una puntuación final de "&score%&"."
-      paragraph #ow%
-      print_l #ow%,"Te deseamos que logres hacerlo mucho mejor."
+      print_l #ow%,\
+        "Confiamos en su excelencia..."
+
     else
+
       paragraph #ow%
-      print_l #ow%,"Eres el primer presidente de nuestra \
-        amada patria Ritimba. \
-        Te deseamos que lo hagas bien."
+      print_l #ow%,\
+        "El anterior presidente \
+        de nuestra amada patria Ritimba \
+        obtuvo una puntuación de "&score%&"."
+
+      if record% and (record%>score%)
+        print_l #ow%,\
+          "Y el que hasta la fecha \
+          ha sido el mejor presidente \
+          obtuvo una puntuación de "&record%&"."
+      endif
+
+      end_paragraph #ow%
+      paragraph #ow%
+      print_l #ow%,\
+        "Deseamos que su excelencia \
+        logre hacerlo mucho mejor..."
+
     endif
-    paragraph #ow%
-    print_l #ow%,"Para empezar podrás ver un informe de \
-      la hacienda pública y otro de la policía secreta."
+
+    print_l #ow%,"por el bien de todos."
+    end_paragraph #ow%
+
+    print_l_paragraph #ow%,\
+      "Para empezar, su excelencia podrá leer un informe \
+      de la hacienda pública \
+      y otro de la policía secreta."
+
     key_press
+
     treasury_report
     ordinary_police_report
 
 enddef
 
-deffn first_game%
-  ret score%>0 and record%
+deffn first_president%
+  ret not (score%+record%)
 enddef
 
 ' ==============================================================
@@ -351,7 +377,7 @@ defproc audience
         =0,1 ' no or yes?
           exit
         =2
-         advice(petition%)
+         advice petition%
       endsel
 
     endrep
@@ -364,6 +390,9 @@ defproc audience
         take_decision petition%
         exit
       else
+        ' XXX FIXME -- This point is not reached when money is not
+        ' enough.
+        '
         ' XXX TODO -- Improve.
         cls #ow%
         print_l_paragraph #ow%,\
@@ -761,6 +790,10 @@ enddef
 
 defproc police_report
 
+  loc fee%
+
+  let fee%=1
+
   wipe black%,white%,black%
 
   if money<=0 \
@@ -771,10 +804,10 @@ defproc police_report
 
   else
 
-    center #ow%,6,"¿Informe de la Policía Secreta?"
-    center #ow%,12,"(Cuesta "&money$(1)&")"
+    center #ow%,6,"¿Informe de la policía secreta?"
+    center #ow%,12,"(Cuesta "&money$(fee%)&")"
     if yes_key%
-      let money=money-1
+      let money=money-fee%
       ordinary_police_report
     endif
 
@@ -1496,6 +1529,7 @@ defproc decision_treasury_report(decision%)
 
     if money+decision_cost>0:\
       ret
+
     if not(\
          (decision_cost<0 or decision_monthly_cost<0) \
          and \
@@ -1508,6 +1542,8 @@ defproc decision_treasury_report(decision%)
     print_l #ow%,\
       "La hacienda pública no dispone del dinero necesario."
 
+    ' XXX FIXME -- This message is too long. It scrolls
+    ' some screens.
     ' XXX TODO -- Combine into one condition and one message:
     if not is_decision_taken%(38):\
       paragraph #ow%
@@ -1595,8 +1631,8 @@ defproc ask_for_loan(decision%)
 
   endif
 
-  clear_lines #ow%,answer_line%,answer_line%+1
-    ' all answers need at least 2 lines
+  clear_lines \
+    #ow%,answer_line%,answer_line%+1 ' at least 2 lines needed
   at #ow%,answer_line%-1,0
   print_l_paragraph #ow%,\
     iso_upper_1$(plural_name$(country%))&" "&answer$&"."
@@ -2644,14 +2680,6 @@ defproc center(channel%,line%,text$)
 
   endif
 
-enddef
-
-defproc center_here(channel,text$)
-  ' XXX UNDER DEVELOPMENT
-  loc length%
-  let length%=minimum%(len(text$),columns%)
-  at #channel,line%,center_for%(length%)
-  print #channel,text$(to length%)
 enddef
 
 defproc restore_csize
