@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.99+201710151900"
+version$="0.1.0-dev.100+201710151906"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -521,7 +521,8 @@ defproc decision
        next choose_decision
 
       =37
-        if transfer%
+        transfer
+        if transferred_money
           exit choose_decision
         endif
 
@@ -1662,33 +1663,31 @@ defproc ask_for_loan(decision%)
 
 enddef
 
-deffn transfer%
+defproc transfer
 
   ' XXX TODO -- Improve.
 
-  loc done%
+  let transferred_money=0
 
   cls #ow%
   center #ow%,1,"TRANSFERENCIA"
   center #ow%,2,"A LA CUENTA EN SUIZA"
 
   if money>0
-    let done%=do_transfer%
+    do_transfer
   else
     print_l_paragraph #ow%,\
       "No hay fondos. \
       La transferencia no puede realizarse."
-    let done%=0
   endif
 
   key_press
-  ret done%
 
 enddef
 
-deffn do_transfer%
+defproc do_transfer
 
-  loc i%,amount,valid_options$,prompt$,key$
+  loc i%,valid_options$,prompt$,key$
 
   at #ow%,4,0
 
@@ -1717,20 +1716,19 @@ deffn do_transfer%
 
   if key$ instr valid_options$
 
-    let amount=money div key$
-    let money_in_switzerland=money_in_switzerland+amount
-    let money=money-amount
+    let transferred_money=money div key$
+    let money_in_switzerland=money_in_switzerland+transferred_money
+    let money=money-transferred_money
 
     at #ow%,4,0
 
     print_l_paragraph #ow%,\
-      money$(amount)&" han sido transferidos a la cuenta Suiza."
+      money$(transferred_money)\
+      &" han sido transferidos a la cuenta Suiza."
 
     ' XXX TODO -- Inform about the treasury.
 
   endif
-
-  ret amount>0
 
 enddef
 
@@ -2398,6 +2396,7 @@ defproc init_data
   endfor
 
   let money=1000
+  let transferred_money=0 ' in the latest transfer only
   let escape%=0
   let monthly_payment=60
   let strength%=4
