@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.94+201710151623"
+version$="0.1.0-dev.95+201710151636"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1016,6 +1016,8 @@ defproc police_report_not_available
     los informes de la policía."
   endif
 
+  key_press
+
 enddef
 
 ' ==============================================================
@@ -1672,7 +1674,7 @@ defproc money_transfer
   if money
     do_money_transfer
   else
-    print_l #ow%,\
+    print_l_paragraph #ow%,\
       "No hay fondos. \
       La transferencia no puede realizarse."
   endif
