@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.101+201710151917"
+version$="0.1.0-dev.102+201710151926"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1706,13 +1706,7 @@ defproc do_transfer
      transfer_option i%
   endfor
   
-  let prompt$="1"
-  for i%=2 to len(valid_options$)
-    let prompt$=prompt$&" | "&i%
-  endfor i%    
-  let prompt$=prompt$&" | ..."
-  
-  let key$=get_key_prompt$(prompt$)
+  let key$=get_key_prompt$(prompt$&" | ...")
 
   if key$ instr valid_options$
 
@@ -1734,6 +1728,9 @@ enddef
 
 defproc transfer_option(divisor%)
 
+  ' If the given transfer divisor is valid, dispaly its corresponding
+  ' menu option and update the related menu variables.
+
   loc amount%
 
   let amount%=money div divisor%
@@ -1743,7 +1740,10 @@ defproc transfer_option(divisor%)
     print #ow%,\
       divisor%;". ";divisor$(divisor%);\
       if$(divisor%<>1," ("&money$(amount%)&")","")
+
     let valid_options$=valid_options$&divisor%
+
+    let prompt$=prompt$&if$(divisor%<>1," | ","")&divisor%
 
   endif
 
