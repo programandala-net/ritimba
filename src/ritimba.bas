@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.93+201710151405"
+version$="0.1.0-dev.94+201710151623"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -792,15 +792,17 @@ defproc police_report
 
   loc fee%
 
-  let fee%=1
+  let fee%=1 ' in thousands
 
   wipe black%,white%,black%
+
+  display_police_icon
 
   if money<=0 \
     or popularity%(police%)<=low% \
     or power%(police%)<=low%
 
-    police_report_not_avalaible
+    police_report_not_available
 
   else
 
@@ -812,6 +814,16 @@ defproc police_report
     endif
 
   endif
+
+enddef
+
+defproc display_police_icon
+
+  loc icon$,x%
+
+  let icon$=datad$&"img_police_icon_pic"
+  let x%=(win_width%(ow%)-pic_width%(icon$)) div 2
+  load_pic_win #ow%,icon$,x%,0
 
 enddef
 
@@ -829,7 +841,6 @@ enddef
 defproc final_police_report
 
   wipe black%,white%,black%
-  center #ow%,1,"FINAL"
   police_report_data "INFORME FINAL","DE LA POLICÍA SECRETA"
 
 enddef
@@ -976,12 +987,17 @@ deffn is_local_group%(a_group%)
 
 enddef
 
-defproc police_report_not_avalaible
+defproc police_report_not_available
+
+  display_police_icon
 
   center #ow%,6,"INFORME DE LA POLICÍA SECRETA"
-  center #ow%,10,"NO DISPONIBLE"
+  ink #ow%,bright_white%
+  center #ow%,8,"NO DISPONIBLE"
+  ink #ow%,white%
 
-  at #ow%,12,0
+  at #ow%,11,0
+
   if popularity%(police%)<=low%
     print_l_paragraph #ow%,\
       "La popularidad de su excelencia entre la policía es "&\
@@ -996,7 +1012,8 @@ defproc police_report_not_avalaible
 
   if money<=0
     print_l_paragraph #ow%,\
-    "Su excelencia no tiene dinero para pagar el informe."
+    "La hacienda pública no tiene dinero para pagar \
+    los informes de la policía."
   endif
 
 enddef
