@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.103+201710151941"
+version$="0.1.0-dev.104+201710151951"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -592,11 +592,7 @@ deffn decision_section%
   let col%=center_for%(3+section_max_len%)
 
   for i%=1 to decision_sections%
-    at #ow%,8+i%*2,col%
-    print #ow%,i%&". "&decision_section$(i%)
-    let digit$=chr$(i%+zero%)
-    let valid_keys$=valid_keys$&digit$
-    let prompt$=prompt$&digit$&" | "
+    decision_item
   endfor
   let prompt$=prompt$&"..."
 
@@ -606,6 +602,22 @@ deffn decision_section%
   else
     ret 0
   endif
+
+enddef
+
+defproc decision_item
+
+  at #ow%,8+i%*2,col%
+  item #ow%,i%,decision_section$(i%)
+  let digit$=chr$(i%+zero%)
+  let valid_keys$=valid_keys$&digit$
+  let prompt$=prompt$&digit$&" | "
+
+enddef
+
+defproc item(channel%,item%,item$)
+
+  print #channel%,item%&". "&item$
 
 enddef
 
