@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.100+201710151906"
+version$="0.1.0-dev.101+201710151917"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1675,6 +1675,9 @@ defproc transfer
 
   if money>0
     do_transfer
+    if not transferred_money
+      ret
+    endif
   else
     print_l_paragraph #ow%,\
       "No hay fondos. \
@@ -1711,22 +1714,19 @@ defproc do_transfer
   
   let key$=get_key_prompt$(prompt$)
 
-  at #ow%,3,0
-  cls #ow%,2
-
   if key$ instr valid_options$
 
     let transferred_money=money div key$
     let money_in_switzerland=money_in_switzerland+transferred_money
     let money=money-transferred_money
 
+    at #ow%,3,0
+    cls #ow%,2
     at #ow%,4,0
 
     print_l_paragraph #ow%,\
       money$(transferred_money)\
       &" han sido transferidos a la cuenta Suiza."
-
-    ' XXX TODO -- Inform about the treasury.
 
   endif
 
