@@ -55,7 +55,6 @@
 
 - Rewrite the final text of the score report.
 - Fix: Clear the input window before the escape to Leftoto.
-- Improve the look of `money_transfer`.
 - Possible improvement of `get_key_prompt$`: Get the valid keys from
   the prompt (uppercase letters and digits).
 - Fix: sometimes the combined power of the rebels is zero.

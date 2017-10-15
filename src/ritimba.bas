@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.102+201710151926"
+version$="0.1.0-dev.103+201710151941"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1695,11 +1695,9 @@ defproc do_transfer
   at #ow%,4,0
 
   print_l_paragraph #ow%,\
-    "La hacienda pública tiene "&money$(money)&"."
-
-  print_l_paragraph #ow%,\
-    "¿Qué cantidad desea su excelencia \
-    transferir a la cuenta en Suiza?"
+    "¿Qué cantidad de dinero desea su excelencia \
+    transferir desde la hacienda pública \
+    a su cuenta personal en Suiza?"
 
   print #ow%
   for i%=1 to transfer_divisors%
@@ -1720,7 +1718,8 @@ defproc do_transfer
 
     print_l_paragraph #ow%,\
       money$(transferred_money)\
-      &" han sido transferidos a la cuenta Suiza."
+      &" han sido transferidos \
+         a la cuenta personal de su excelencia en Suiza."
 
   endif
 
@@ -1731,18 +1730,19 @@ defproc transfer_option(divisor%)
   ' If the given transfer divisor is valid, dispaly its corresponding
   ' menu option and update the related menu variables.
 
-  loc amount%
+  loc amount%,amount$
 
   let amount%=money div divisor%
 
   if valid_transfer%(amount%,divisor%)
 
+    amount$=money$(amount%)
     print #ow%,\
-      divisor%;". ";divisor$(divisor%);\
-      if$(divisor%<>1," ("&money$(amount%)&")","")
+      divisor%;". ";divisor$(divisor%);" ";\
+      fill$(".",columns%-5-len(divisor$(divisor%))-len(amount$));\
+      to columns%-len(amount$);amount$
 
     let valid_options$=valid_options$&divisor%
-
     let prompt$=prompt$&if$(divisor%<>1," | ","")&divisor%
 
   endif
@@ -2515,7 +2515,7 @@ data "NAMIIJMMKMMMMMMMM",\
      "Comprar un helicóptero para una posible huida del país"
 data "NMMMMMMMMMMMMMMMM",\
      "Hacer una transferencia a la cuenta presidencial \
-     en un banco suizo"
+     en Suiza"
 data "NMMMMMMMMMMMMMMMM",\
      "Solicitar un préstamo a los rusos"
 data "NMMMMMMMMMMMMMMMM",\
