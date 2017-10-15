@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.104+201710151951"
+version$="0.1.0-dev.105+201710152058"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -40,6 +40,8 @@ rem http://programandala.net/es.programa.ritimba.html
 
 ' ==============================================================
 ' Main loop {{{1
+
+' #define debugging
 
 defproc ritimba
 
@@ -615,12 +617,6 @@ defproc decision_item
 
 enddef
 
-defproc item(channel%,item%,item$)
-
-  print #channel%,item%&". "&item$
-
-enddef
-
 deffn decision%(section%)
 
   loc i%,\
@@ -634,6 +630,7 @@ deffn decision%(section%)
   at #ow%,(20-((last_decision%(section%)-first_decision%(section%))*3))*.5,0
 
   for i%=first_decision%(section%) to last_decision%(section%)
+
     if is_decision_taken%(i%)
       ink #ow%,white% ' XXX TMP --
     else
@@ -646,9 +643,12 @@ deffn decision%(section%)
         &if$(len(prompt$)," | ","")\
         &decision_index%(i%)
     endif
-    print_l_paragraph #ow%,\
-      decision_index%(i%)&". "\
-      &issue$(i%)&"."
+
+    item #ow%,\
+      decision_index%(i%),\
+      issue$(i%)&"."
+    print #ow%
+
   endfor i%
 
   if len(options$)
@@ -2779,6 +2779,65 @@ defproc restore_csize
 
 enddef
 
+defproc item(channel%,item%,item$)
+
+  ' Display list item with number `item%` and text `item$` on window
+  ' `channel%`.
+
+  loc indentation%,\         ' min column usable by the item string
+      width%,\               ' columns usable by the item string
+      len%,\                 ' lenght of the item string
+      first_char%,last_char% ' slice of item
+
+  let len%=len(item$)
+
+  print #channel%,item%&". ";
+  let indentation%=win_column%(channel%)
+  let width%=win_columns%(channel%)-indentation%
+  #ifdef debugging
+    print #dw%,"indentation%=";indentation%
+    print #dw%,"width%=";width%
+  #endif
+  let first_char%=1
+  let last_char%=minimum%(first_char%+width%,len%)
+
+  rep
+
+    #ifdef debugging
+      print #dw%,"first_char%=";first_char%;"=(";item$(first_char%);")"
+      print #dw%,"last_char%=";last_char%;"=(";item$(last_char%);")"
+      print #dw%,item$(first_char% to last_char%)
+    #endif
+
+    if (last_char%-first_char%+1)<=width% and last_char%=len%
+      #ifdef debugging
+        print #dw%,"FIT!"
+      #endif
+      print #channel%,item$(first_char% to last_char%);
+      exit
+    else
+      if item$(last_char%)=" "
+        #ifdef debugging
+          print #dw%,"Space!"
+        #endif
+        print #channel%,item$(first_char% to last_char%-1)
+        let first_char%=last_char%+1
+        let last_char%=minimum%(first_char%+width%,len%)
+        print #channel%,to indentation%;
+      else
+        #ifdef debugging
+          print #dw%,"1 less..."
+        #endif
+        let last_char%=last_char%-1
+      endif
+    endif
+
+  endrep
+
+  print #channel%
+
+enddef
+
 ' ==============================================================
 ' Screen {{{1
 
@@ -2921,6 +2980,21 @@ defproc init_windows
 
   let blank_line$=fill$(" ",columns%)
 
+  #ifdef debugging
+  
+    let dw%=fopen("scr_") ' debug window
+    window #dw%,\
+      scr_xlim-ow_x%-ow_width%,\
+      scr_ylim,\
+      ow_x%+ow_width%,\
+      0
+    paper #dw%,black%
+    ink #dw%,red%
+    csize #dw%,1,1
+    border #dw%,4,black%
+
+  #endif
+
 enddef
 
 deffn windows_do_not_fit%
@@ -3015,6 +3089,8 @@ enddef
 ' ==============================================================
 ' Meta {{{1
 
+' #ifdef debugging ' XXX TODO --
+
 defproc debug_(message$)
   if 1
     print #ow%,message$
@@ -3105,5 +3181,22 @@ defproc checkw
   endfor
 
 enddef
+
+defproc ci
+
+  ' Check `item`
+
+  paper #ow%,yellow%
+  ink #ow%,black%
+  cls
+  cls #ow%
+  item #ow%,1,\
+    "En un lugar de La Mancha, \
+    de cuyo nombre no quiero acordarme, \
+    no ha mucho que vivía un hidalgo."
+
+enddef
+
+' #endif ' XXX TODO --
 
 ' vim: filetype=sbim textwidth=70

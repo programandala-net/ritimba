@@ -46,7 +46,6 @@
   the list and the prompt. Count the loyal groups in advance.
 - Rewrite `celebration`.
 - Fix "fuerza/poder".
-- Tidy the submenus of presidential decisions.
 - Improve the Y/N of a presidential decision after the petitions:
   combine with advice report and adapt the valid options if the
   decision is not affordable.
@@ -69,3 +68,4 @@
 - Improve: use actual amounts of money, not units of thousands. This
   will make the transfer options more accurate.
 - Make `endfor` unnamed, except special case.
+- Add section title to the lists of presidential decisions.
