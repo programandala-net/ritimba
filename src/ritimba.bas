@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.95+201710151636"
+version$="0.1.0-dev.96+201710151645"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -521,8 +521,9 @@ defproc decision
        next choose_decision
 
       =37
-        money_transfer
-        exit choose_decision
+        if money_transfer%
+          exit choose_decision
+        endif
 
       =38,39
         ask_for_loan chosen_decision%
@@ -1661,29 +1662,31 @@ defproc ask_for_loan(decision%)
 
 enddef
 
-defproc money_transfer
+deffn money_transfer%
 
   ' XXX TODO -- Improve.
 
-  loc amount
+  loc done%
 
   cls #ow%
   center #ow%,1,"TRANSFERENCIA"
   center #ow%,2,"A LA CUENTA EN SUIZA"
 
   if money
-    do_money_transfer
+    let done%=do_money_transfer%
   else
     print_l_paragraph #ow%,\
       "No hay fondos. \
       La transferencia no puede realizarse."
+    let done%=0
   endif
 
   key_press
+  ret done%
 
 enddef
 
-defproc do_money_transfer
+deffn do_money_transfer%
 
   loc amount
 
@@ -1695,6 +1698,8 @@ defproc do_money_transfer
   print_l_paragraph #ow%,\
     "¿Qué cantidad desea su excelencia \
     transferir a la cuenta en Suiza?"
+
+  ' XXX FIXME -- Offer only amounts greater than zero!
 
   print #ow%
   print #ow%,"1. Todo."
@@ -1720,6 +1725,8 @@ defproc do_money_transfer
       money$(amount)&" han sido transferidos a la cuenta Suiza."
 
   endif
+
+  ret amount>0
 
 enddef
 

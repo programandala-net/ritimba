@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-10-14
+:revdate: 2017-10-15
 
 == 2017-09-21
 
@@ -64,3 +64,7 @@
 == 2017-10-14
 
 - Improve design of `ask_for_loan`.
+
+== 2017-10-15
+
+- Fix `transfer`: Offer only amounts greater than zero!
