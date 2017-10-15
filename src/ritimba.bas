@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.96+201710151645"
+version$="0.1.0-dev.97+201710151725"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -521,7 +521,7 @@ defproc decision
        next choose_decision
 
       =37
-        if money_transfer%
+        if transfer%
           exit choose_decision
         endif
 
@@ -1282,10 +1282,10 @@ defproc the_guerrilla_catchs_you
   print_l #ow%,\
     "Por desgracia, la guerrilla lo encuentra \
     antes de que llegue a la frontera..."
-  pause 50
+  pause 150
   shoot_dead_sfx
   print_l #ow%,\
-    "y lo ejecutan."
+    "y lo ejecuta."
   end_paragraph #ow%
   let alive%=0
 
@@ -1295,7 +1295,7 @@ defproc the_rebellion_wins
 
   wipe black%,white%,black%
   center #ow%,10,"Su excelencia es capturado..."
-  pause 50
+  pause 150
   shoot_dead_sfx
   center #ow%,12,"y ejecutado."
   let alive%=0
@@ -1398,23 +1398,23 @@ defproc display_treasury_graph
 
 enddef
 
-deffn money$(ammount)
+deffn money$(amount)
 
-  ' Return `ammount` formatted as money.
+  ' Return `amount` formatted as money.
 
-  loc digit%,ammount$,formatted$,digits%
+  loc digit%,amount$,formatted$,digits%
 
-  let ammount$=trim_left$(idec$(abs(ammount)*1000,8,0))
-  let digits%=len(ammount$)
+  let amount$=trim_left$(idec$(abs(amount)*1000,8,0))
+  let digits%=len(amount$)
 
   for digit%=1 to digits%
-    let formatted$=ammount$(digits%-digit%+1)&formatted$
+    let formatted$=amount$(digits%-digit%+1)&formatted$
     if not(digit% mod 3) and digit%<>digits%
       let formatted$=nbsp$&formatted$
     endif
   endfor digit%
 
-  if ammount<0
+  if amount<0
     let formatted$="-"&formatted$
   endif
 
@@ -1424,7 +1424,7 @@ enddef
 
 defproc treasury_report_data
 
-  loc ammount$
+  loc amount$
 
   paper #ow%,bright_blue%
   ink #ow%,bright_white%
@@ -1434,26 +1434,26 @@ defproc treasury_report_data
   if money<0
     ink #ow%,bright_red%
   endif
-  print_ammount ow%,money
+  print_amount ow%,money
   ink #ow%,bright_white%
 
   at #ow%,14,1
   print #ow%,"Gasto mensual:";
-  print_ammount #ow%,monthly_payment
+  print_amount #ow%,monthly_payment
 
   at #ow%,16,1
   print #ow%,"En Suiza:";
-  print_ammount #ow%,money_in_switzerland
+  print_amount #ow%,money_in_switzerland
 
   key_press
 
 enddef
 
-defproc print_ammount(channel%,ammount)
+defproc print_amount(channel%,amount)
 
-  loc ammount$
-  let ammount$=money$(ammount)
-  print #channel%,to columns%-1-len(ammount$);ammount$
+  loc amount$
+  let amount$=money$(amount)
+  print #channel%,to columns%-1-len(amount$);amount$
 
 enddef
 
@@ -1662,7 +1662,7 @@ defproc ask_for_loan(decision%)
 
 enddef
 
-deffn money_transfer%
+deffn transfer%
 
   ' XXX TODO -- Improve.
 
@@ -1673,7 +1673,7 @@ deffn money_transfer%
   center #ow%,2,"A LA CUENTA EN SUIZA"
 
   if money
-    let done%=do_money_transfer%
+    let done%=do_transfer%
   else
     print_l_paragraph #ow%,\
       "No hay fondos. \
@@ -1686,9 +1686,9 @@ deffn money_transfer%
 
 enddef
 
-deffn do_money_transfer%
+deffn do_transfer%
 
-  loc amount
+  loc amount,valid_options$,prompt$,key$
 
   at #ow%,4,0
 
@@ -1699,21 +1699,26 @@ deffn do_money_transfer%
     "¿Qué cantidad desea su excelencia \
     transferir a la cuenta en Suiza?"
 
-  ' XXX FIXME -- Offer only amounts greater than zero!
-
   print #ow%
-  print #ow%,"1. Todo."
-  print #ow%,"2. La mitad ("&money$(money div 2)&")"
-  print #ow%,"3. Un tercio ("&money$(money div 3)&")"
-  print #ow%,"4. Un cuarto ("&money$(money div 4)&")"
-  print #ow%,"5. Un quinto ("&money$(money div 5)&")"
 
-  let key$=get_key_prompt$("1 | 2 | 3 | 4 | 5 | ...")
+  transfer_option 1,"Todo"
+  transfer_option 2,"La mitad"
+  transfer_option 3,"Un tercio"
+  transfer_option 4,"Un cuarto"
+  transfer_option 5,"Un quinto"
+
+  let prompt$="1"
+  for i%=2 to len(valid_options$)
+    let prompt$=prompt$&" | "&i%
+  endfor i%    
+  let prompt$=prompt$&" | ..."
+  
+  let key$=get_key_prompt$(prompt$)
 
   at #ow%,3,0
   cls #ow%,2
 
-  if key$ instr "12345"
+  if key$ instr valid_options$
 
     let amount=money div key$
     let money_in_switzerland=money_in_switzerland+amount
@@ -1724,9 +1729,44 @@ deffn do_money_transfer%
     print_l_paragraph #ow%,\
       money$(amount)&" han sido transferidos a la cuenta Suiza."
 
+    ' XXX TODO -- Inform about the treasury.
+
   endif
 
   ret amount>0
+
+enddef
+
+defproc transfer_option(part%,option$)
+
+  loc amount%
+
+  let amount%=money div part%
+
+  if valid_transfer%(amount%,part%)
+
+    print #ow%,\
+      part%;". ";option$;\
+      if$(part%<>1," ("&money$(amount%)&")","")
+    let valid_options$=valid_options$&part%
+
+  endif
+
+enddef
+
+deffn valid_transfer%(amount%,part%)
+
+  ' Return 1 if `amount%` is valid, given its corresponding `part%`.
+  ' Otherwise return zero.
+  '
+  ' This check is needed to avoid transfer options that are identical
+  ' to the previous one.
+
+  if part%=1
+    ret 1
+  else
+    ret amount%>0 and amount%<(money div (part%-1))
+  endif
 
 enddef
 
