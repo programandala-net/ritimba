@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.105+201710152058"
+version$="0.1.0-dev.106+201710160031"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -2806,24 +2806,24 @@ defproc item(channel%,item%,item$)
     #ifdef debugging
       print #dw%,"first_char%=";first_char%;"=(";item$(first_char%);")"
       print #dw%,"last_char%=";last_char%;"=(";item$(last_char%);")"
-      print #dw%,item$(first_char% to last_char%)
+      print #dw%,"<";item$(first_char% to last_char%);">"
     #endif
 
-    if (last_char%-first_char%+1)<=width% and last_char%=len%
+    if item$(last_char%)=" "
       #ifdef debugging
-        print #dw%,"FIT!"
+        print #dw%,"Space!"
       #endif
-      print #channel%,item$(first_char% to last_char%);
-      exit
+      print #channel%,item$(first_char% to last_char%-1)
+      let first_char%=last_char%+1
+      let last_char%=minimum%(first_char%+width%,len%)
+      print #channel%,to indentation%;
     else
-      if item$(last_char%)=" "
+      if (last_char%-first_char%+1)<=width% and last_char%=len%
         #ifdef debugging
-          print #dw%,"Space!"
+          print #dw%,"FIT!"
         #endif
-        print #channel%,item$(first_char% to last_char%-1)
-        let first_char%=last_char%+1
-        let last_char%=minimum%(first_char%+width%,len%)
-        print #channel%,to indentation%;
+        print #channel%,item$(first_char% to last_char%);
+        exit
       else
         #ifdef debugging
           print #dw%,"1 less..."
@@ -3194,6 +3194,251 @@ defproc ci
     "En un lugar de La Mancha, \
     de cuyo nombre no quiero acordarme, \
     no ha mucho que vivía un hidalgo."
+
+enddef
+
+defproc item_v0(channel%,item%,item$)
+
+  ' Display list item with number `item%` and text `item$` on window
+  ' `channel%`.
+
+  loc indentation%,\         ' min column usable by the item string
+      width%,\               ' columns usable by the item string
+      len%,\                 ' lenght of the item string
+      first_char%,last_char% ' slice of item
+
+  let len%=len(item$)
+
+  print #channel%,item%&". ";
+  let indentation%=win_column%(channel%)
+  let width%=win_columns%(channel%)-indentation%
+  let first_char%=1
+  let last_char%=minimum%(first_char%+width%,len%)
+
+  rep
+
+    if (last_char%-first_char%+1)<=width% and last_char%=len%
+      print #channel%,item$(first_char% to last_char%);
+      exit
+    else
+      if item$(last_char%)=" "
+        print #channel%,item$(first_char% to last_char%-1)
+        let first_char%=last_char%+1
+        let last_char%=minimum%(first_char%+width%,len%)
+        print #channel%,to indentation%;
+      else
+        let last_char%=last_char%-1
+      endif
+    endif
+
+  endrep
+
+  print #channel%
+
+enddef
+
+defproc item_v1(channel%,item%,item$)
+
+  ' Display list item with number `item%` and text `item$` on window
+  ' `channel%`.
+
+  loc indentation%,\         ' min column usable by the item string
+      width%,\               ' columns usable by the item string
+      len%,\                 ' lenght of the item string
+      first_char%,last_char% ' slice of item
+
+  let len%=len(item$)
+
+  print #channel%,item%&". ";
+  let indentation%=win_column%(channel%)
+  let width%=win_columns%(channel%)-indentation%
+  let first_char%=1
+  let last_char%=minimum%(first_char%+width%,len%)
+
+  rep
+
+    if item$(last_char%)=" "
+      print #channel%,item$(first_char% to last_char%-1)
+      let first_char%=last_char%+1
+      let last_char%=minimum%(first_char%+width%,len%)
+      print #channel%,to indentation%;
+    else
+      if (last_char%-first_char%+1)<=width% and last_char%=len%
+        print #channel%,item$(first_char% to last_char%);
+        exit
+      else
+        let last_char%=last_char%-1
+      endif
+    endif
+
+  endrep
+
+  print #channel%
+
+enddef
+
+defproc item_v2(channel%,item%,item$)
+
+  ' Display list item with number `item%` and text `item$` on window
+  ' `channel%`.
+
+  loc indentation%,\         ' min column usable by the item string
+      width%,\               ' columns usable by the item string
+      len%,\                 ' lenght of the item string
+      first_char%,last_char% ' slice of item
+
+  let len%=len(item$)
+
+  print #channel%,item%&". ";
+  let indentation%=win_column%(channel%)
+  let width%=win_columns%(channel%)-indentation%
+  let first_char%=1
+  let last_char%=minimum%(first_char%+width%,len%)
+
+  rep
+
+    if item$(last_char%)=" "
+      print #channel%,item$(first_char% to last_char%-1)
+      let first_char%=last_char%+1
+      let last_char%=minimum%(first_char%+width%,len%)
+      print #channel%,to indentation%;
+      next
+    else
+      if (last_char%-first_char%+1)<=width% and last_char%=len%
+        print #channel%,item$(first_char% to last_char%);
+        exit
+      else
+        let last_char%=last_char%-1
+      endif
+    endif
+
+  endrep
+
+  print #channel%
+
+enddef
+
+defproc item_v3(channel%,item%,item$)
+
+  ' Display list item with number `item%` and text `item$` on window
+  ' `channel%`.
+
+  loc indentation%,\         ' min column usable by the item string
+      width%,\               ' columns usable by the item string
+      len%,\                 ' lenght of the item string
+      first_char%,last_char% ' slice of item
+
+  let len%=len(item$):\
+
+  print #channel%,item%&". ";:\
+  let indentation%=win_column%(channel%):\
+  let width%=win_columns%(channel%)-indentation%:\
+  let first_char%=1:\
+  let last_char%=minimum%(first_char%+width%,len%)
+
+  rep
+
+    if item$(last_char%)=" "
+      print #channel%,item$(first_char% to last_char%-1):\
+      let first_char%=last_char%+1:\
+      let last_char%=minimum%(first_char%+width%,len%):\
+      print #channel%,to indentation%;:\
+      next
+    else
+      if (last_char%-first_char%+1)<=width% and last_char%=len%
+        print #channel%,item$(first_char% to last_char%);:\
+        exit
+      else
+        let last_char%=last_char%-1
+      endif
+    endif
+
+  endrep
+
+  print #channel%
+
+enddef
+
+defproc bi(times%)
+
+  ' Bench several variants of `item`, displaying a long text the given
+  ' number of `times%`.
+
+  loc t,txt$
+
+  let txt$=\
+    "En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no \
+    ha mucho tiempo que vivía un hidalgo de los de lanza en astillero, \
+    adarga antigua, rocín flaco y galgo corredor. Una olla de algo más \
+    vaca que carnero, salpicón las más noches, duelos y quebrantos los \
+    sábados, lantejas los viernes, algún palomino de añadidura los \
+    domingos, consumían las tres partes de su hacienda. El resto della \
+    concluían sayo de velarte, calzas de velludo para las fiestas, con \
+    sus pantuflos de lo mesmo, y los días de entresemana se honraba \
+    con su vellorí de lo más fino. Tenía en su casa una ama que pasaba \
+    de los cuarenta, y una sobrina que no llegaba a los veinte, y un \
+    mozo de campo y plaza, que así ensillaba el rocín como tomaba la \
+    podadera. Frisaba la edad de nuestro hidalgo con los cincuenta \
+    años; era de complexión recia, seco de carnes, enjuto de rostro, \
+    gran madrugador y amigo de la caza. Quieren decir que tenía el \
+    sobrenombre de Quijada, o Quesada, que en esto hay alguna \
+    diferencia en los autores que deste caso escriben; aunque, por \
+    conjeturas verosímiles, se deja entender que se llamaba Quejana. \
+    Pero esto importa poco a nuestro cuento; basta que en la narración \
+    dél no se salga un punto de la verdad. \
+    Es, pues, de saber que este sobredicho hidalgo, los ratos que \
+    estaba ocioso, que eran los más del año, se daba a leer libros de \
+    caballerías, con tanta afición y gusto, que olvidó casi de todo \
+    punto el ejercicio de la caza, y aun la administración de su \
+    hacienda. Y llegó a tanto su curiosidad y desatino en esto, que \
+    vendió muchas hanegas de tierra de sembradura para comprar libros \
+    de caballerías en que leer, y así, llevó a su casa todos cuantos \
+    pudo haber dellos; y de todos, ningunos le parecían tan bien como \
+    los que compuso el famoso Feliciano de Silva, porque la claridad \
+    de su prosa y aquellas entricadas razones suyas le parecían de \
+    perlas, y más cuando llegaba a leer aquellos requiebros y cartas \
+    de desafíos, donde en muchas partes hallaba escrito: La razón de \
+    la sinrazón que a mi razón se hace, de tal manera mi razón \
+    enflaquece, que con razón me quejo de la vuestra fermosura. Y \
+    también cuando leía: ...los altos cielos que de vuestra divinidad \
+    divinamente con las estrellas os fortifican, y os hacen merecedora \
+    del merecimiento que merece la vuestra grandeza."
+
+  cls
+
+  let t=date:\
+  for i%=1 to times%:\
+    at 0,0:\
+    item_v0 0,1,txt$
+
+  print "v0: ";date-t;" seconds"
+
+  let t=date:\
+  for i%=1 to times%:\
+    at 0,0:\
+    item_v1 0,1,txt$
+
+  print \"v1: ";date-t;" seconds"
+
+  let t=date:\
+  for i%=1 to times%:\
+    at 0,0:\
+    item_v2 0,1,txt$
+
+  print \\"v2: ";date-t;" seconds"
+
+  let t=date:\
+  for i%=1 to times%:\
+    at 0,0:\
+    item_v3 0,1,txt$
+
+  print \\"v3: ";date-t;" seconds"
+
+  ' Results:
+  '
+  ' times    v0    v1    v2   v3
+  '  64      45    44    44
+  ' 256     179   177   177  179
 
 enddef
 
