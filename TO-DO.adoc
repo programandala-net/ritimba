@@ -69,3 +69,4 @@
 
 - Improve: use actual amounts of money, not units of thousands. This
   will make the transfer options more accurate.
+- Make `endfor` unnamed, except special case.

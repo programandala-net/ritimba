@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.98+201710151847"
+version$="0.1.0-dev.99+201710151900"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1688,7 +1688,7 @@ enddef
 
 deffn do_transfer%
 
-  loc amount,valid_options$,prompt$,key$
+  loc i%,amount,valid_options$,prompt$,key$
 
   at #ow%,4,0
 
@@ -1700,13 +1700,10 @@ deffn do_transfer%
     transferir a la cuenta en Suiza?"
 
   print #ow%
-
-  transfer_option 1,"Todo"
-  transfer_option 2,"La mitad"
-  transfer_option 3,"Un tercio"
-  transfer_option 4,"Un cuarto"
-  transfer_option 5,"Un quinto"
-
+  for i%=1 to transfer_divisors%
+     transfer_option i%
+  endfor
+  
   let prompt$="1"
   for i%=2 to len(valid_options$)
     let prompt$=prompt$&" | "&i%
@@ -1737,18 +1734,18 @@ deffn do_transfer%
 
 enddef
 
-defproc transfer_option(part%,option$)
+defproc transfer_option(divisor%)
 
   loc amount%
 
-  let amount%=money div part%
+  let amount%=money div divisor%
 
-  if valid_transfer%(amount%,part%)
+  if valid_transfer%(amount%,divisor%)
 
     print #ow%,\
-      part%;". ";option$;\
-      if$(part%<>1," ("&money$(amount%)&")","")
-    let valid_options$=valid_options$&part%
+      divisor%;". ";divisor$(divisor%);\
+      if$(divisor%<>1," ("&money$(amount%)&")","")
+    let valid_options$=valid_options$&divisor%
 
   endif
 
@@ -2391,6 +2388,15 @@ defproc init_data
   ' needs more restoration:
   restore_decisions
 
+  let transfer_divisors%=5
+  dim divisor$(transfer_divisors%,9)
+
+  restore @transfer_divisor_data
+  
+  for i%=1 to transfer_divisors%
+    read divisor$(i%)
+  endfor
+
   let money=1000
   let escape%=0
   let monthly_payment=60
@@ -2618,6 +2624,14 @@ data "Complacer a todos    ",31,33
 data "Aumentar los ingresos",38,40
 data "Fortalecer a un grupo",41,43
 data "Asuntos privados     ",34,37
+
+label @transfer_divisor_data
+
+data "Todo"
+data "La mitad"
+data "Un tercio"
+data "Un cuarto"
+data "Un quinto"
 
 ' ==============================================================
 ' Special effects {{{1
