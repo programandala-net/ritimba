@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.97+201710151725"
+version$="0.1.0-dev.98+201710151847"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1672,7 +1672,7 @@ deffn transfer%
   center #ow%,1,"TRANSFERENCIA"
   center #ow%,2,"A LA CUENTA EN SUIZA"
 
-  if money
+  if money>0
     let done%=do_transfer%
   else
     print_l_paragraph #ow%,\
