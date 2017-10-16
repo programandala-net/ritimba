@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.106+201710160031"
+version$="0.1.0-dev.107+201710161953"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1632,9 +1632,11 @@ defproc ask_for_loan(decision%)
   pause 50
 
   if country%=usa%
-    tune "2m1j3f3j3m4r1 2v1t3r3j3l4m"
+    ' tune "2m1j3f3j3m4r1 2v1t3r3j3l4m" ' XXX OLD
+    sound "usa"
   else
-    tune "2g2d3i4d2 2g2d3i4d"
+    ' tune "2g2d3i4d2 2g2d3i4d" ' XXX OLD
+    sound "russia"
   endif
 
   if months%<rnd(3 to 7)
@@ -2656,12 +2658,27 @@ defproc zx_border(colour%)
 enddef
 
 defproc war_sfx
-  ' XXX TODO
-  pause 100
+  sel on rnd(0 to 1)
+    =0:sound "war"
+    =1:sound "gunbattle"
+  endsel
 enddef
 
 defproc shoot_dead_sfx
-  ' XXX TODO --
+  if rnd(0 to 1)
+    sound "star9mm"
+  endif
+  sel on rnd(0 to 3)
+    =0:sound "9mmgunshot"
+    =1:sound "p90gunfire"
+    =2:sound "p90machinegunfire"
+    =3:sound "shotgunmossberg"
+  endsel
+enddef
+
+defproc sound(basefile$)
+  ' Play a sound file.
+  soundfile datad$&"snd_"&basefile$&".ub"
 enddef
 
 defproc tune(score$)
@@ -3440,6 +3457,16 @@ defproc bi(times%)
   '  64      45    44    44
   ' 256     179   177   177  179
 
+enddef
+
+defproc s(basefile$)
+  ' Play a sound file.
+  soundfile datad$&"snd_"&basefile$&".ub"
+enddef
+
+defproc s2(basefile$)
+  ' Play a sound file in background.
+  soundfile2  datad$&"snd_"&basefile$&".ub"
 enddef
 
 ' #endif ' XXX TODO --
