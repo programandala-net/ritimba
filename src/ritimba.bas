@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.107+201710161953"
+version$="0.1.0-dev.108+201710162024"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -610,7 +610,7 @@ enddef
 defproc decision_item
 
   at #ow%,8+i%*2,col%
-  item #ow%,i%,decision_section$(i%)
+  print #ow%,i%;". ";decision_section$(i%)
   let digit$=chr$(i%+zero%)
   let valid_keys$=valid_keys$&digit$
   let prompt$=prompt$&digit$&" | "
@@ -1629,7 +1629,6 @@ defproc ask_for_loan(decision%)
   paper #ow%,red%
   center #ow%,1,"SOLICITUD DE PRÉSTAMO EXTRANJERO"
   center #ow%,answer_line%,"ESPERE"
-  pause 50
 
   if country%=usa%
     ' tune "2m1j3f3j3m4r1 2v1t3r3j3l4m" ' XXX OLD
