@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.108+201710162024"
+version$="0.1.0-dev.109+201710171755"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1297,6 +1297,7 @@ defproc the_guerrilla_catchs_you
     antes de que llegue a la frontera..."
   pause 150
   shoot_dead_sfx
+  pause 50
   print_l #ow%,\
     "y lo ejecuta."
   end_paragraph #ow%
@@ -1307,10 +1308,12 @@ enddef
 defproc the_rebellion_wins
 
   wipe black%,white%,black%
-  center #ow%,10,"Su excelencia es capturado..."
+  center #ow%,10,"Su excelencia es capturado"
+  center #ow%,11,"por los rebeldes..."
   pause 150
-  shoot_dead_sfx
-  center #ow%,12,"y ejecutado."
+  execution_sfx
+  pause 50
+  center #ow%,13,"y ejecutado."
   let alive%=0
 
 enddef
@@ -1361,9 +1364,9 @@ defproc punish_the_rebels
 
   local i%
 
-  for i%=1 to 3
-    shoot_dead_sfx
-    pause .1
+  for i%=1 to rnd(2 to 3)
+    execution_sfx
+    pause 50
   endfor i%
 
   let popularity%(rebel_group%)=0
@@ -2016,7 +2019,8 @@ enddef
 
 defproc leftoto_wins
 
-  ' XXX TODO -- Improve texts.
+  ' XXX TODO -- Improve texts and logic.
+  ' XXX TODO -- Add sounds.
 
   wipe black%,white%,black%
   center #ow%,7,"Victoria de Leftoto"
@@ -2046,7 +2050,8 @@ defproc leftoto_wins
       "Su excelencia es acusado de ser un enemigo del pueblo y, \
       tras un juicio sumarísimo,"
     pause 50
-    shoot_dead_sfx
+    execution_sfx
+    pause 50
     print_l #ow%,"ejecutado."
     end_paragraph #ow%
     let alive%=0
@@ -2663,10 +2668,15 @@ defproc war_sfx
   endsel
 enddef
 
+defproc execution_sfx
+  sel on rnd(0 to 2)
+    =0:sound "star9mm":sound "9mmgunshot"
+    =1:sound "p90gunfire"
+    =2:sound "p90machinegunfire"
+  endsel
+enddef
+
 defproc shoot_dead_sfx
-  if rnd(0 to 1)
-    sound "star9mm"
-  endif
   sel on rnd(0 to 3)
     =0:sound "9mmgunshot"
     =1:sound "p90gunfire"
@@ -2678,6 +2688,15 @@ enddef
 defproc sound(basefile$)
   ' Play a sound file.
   soundfile datad$&"snd_"&basefile$&".ub"
+  ' copy datad$&"snd_"&basefile$&".ub",sound1 ' XXX TMP --
+enddef
+
+deffn sounding%
+ 
+  ' XXX TODO --
+
+  ret 0
+  
 enddef
 
 defproc tune(score$)
