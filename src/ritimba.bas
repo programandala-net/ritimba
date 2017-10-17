@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.109+201710171755"
+version$="0.1.0-dev.110+201710171816"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -31,6 +31,7 @@ rem http://programandala.net/es.programa.ritimba.html
 #include lib/iso_lower.bas
 #include lib/iso_upper.bas
 #include lib/pic.bas
+#include lib/print_cc.bas
 #include lib/print_l.bas
 #include lib/trim.bas
 #include lib/win.bas
@@ -327,7 +328,7 @@ defproc failed_assassination
   wipe white%,black%,black%
   paper #ow%,white%
   ink #ow%,black%
-  center #ow%,12,"Intento fallido."
+  print_cc #ow%,"Intento fallido."
 
 enddef
 
@@ -335,7 +336,7 @@ defproc successful_assassination
 
   ' XXX TODO -- Improve.
   wipe black%,white%,black%
-  center #ow%,12,"El asesino ha logrado su objetivo."
+  print_cc #ow%,"El asesino ha logrado su objetivo."
   zx_beep 3,-40
   let alive%=0
 
@@ -1116,7 +1117,7 @@ enddef
 defproc rebellion_starts
 
   wipe white%,black%,white%
-  center #ow%,12,"La rebelión ha comenzado"
+  print_cc #ow%,"La rebelión ha comenzado"
   war_sfx
 
 enddef
@@ -1131,11 +1132,13 @@ enddef
 
 defproc rebellion_alarm
 
+  ' XXX TODO -- Improve sound; add flash.
+
   local i%
 
   wipe red%,black%,red%
   ink #ow%,white%
-  center #ow%,10,"REBELIÓN"
+  print_cc #ow%,"REBELIÓN"
   for i%=1 to 5:\
     zx_beep .5,20:\
     zx_beep .5,10
@@ -1211,7 +1214,7 @@ defproc ask_for_help
   else
 
     cls #ow%
-    center #ow%,8,"¡Estás solo!"
+    print_cc #ow%,"¡Su excelencia está solo!"
     key_press
 
   endif
@@ -1232,6 +1235,8 @@ enddef
 
 deffn escape_by_helicopter%
 
+  ' XXX TODO -- Sound.
+
   if the_helicopter_works%
     do_escape_by_helicopter
   else
@@ -1249,7 +1254,7 @@ enddef
 
 defproc do_escape_by_helicopter
 
-  center #ow%,12,"¡Escapas en helicóptero!"
+  print_cc #ow%,"¡El helicóptero despega!"
   let escape%=1
 
 enddef
