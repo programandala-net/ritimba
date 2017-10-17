@@ -7,7 +7,7 @@ rem BMP format tools.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201710180036
+' Last modified 201710180147
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -63,10 +63,59 @@ deffn bmp_height(file$)
 
 enddef
 
+defproc load_bmp(file$,x,y)
+
+  ' Load a BMP image at the given screen coordinates.
+  '
+  ' Required SBASIC extension:
+  '
+  ' From BMPCVT (by Wolfgang Lenerz, 2002): `wl_bmp3load`.
+
+  loc window%
+  let window%=fopen("scr_")
+
+  window #window%,bmp_width(file$),bmp_height(file$),x,y
+  wl_bmp8load #window%,file$
+  close #window%
+
+enddef
+
+defproc bmp_to_pic(infile$,outfile$)
+
+  ' Convert a BMP image `infile$` to a PIC image `outfile$`.
+  '
+  ' Required SBASIC extensions:
+  '
+  ' From BMPCVT (by Wolfgang Lenerz, 2002): `wl_bmp3load`.
+  '
+  ' From EasyPtr 4 (by Albin Hessler and Marcel Kilgus, 2016):
+  ' `wsain`, `wsasv`, `s_wsa`.
+
+  loc window%,pic_address,width%,height%
+
+  let width%=bmp_width(infile$)
+  let height%=bmp_height(infile$)
+
+  print infile$,width%,height%:pause
+  
+  let window%=fopen("scr_")
+  window #window%,width%,height%,0,0
+
+  wl_bmp8load #window%,infile$
+  let pic_address=wsain(#window%)
+  wsasv #window%,pic_address
+  s_wsa #window%,pic_address,outfile$
+  rechp pic_address
+  close #window%
+
+enddef
+
 ' ==============================================================
 ' Change log
 
-' 2017-10-17: Start.
+' 2017-10-17: Start: `bmp_width`, `bmp_height`.
+'
+' 2017-10-18: Add `bmp_to_pic`.
 
 ' vim: filetype=sbim
 

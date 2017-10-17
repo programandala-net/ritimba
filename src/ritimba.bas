@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.110+201710171816"
+version$="0.1.0-dev.111+201710180148"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -27,6 +27,7 @@ rem http://programandala.net/es.programa.ritimba.html
 ' ==============================================================
 ' Requirements {{{1
 
+#include lib/bmp.bas
 #include lib/csize_pixels.bas
 #include lib/iso_lower.bas
 #include lib/iso_upper.bas
@@ -3151,47 +3152,15 @@ defproc advices
   endfor
 enddef
 
-defproc all_bmp_to_pic
+defproc bmps_to_pic
 
-  ' Convert all BMP to PIC.
+  ' Convert some BMP images to PIC.
 
-  loc pw%
+  loc d$
+  let d$=datad$&"img_"
 
-  let pw%=fopen("scr_")
-
-  bmp_to_pic "army_084x045"
-  bmp_to_pic "dollar_042x072"
-  bmp_to_pic "landowners_090x045"
-  bmp_to_pic "peasants_096x045"
-  bmp_to_pic "police_072x042"
-
-  close #pw%
-
-enddef
-
-defproc bmp_to_pic(base_filename$)
-
-  loc pic_address,len%,width%,height%,bmp_file$,pic_file$
-
-  let len%=len(base_filename$)
-  let width%=base_filename$(len%-6 to len%-4)
-  let height%=base_filename$(len%-2 to)
-
-  let bmp_file$=datad$&"img_"&base_filename$&".bmp"
-  let pic_file$=datad$&"img_"&base_filename$&"_pic"
-
-  window #pw%,width%,height%,0,0
-
-  print bmp_file$,width%;"x";height%
-
-  wl_bmp8load #pw%,bmp_file$ ' load the BMP
-
-  ' Convert the BMP to PIC, ready for the next time.
-
-  let pic_address=wsain(#pw%)
-  wsasv #pw%,pic_address
-  s_wsa #pw%,pic_address,pic_file$
-  rechp pic_address
+  bmp_to_pic d$&"usa_flag.bmp",d$&"usa_flag_pic"
+  bmp_to_pic d$&"ussr_flag.bmp",d$&"ussr_flag_pic"
 
 enddef
 
@@ -3404,7 +3373,7 @@ defproc bi(times%)
   ' Bench several variants of `item`, displaying a long text the given
   ' number of `times%`.
 
-  loc t,txt$
+  loc t,i%,txt$
 
   let txt$=\
     "En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no \
@@ -3472,7 +3441,7 @@ defproc bi(times%)
     at 0,0:\
     item_v3 0,1,txt$
 
-  print \\"v3: ";date-t;" seconds"
+  print \\\"v3: ";date-t;" seconds"
 
   ' Results:
   '
