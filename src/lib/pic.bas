@@ -7,7 +7,7 @@ rem PIC format tools.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201710110024
+' Last modified 201710172127
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -33,7 +33,7 @@ deffn pic_size%(file$,width%,height%)
   let channel%=fopen(file$)
 
   if channel%>-1
-    get #channel%\2,width%,height%
+    wget #channel%\2,width%,height%
     close #channel%
   endif
 
@@ -43,7 +43,7 @@ enddef
 
 deffn pic_width%(file$)
 
-  ' Return the width in pixels of the PIC image `file$`.  Ff the
+  ' Return the width in pixels of the PIC image `file$`.  If the
   ' file can not be read, return the corresponding error code
   ' instead, which is a negative integer.
 
@@ -52,7 +52,7 @@ deffn pic_width%(file$)
   let channel%=fopen(file$)
 
   if channel%>-1
-    get #channel%\2,width%
+    wget #channel%\2,width%
     close #channel%
     ret width%
   else
@@ -72,7 +72,7 @@ deffn pic_height%(file$)
   let channel%=fopen(file$)
 
   if channel%>-1
-    get #channel%\4,height%
+    wget #channel%\4,height%
     close #channel%
     ret height%
   else
@@ -145,5 +145,10 @@ enddef
 ' Change log
 
 ' 2017-10-10: Start.
+'
+' 2017-10-17: Replace `get` (which reads variables in its
+' internal format) with `wget` (which reads words); there's no
+' difference in this case, but, as an external binary file is
+' read, `wget` is clearer.
 
 ' vim: filetype=sbim
