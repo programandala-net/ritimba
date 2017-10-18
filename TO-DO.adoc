@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-10-15
+:revdate: 2017-10-18
 
 == 2017-09-21
 
@@ -69,3 +69,10 @@
   will make the transfer options more accurate.
 - Make `endfor` unnamed, except special case.
 - Add section title to the lists of presidential decisions.
+
+== 2017-10-18
+
+- Improve layout, text and pauses of `actual_war`.
+- Fix: `soundfile` corrupts the system when the national anthems are
+  played, which are more than 1 minute long. This looks a bug of
+  SMSQmulator.

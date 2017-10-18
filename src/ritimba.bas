@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.111+201710180148"
+version$="0.1.0-dev.112+201710181601"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -39,6 +39,11 @@ rem http://programandala.net/es.programa.ritimba.html
 #include lib/zx_beep.bas
 
 ' The SBASIC extensions are loaded by the <boot> file.
+
+' ==============================================================
+' Config {{{1
+
+let sss=1 ' XXX TMP -- turn Sample Sound System on or off
 
 ' ==============================================================
 ' Main loop {{{1
@@ -530,8 +535,12 @@ defproc decision
           exit choose_decision
         endif
 
-      =38,39
-        ask_for_loan chosen_decision%
+      =38
+        ask_for_loan russia%
+        exit choose_decision
+
+      =39
+        ask_for_loan usa%
         exit choose_decision
 
       =remainder
@@ -1619,32 +1628,36 @@ deffn affordable%(decision%)
 
 enddef
 
-defproc ask_for_loan(decision%)
+defproc ask_for_loan(country%)
 
-  loc country%,\
-      loan,\
+  loc loan,\
       answer$,\
       answer_line%
 
-  let answer_line%=12
+  let answer_line%=center_for%(ow_lines%)
 
-  sel on decision%
-    =38:let country%=russia%
-    =39:let country%=usa%
-  endsel
+  wipe black%,bright_white%,black%
 
-  wipe yellow%,black%,red%
+  print_l_paragraph #ow%,\
+    "La solicitud de préstamo ha sido cursada \
+    y solo cabe aguardar pacientemente la respuesta."
 
-  paper #ow%,red%
-  center #ow%,1,"SOLICITUD DE PRÉSTAMO EXTRANJERO"
-  center #ow%,answer_line%,"ESPERE"
+  pause 100
 
   if country%=usa%
-    ' tune "2m1j3f3j3m4r1 2v1t3r3j3l4m" ' XXX OLD
-    sound "usa"
+    load_pic_win_cc #ow%,datad$&"img_usa_flag_pic"
+    if sss
+      sound "usa"
+    else
+      tune "2m1j3f3j3m4r1 2v1t3r3j3l4m" ' XXX OLD
+    endif
   else
-    ' tune "2g2d3i4d2 2g2d3i4d" ' XXX OLD
-    sound "russia"
+    load_pic_win_cc #ow%,datad$&"img_ussr_flag_pic"
+    if sss
+      sound "ussr"
+    else
+      tune "2g2d3i4d2 2g2d3i4d" ' XXX OLD
+    endif
   endif
 
   if months%<rnd(3 to 7)
@@ -1674,12 +1687,12 @@ defproc ask_for_loan(decision%)
 
   endif
 
-  clear_lines \
-    #ow%,answer_line%,answer_line%+1 ' at least 2 lines needed
-  at #ow%,answer_line%-1,0
+  cls #ow%
+  pause 50
+  
+  at #ow%,answer_line%,0
   print_l_paragraph #ow%,\
     iso_upper_1$(plural_name$(country%))&" "&answer$&"."
-  cls #ow%,4 ' clear the rest of the possible third line
 
   key_press
 
@@ -2693,8 +2706,10 @@ enddef
 
 defproc sound(basefile$)
   ' Play a sound file.
-  soundfile datad$&"snd_"&basefile$&".ub"
-  ' copy datad$&"snd_"&basefile$&".ub",sound1 ' XXX TMP --
+  if sss
+    soundfile datad$&"snd_"&basefile$&".ub"
+    ' copy datad$&"snd_"&basefile$&".ub",sound1 ' XXX TMP --
+  endif
 enddef
 
 deffn sounding%
