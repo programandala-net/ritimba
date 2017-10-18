@@ -96,8 +96,6 @@ defproc bmp_to_pic(infile$,outfile$)
   let width%=bmp_width(infile$)
   let height%=bmp_height(infile$)
 
-  print infile$,width%,height%:pause
-  
   let window%=fopen("scr_")
   window #window%,width%,height%,0,0
 
