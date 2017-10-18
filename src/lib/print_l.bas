@@ -7,7 +7,7 @@ rem Procedures to print left-justified strings.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201710172057
+' Last modified 201710180151
 ' See change log at the end of the file
 
 ' ==============================================================

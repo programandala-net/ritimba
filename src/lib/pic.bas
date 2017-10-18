@@ -7,7 +7,7 @@ rem PIC format tools.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201710172127
+' Last modified 201710181407
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -127,6 +127,40 @@ defproc load_pic_win(channel%,file$,x%,y%)
   let py%=win_ymin%(channel%)+y%
 
   if not ior%
+    let pw%=fopen("scr_")
+    window #pw%,width%,height%,px%,py%
+    let pic_address=l_wsa(file$)
+    wsars #pw%,pic_address,
+    close #pw%
+  endif
+
+  ' XXX REMARK -- The comma separator after the address
+  ' parameter of `wsars` is used to give up the save area. A
+  ' backslash separator would mean keep the save area. See the
+  ' manual of EasyPtr 4.
+
+enddef
+
+defproc load_pic_win_cc(channel%,file$)
+
+  ' Load a PIC image from `file$` and display it at the center
+  ' of window `channel%`. If the file can not be found, do
+  ' nothing.
+
+  loc width%,height%,\ ' image size in pixels
+      ior%,\           ' I/O result
+      pw%,\            ' picture window channel
+      px%,py%          ' coordinates of the picture in the window
+
+  let ior%=pic_size%(file$,width%,height%)
+
+  if not ior%
+    let px%=\
+      win_xmin%(channel%)+\
+      (win_width%(channel%)-width%) div 2
+    let py%=\
+      win_ymin%(channel%)+\
+      (win_height%(channel%)-height%) div 2
     let pw%=fopen("scr_")
     window #pw%,width%,height%,px%,py%
     let pic_address=l_wsa(file$)
