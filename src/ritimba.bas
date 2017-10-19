@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.112+201710181601"
+version$="0.1.0-dev.113+201710192025"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1264,6 +1264,7 @@ enddef
 
 defproc do_escape_by_helicopter
 
+  sound "helicopterleaving"
   print_cc #ow%,"¡El helicóptero despega!"
   let escape%=1
 
@@ -1271,7 +1272,8 @@ enddef
 
 defproc the_helicopter_does_not_work
 
-  center #ow%,10,"¡El helicóptero no funciona!"
+  center #ow%,cc,"¡El helicóptero no funciona!"
+  sound "helicopterapproaching"
   pause 150
 
 enddef
@@ -1281,8 +1283,8 @@ defproc escape_on_foot
   at #ow%,8,0
   print_l_paragraph #ow%,\
     "Su excelencia tiene que atravesar el monte a pie hacia Leftoto..."
-  pause 200
-  cls #ow%
+  sound "junglesteps"
+  pause 50
 
   if not int((rnd*((power%(guerrilla%)/3)+.4)))
     do_escape_on_foot
@@ -1294,7 +1296,9 @@ enddef
 
 defproc do_escape_on_foot
 
-  at #ow%,12,0
+  cls #ow%
+  pause 50
+  at #ow%,ow_lines% div 2,0
   print_l_paragraph #ow%,\
     "Milagrosamente, la guerrilla no logra atraparlo."
   let escape%=1
@@ -1305,12 +1309,12 @@ defproc the_guerrilla_catchs_you
 
   wipe black%,white%,black%
   pause 50
-  at #ow%,12,0
+  at #ow%,ow_lines% div 2,0
   paragraph #ow%
   print_l #ow%,\
     "Por desgracia, la guerrilla lo encuentra \
     antes de que llegue a la frontera..."
-  pause 150
+  pause 100
   shoot_dead_sfx
   pause 50
   print_l #ow%,\
@@ -1322,13 +1326,16 @@ enddef
 
 defproc the_rebellion_wins
 
+  loc line%
+  let line%=(ow_lines% div 2)-1
+
   wipe black%,white%,black%
-  center #ow%,10,"Su excelencia es capturado"
-  center #ow%,11,"por los rebeldes..."
+  center #ow%,line%,"Su excelencia es capturado"
+  center #ow%,line%+1,"por los rebeldes..."
   pause 150
   execution_sfx
   pause 50
-  center #ow%,13,"y ejecutado."
+  center #ow%,line%+2,"y ejecutado."
   let alive%=0
 
 enddef
@@ -2708,7 +2715,6 @@ defproc sound(basefile$)
   ' Play a sound file.
   if sss
     soundfile datad$&"snd_"&basefile$&".ub"
-    ' copy datad$&"snd_"&basefile$&".ub",sound1 ' XXX TMP --
   endif
 enddef
 
