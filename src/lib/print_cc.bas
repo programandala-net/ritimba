@@ -10,7 +10,7 @@ rem Simon n Goodwin, 1991-12
 rem Suggested by Dario Leslie
 rem Adapted to Sbira by Marcos Cruz (programandala.net), 2017
 
-' Last modified 201710201920
+' Last modified 201710212217
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -25,15 +25,15 @@ rem Adapted to Sbira by Marcos Cruz (programandala.net), 2017
 
 ' #require win.bas ' XXX TODO --
 
-deffn centre_line(ch%)
+deffn centre_line%(ch%)
 
   ' doc{
   '
-  ' centre_line (ch%)
+  ' centre_line% (ch%)
   '
   ' A function that returns the centre line of window ``ch%``.
   '
-  ' See: `centre_column`, `win_height%`, `win_cursor_height%`, `win_lines%`.
+  ' See: `centre_column%`, `win_height%`, `win_cursor_height%`, `win_lines%`.
   '
   ' }doc
 
@@ -41,15 +41,15 @@ deffn centre_line(ch%)
 
 enddef
 
-deffn centre_column(ch%)
+deffn centre_column%(ch%)
 
   ' doc{
   '
-  ' centre_column (ch%)
+  ' centre_column% (ch%)
   '
   ' A function that returns the centre column of window ``ch%``.
   '
-  ' See: `centre_line`, `win_width%`, `win_cursor_width%`, `win_columns%`.
+  ' See: `centre_line%`, `win_width%`, `win_cursor_width%`, `win_columns%`.
   '
   ' }doc
 
@@ -66,13 +66,13 @@ defproc print_cc(ch%,text$)
   ' A procedure that prints ``text$`` at the centre of the centre line of
   ' window ``ch%``.
   '
-  ' See: `centre_line`, `centre_column`.
+  ' See: `centre_line%`, `centre_column%`.
   '
   ' }doc
 
   loc fit$
   let fit$=text$(to win_columns%(ch%))
-  at #ch%,centre_line(ch%),centre_column(ch%)-(len(fit$) div 2)
+  at #ch%,centre_line%(ch%),centre_column%(ch%)-(len(fit$) div 2)
   print #ch%,fit$
 
 enddef
@@ -92,5 +92,7 @@ enddef
 ' 2017-10-20: Document the code with the format required by
 ' Glosara (http://programandala.net/en.program.glosara.html) in
 ' order to build the manual.
+'
+' 2017-10-21: Make `centre_line` and `centre_column` integer.
 
 ' vim: filetype=sbim
