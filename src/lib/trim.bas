@@ -7,7 +7,7 @@ rem Functions to trim strings.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201710071913
+' Last modified 201710201923
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -21,6 +21,17 @@ rem Author: Marcos Cruz (programandala.net), 2017
 ' ==============================================================
 
 deffn trim_right$(txt$)
+
+  ' doc{
+  '
+  ' trim_right$ (txt$)
+  '
+  ' A function that returns ``txt$`` without traling spaces.
+  '
+  ' See: `trim_left$`, `trim$`.
+  '
+  ' }doc
+
   loc last%
   rep trim
     let last%=len(txt$)
@@ -33,9 +44,21 @@ deffn trim_right$(txt$)
     endif
   endrep trim
   ret txt$
+
 enddef
 
 deffn trim_left$(txt$)
+
+  ' doc{
+  '
+  ' trim_left$ (txt$)
+  '
+  ' A function that returns ``txt$`` without leading spaces.
+  '
+  ' See: `trim_right$`, `trim$`.
+  '
+  ' }doc
+
   rep trim
     if not len(txt$):\
       exit trim
@@ -48,7 +71,19 @@ deffn trim_left$(txt$)
 enddef
 
 deffn trim$(txt$)
+
+  ' doc{
+  '
+  ' trim$ (txt$)
+  '
+  ' A function that returns ``txt$`` without surrounding spaces.
+  '
+  ' See: `trim_left$`, `trim_right$`.
+  '
+  ' }doc
+
   ret trim_right$(trim_left$(txt$))
+
 enddef
 
 ' ==============================================================
@@ -56,5 +91,9 @@ enddef
 
 ' 2017-10-07: Start: Code extracted from CE4
 ' (http://programandala.net/es.programa.ce4.sbim.html).
+'
+' 2017-10-20: Document the code with the format required by
+' Glosara (http://programandala.net/en.program.glosara.html) in
+' order to build the manual.
 
 ' vim: filetype=sbim

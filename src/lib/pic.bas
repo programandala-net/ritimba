@@ -22,12 +22,20 @@ rem Author: Marcos Cruz (programandala.net), 2017
 
 deffn pic_size%(file$,width%,height%)
 
-  ' Set variables `width%` and `height%` to the size of the PIC
-  ' image `file$`.
+  ' doc{
   '
-  ' Return an I/O result: if the file can be read, return zero;
-  ' otherwise return the corresponding error code, which is a
-  ' negative integer.
+  ' pic_size% (file$,width%,height%)
+  '
+  ' A function that sets variables ``width%`` and ``height%`` to
+  ' the size of the PIC image ``file$``.
+  '
+  ' The function returns an I/O result: if the file can be read,
+  ' it returns zero; otherwise it returns the corresponding
+  ' error code, which is a negative integer.
+  '
+  ' See: `pic_width%`, `pic_height%`.
+  '
+  ' }doc
 
   loc channel%
   let channel%=fopen(file$)
@@ -43,9 +51,16 @@ enddef
 
 deffn pic_width%(file$)
 
-  ' Return the width in pixels of the PIC image `file$`.  If the
-  ' file can not be read, return the corresponding error code
-  ' instead, which is a negative integer.
+  ' doc{
+  '
+  ' pic_width% (file$)
+  '
+  ' A function that returns the width in pixels of the PIC image
+  ' ``file$``.  If the file can not be read, the function
+  ' returns the corresponding error code instead, which is a
+  ' negative integer.
+  '
+  ' }doc
 
   loc channel%,width%
 
@@ -63,9 +78,16 @@ enddef
 
 deffn pic_height%(file$)
 
-  ' Return the height in pixels of the PIC image `file$`.  Ff the
-  ' file can not be read, return the corresponding error code
-  ' instead, which is a negative integer.
+  ' doc{
+  '
+  ' pic_height% (file$)
+  '
+  ' A function that returns the height in pixels of the PIC image
+  ' ``file$``.  If the file can not be read, the function
+  ' returns the corresponding error code instead, which is a
+  ' negative integer.
+  '
+  ' }doc
 
   loc channel%,height%
 
@@ -83,9 +105,15 @@ enddef
 
 defproc load_pic(file$,x%,y%)
 
-  ' Load a PIC image from `file$` and display it at screen
-  ' coordinates `x%`, `y%`. If the file can not be found, do
-  ' nothing.
+  ' doc{
+  '
+  ' load_pic (file$,x%,y%)
+  '
+  ' A procedure that loads a PIC image ``file$`` and displays it
+  ' at screen coordinates ``x%`` and ``y%``. If the file can not
+  ' be found, the procedures does nothing.
+  '
+  ' }doc
 
   loc pic_address,\
       width%,height%,\ ' image size in pixels
@@ -111,9 +139,15 @@ enddef
 
 defproc load_pic_win(channel%,file$,x%,y%)
 
-  ' Load a PIC image from `file$` and display it at coordinates
-  ' `x%`, `y%` of window `channel%`. If the file can not be
-  ' found, do nothing.
+  ' doc{
+  '
+  ' load_pic_win (channel%,file$,x%,y%)
+  '
+  ' A procedure that loads a PIC image ``file$`` and displays it
+  ' at coordinates ``x%`` and ``y%`` of window ``channel%``. If
+  ' the file can not be found, the procedure does nothing.
+  '
+  ' }doc
 
   loc pic_address,\
       width%,height%,\ ' image size in pixels
@@ -143,9 +177,15 @@ enddef
 
 defproc load_pic_win_cc(channel%,file$)
 
-  ' Load a PIC image from `file$` and display it at the center
-  ' of window `channel%`. If the file can not be found, do
-  ' nothing.
+  ' doc{
+  '
+  ' load_pic_win_cc (channel%,file$)
+  '
+  ' A procedure that loads a PIC image ``file$`` and displays it
+  ' at the center of window ``channel%``. If the file can not be
+  ' found, the procedure does nothing.
+  '
+  ' }doc
 
   loc width%,height%,\ ' image size in pixels
       ior%,\           ' I/O result
@@ -184,5 +224,9 @@ enddef
 ' internal format) with `wget` (which reads words); there's no
 ' difference in this case, but, as an external binary file is
 ' read, `wget` is clearer.
+'
+' 2017-10-20: Document the code with the format required by
+' Glosara (http://programandala.net/en.program.glosara.html) in
+' order to build the manual.
 
 ' vim: filetype=sbim

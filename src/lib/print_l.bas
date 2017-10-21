@@ -7,7 +7,7 @@ rem Procedures to print left-justified strings.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201710180151
+' Last modified 201710210207
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -21,15 +21,44 @@ rem Author: Marcos Cruz (programandala.net), 2017
 ' ==============================================================
 
 let paragraph_separation% = 0
-  ' Number of lines between paragraphs.
+
+  ' doc{
+  '
+  ' paragraph_separation%
+  '
+  ' A variable that holds the number of lines between
+  ' paragraphs. Used by `paragraph`.  Its default value is 0.
+  '
+  ' See: `paragraph_indentation%`.
+  '
+  ' }doc
 
 let paragraph_indentation% = 2
-  ' Spaces at the start of the first line of a paragraph.
+
+  ' doc{
+  '
+  ' paragraph_indentation%
+  '
+  ' A variable that holds the number of spaces at the start of
+  ' the first line of a `paragraph`. Its default value is 2.
+  '
+  ' See: `paragraph_separation%`.
+  '
+  ' }doc
 
 defproc print_l(channel%,text$)
 
-  ' Print the given text left justified from the current cursor
-  ' position of the window identified by `channel%`.
+  ' doc{
+  '
+  ' print_l (channel%,text$)
+  '
+  ' A procedure that prints ``text$`` left justified from the
+  ' current cursor position of the window identified by
+  ' ``channel%``.  Its default value is 2.
+  '
+  ' See: `print_l_paragraph`, `paragraph`.
+  '
+  ' }doc
 
   local first%,last%
 
@@ -47,8 +76,19 @@ enddef
 
 defproc paragraph(channel%)
 
-  ' Start a new paragraph in the window identified by
-  ' `channel%`.
+  ' doc{
+  '
+  ' paragraph (channel%)
+  '
+  ' A procedure that starts a new paragraph in the window
+  ' identified by ``channel%``. Its behaviour can be configured
+  ' by variables `paragraph_indentation%` and
+  ' `paragraph_separation%`.
+  '
+  ' See: `end_paragraph`, `print_l_paragraph`,
+  ' `paragraph_separation%`, `paragraph_indentation%`.
+  '
+  ' }doc
 
   loc i%
   for i%=1 to paragraph_separation%:\
@@ -62,8 +102,16 @@ enddef
 
 defproc end_paragraph(channel%)
 
-  ' End the current paragraph in the window identified by
-  ' `channel%`.
+  ' doc{
+  '
+  ' end_paragraph (channel%)
+  '
+  ' A procedure that ends the current paragraph in the window
+  ' identified by ``channel%``.
+  '
+  ' See: `paragraph`, `print_l_paragraph`.
+  '
+  ' }doc
 
   print #channel%
 
@@ -71,8 +119,18 @@ enddef
 
 defproc print_l_paragraph(channel%,text$)
 
-  ' Print the given text left justified as a new paragraph,
-  ' in the window identified by `channel%`.
+  ' doc{
+  '
+  ' print_l_paragraph (channel%,text$)
+  '
+  ' A procedure that prints ``text$`` left justified as a new
+  ' paragraph, in the window identified by ``channel%``. This
+  ' procedure just calls `paragraph`, `print_l` and
+  ' `end_paragraph`.
+  '
+  ' See: `paragraph_separation%`, `paragraph_indentation%`.
+  '
+  ' }doc
 
   paragraph #channel%
   print_l #channel%,text$
@@ -88,7 +146,7 @@ enddef
 defproc print_l_v1(channel%,text$)
 
   ' Print the given text left justified from the current cursor
-  ' position of the window identified by `channel%`.
+  ' position of the window identified by ``channel%``.
 
   local t$,first%,last%
 
@@ -108,7 +166,7 @@ enddef
 defproc print_l_v2(channel%,text$)
 
   ' Print the given text left justified from the current cursor
-  ' position of the window identified by `channel%`.
+  ' position of the window identified by ``channel%``.
 
   local t$,first%,last%
 
@@ -126,7 +184,7 @@ enddef
 defproc print_l_v3(channel%,text$)
 
   ' Print the given text left justified from the current cursor
-  ' position of the window identified by `channel%`.
+  ' position of the window identified by ``channel%``.
 
   local first%,last%
 
@@ -145,7 +203,7 @@ enddef
 defproc print_l_v4(channel%,text$)
 
   ' Print the given text left justified from the current cursor
-  ' position of the window identified by `channel%`.
+  ' position of the window identified by ``channel%``.
 
   local spacepos%,txt$
 
@@ -259,7 +317,13 @@ enddef
 ' (http://programandala.net/es.programa.ritimba.html) and
 ' improved.
 '
-' 2017-10-17: Write altenative versions of `print_l`,
-' benchmark them, and use the best one.
+' 2017-10-17: Write altenative versions of `print_l`, benchmark
+' them, and use the best one.
+'
+' 2017-10-20: Document the code with the format required by
+' Glosara (http://programandala.net/en.program.glosara.html) in
+' order to build the manual.
+'
+' 2017-10-21: Fix and improve documentation.
 
 ' vim: filetype=sbim

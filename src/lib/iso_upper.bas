@@ -7,7 +7,7 @@ rem Functions that convert ISO 8859-1 characters and strings to uppercase.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201709291507
+' Last modified 201710201835
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -22,7 +22,16 @@ rem Author: Marcos Cruz (programandala.net), 2017
 
 deffn iso_upper%(char%)
 
-  ' Return the uppercase char code of the given ISO 8859-1 char.
+  ' doc{
+  '
+  ' iso_upper% (char%)
+  '
+  ' A function that returns the uppercase character code of the
+  ' given ISO 8859-1 charactor ``char%``.
+  '
+  ' See: `iso_lower%`, `iso_upper$`.
+  '
+  ' }doc
 
   sel on char%
     =97 to 122,224 to 246,248 to 254:\
@@ -35,7 +44,16 @@ enddef
 
 deffn iso_upper$(text$)
 
-  ' Return the given ISO 8859-1 text in uppercase.
+  ' doc{
+  '
+  ' iso_upper$ (text$)
+  '
+  ' A function that returns the ISO 8859-1 string ``text$``
+  ' in uppercase.
+  '
+  ' See: `iso_upper_1$`, `iso_lower$`,``iso_upper%`.
+  '
+  ' }doc
 
   loc i%,upper_text$
   let upper_text$=text$
@@ -48,8 +66,16 @@ enddef
 
 deffn iso_upper_1$(text$)
 
-  ' Return the given ISO 8859-1 text with the first letter in
-  ' uppercase.
+  ' doc{
+  '
+  ' iso_upper_1$ (text$)
+  '
+  ' A function that returns the ISO 8859-1 string ``text$``
+  ' with the its character converted to uppercase.
+  '
+  ' See: `iso_upper$`, `iso_lower_1$`, `iso_upper%`.
+  '
+  ' }doc
 
   ret iso_upper$(text$(1))&text$(2 to)
 
@@ -62,5 +88,9 @@ enddef
 ' (http://programandala.net/es.programa.asalto_y_castigo.superbasic.html).
 '
 ' 2017-09-27: Update file header.
+'
+' 2017-10-20: Document the code with the format required by
+' Glosara (http://programandala.net/en.program.glosara.html) in
+' order to build the manual.
 
 ' vim: filetype=sbim

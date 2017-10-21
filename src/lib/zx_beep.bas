@@ -7,7 +7,7 @@ rem Procedure that simulates the ZX Spectrum's 'beep' command.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201709291507
+' Last modified 201710202009
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -49,7 +49,16 @@ rem Author: Marcos Cruz (programandala.net), 2017
 
 defproc zx_beep(duration,tone%)
 
-  ' Simulate the ZX Spectrum BASIC command `beep`.
+  ' doc{
+  '
+  ' zx_beep (duration,tone%)
+  '
+  ' A function that simulates the ZX Spectrum BASIC command
+  ' ``beep``.
+  '
+  ' See: `init_zx_beep`.
+  '
+  ' }doc
 
   loc pitch%
 
@@ -66,7 +75,15 @@ enddef
 
 defproc init_zx_beep
 
-  ' Init the data used by `zx_beep`.
+  ' doc{
+  '
+  ' init_zx_beep
+  '
+  ' A procedure that inits the data used by `zx_beep`.
+  ' This procedure must be called by the application before
+  ' using `zx_beep`.
+  '
+  ' }doc
 
   loc i%,middle_c_pitch%
 
@@ -175,5 +192,9 @@ data -1 ' end of data
 ' 2017-09-20: Integrate into the new library project.
 '
 ' 2017-09-27: Update file header. Convert `i` to `i%`.
+'
+' 2017-10-20: Document the code with the format required by
+' Glosara (http://programandala.net/en.program.glosara.html) in
+' order to build the manual.
 
 ' vim: filetype=sbim
