@@ -7,7 +7,7 @@ rem Functions that convert ISO 8859-1 characters and strings to lowercase.
 
 rem Author: Marcos Cruz (programandala.net), 2017
 
-' Last modified 201710201832
+' Last modified 201710211817
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -51,7 +51,7 @@ deffn iso_lower$(text$)
   ' A function that returns the ISO 8859-1 string ``text$``
   ' in lowercase.
   '
-  ' See: `iso_lower_1$`, `iso_upper$`,``iso_lower%`.
+  ' See: `iso_lower_1$`, `iso_upper$`, `iso_lower%`.
   '
   ' }doc
 
@@ -91,5 +91,7 @@ enddef
 ' 2017-10-20: Document the code with the format required by
 ' Glosara (http://programandala.net/en.program.glosara.html) in
 ' order to build the manual.
+'
+' 2017-10-21: Fix cross-reference in documentation.
 
 ' vim: filetype=sbim

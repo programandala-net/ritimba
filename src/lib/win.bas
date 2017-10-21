@@ -9,7 +9,7 @@ rem Authors:
 rem Simon n Goodwin, 1988
 rem Adapted to Sbira by Marcos Cruz (programandala.net), 2017
 
-' Last modified 201710210206
+' Last modified 201710211820
 ' See change log at the end of the file
 
 ' ==============================================================
@@ -26,7 +26,7 @@ deffn win_base(chan%)
 
   ' doc{
   '
-  ' win_base(chan%)
+  ' win_base (chan%)
   '
   ' A function that returns the screen address of top left of
   ' window ``chan%``.
@@ -245,7 +245,7 @@ deffn win_attr%(chan%)
 
   ' doc{
   '
-  ' win_attr%(chan%)
+  ' win_attr% (chan%)
   '
   ' A function that returns the character attributes byte of
   ' window ``chan%``.  This byte contains seven useful bits of
