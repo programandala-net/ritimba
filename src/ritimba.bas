@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.113+201710192025"
+version$="0.1.0-dev.114+201710211747"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -2715,15 +2715,12 @@ defproc sound(basefile$)
   ' Play a sound file.
   if sss
     soundfile datad$&"snd_"&basefile$&".ub"
+    repeat
+      if not jva_sounding
+        exit
+      endif
+    endrep
   endif
-enddef
-
-deffn sounding%
- 
-  ' XXX TODO --
-
-  ret 0
-  
 enddef
 
 defproc tune(score$)
