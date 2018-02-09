@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-10-18
+:revdate: 2017-12-27
 
 == 2017-09-21
 
@@ -11,7 +11,6 @@
 
 - Rename `pc%`.
 - Move the data from `issue_data$()` into numeric arrays.
-- Move `csize_width_pixels` and `csize_height_pixels` to the library.
 - Improve `center_for%` and `center`: calculate the actual size of the
   text using the current `csize`.
 
@@ -73,6 +72,7 @@
 == 2017-10-18
 
 - Improve layout, text and pauses of `actual_war`.
-- Fix: `soundfile` corrupts the system when the national anthems are
-  played, which are more than 1 minute long. This looks a bug of
-  SMSQmulator.
+
+== 2017-12-27
+
+- Fix the results of the loans.

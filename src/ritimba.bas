@@ -1,6 +1,6 @@
 rem Ritimba
 
-version$="0.1.0-dev.114+201710211747"
+version$="0.1.0-dev.115+201710212329"
 
 ' ==============================================================
 ' Author and license {{{1
@@ -1234,25 +1234,15 @@ enddef
 defproc escape
 
   if got_helicopter%
-    if not escape_by_helicopter%
+    if the_helicopter_works%
+      escape_by_helicopter
+    else
+      the_helicopter_does_not_work
       escape_on_foot
     endif
   else
     escape_on_foot
   endif
-
-enddef
-
-deffn escape_by_helicopter%
-
-  ' XXX TODO -- Sound.
-
-  if the_helicopter_works%
-    do_escape_by_helicopter
-  else
-    the_helicopter_does_not_work
-  endif
-  ret escape%
 
 enddef
 
@@ -1262,27 +1252,28 @@ deffn the_helicopter_works%
 
 enddef
 
-defproc do_escape_by_helicopter
+defproc escape_by_helicopter
 
+  print_cc #ow%,"El helicóptero despega..."
   sound "helicopterleaving"
-  print_cc #ow%,"¡El helicóptero despega!"
   let escape%=1
 
 enddef
 
 defproc the_helicopter_does_not_work
 
-  center #ow%,cc,"¡El helicóptero no funciona!"
-  sound "helicopterapproaching"
+  print_cc #ow%,"¡El helicóptero no funciona!"
+  sound "helicopterapproach"
   pause 150
 
 enddef
 
 defproc escape_on_foot
 
-  at #ow%,8,0
+  at #ow%,centre_line%(#ow%),0
   print_l_paragraph #ow%,\
-    "Su excelencia tiene que atravesar el monte a pie hacia Leftoto..."
+    "Su excelencia se ve obligado \
+    a atravesar el monte a pie hacia Leftoto..."
   sound "junglesteps"
   pause 50
 
@@ -1314,7 +1305,7 @@ defproc the_guerrilla_catchs_you
   print_l #ow%,\
     "Por desgracia, la guerrilla lo encuentra \
     antes de que llegue a la frontera..."
-  pause 100
+  pause 150
   shoot_dead_sfx
   pause 50
   print_l #ow%,\
@@ -1684,8 +1675,7 @@ defproc ask_for_loan(country%)
         let answer$="dicen que no, sin ninguna explicación"
       else
         let loan=popularity%(country%)*30+rnd(0 to 199)
-        let answer$="conceden un préstamo de "\
-          &money$(loan)
+        let answer$="conceden un préstamo de "&money$(loan)
         let money=money+loan
         mark_decision_taken decision%
       endif
