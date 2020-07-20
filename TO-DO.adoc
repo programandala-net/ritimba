@@ -1,6 +1,6 @@
 = Ritimba
 :author: Marcos Cruz (programandala.net)
-:revdate: 2017-12-27
+:revdate: 2020-07-20
 
 == 2017-09-21
 
@@ -76,3 +76,17 @@
 == 2017-12-27
 
 - Fix the results of the loans.
+
+== 2020-07-20
+
+- Fix "At line 161:1 invalid parameter":
++
+----
+157 let pw%=fopen("scr_")
+158 window #pw%,width%,height%,px%,py%
+159 let pic_address=l_wsa(file$)
+160 wsars #pw%,pic_address,
+161 close #pw%
+----
++
+The value of `pw%` is -15.
