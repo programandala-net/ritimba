@@ -24,6 +24,10 @@ target/ext/* linguist-vendored
 *_bmp binary
 *.bmp binary
 
+# Sounds:
+*.ub binary
+*.ub linguist-vendored
+
 # Fonts:
 *_font binary
 *_font linguist-vendored

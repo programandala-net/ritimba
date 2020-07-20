@@ -1,0 +1,2271 @@
+1 rem Ritimba
+2 version$="0.1.0-dev.115+201710212329"
+3 rem Copyright (C) 2011,2012,2015,2016,2017 Marcos Cruz (programandala.net)
+4 rem You may do whatever you want with this work, so long as you
+5 rem retain the copyright notice(s) and this license in all
+6 rem redistributed copies and derived works. There is no warranty.
+7 rem
+8 rem Ritimba is a QL port of the Spanish version of Don Priestley's
+9 rem ZX Spectrum game "DICTATOR" (1983), written in SBASIC for SMSQ/E.
+10 rem Home page (in Spanish):
+11 rem http://programandala.net/es.programa.ritimba.html
+12 rem BMP format tools.
+13 rem Author: Marcos Cruz (programandala.net), 2017
+14 deffn bmp_width(file$)
+15 loc channel%,b0%,b1%,b2%,b3%
+16 let channel%=fopen(file$)
+17 if channel%>-1
+18 bget #channel%\18,b0%,b1%,b2%,b3%
+19 close #channel%
+20 ret b0%+b1%*$100+b2%*$10000+b3%*$1000000
+21 else
+22 ret channel%
+23 endif
+24 enddef
+25 deffn bmp_height(file$)
+26 loc channel%,b0%,b1%,b2%,b3%
+27 let channel%=fopen(file$)
+28 if channel%>-1
+29 bget #channel%\22,b0%,b1%,b2%,b3%
+30 close #channel%
+31 ret b0%+b1%*$100+b2%*$10000+b3%*$1000000
+32 else
+33 ret channel%
+34 endif
+35 enddef
+36 defproc load_bmp(file$,x,y)
+37 loc window%
+38 let window%=fopen("scr_")
+39 window #window%,bmp_width(file$),bmp_height(file$),x,y
+40 wl_bmp8load #window%,file$
+41 close #window%
+42 enddef
+43 defproc bmp_to_pic(infile$,outfile$)
+44 loc window%,pic_address,width%,height%
+45 let width%=bmp_width(infile$)
+46 let height%=bmp_height(infile$)
+47 let window%=fopen("scr_")
+48 window #window%,width%,height%,0,0
+49 wl_bmp8load #window%,infile$
+50 let pic_address=wsain(#window%)
+51 wsasv #window%,pic_address
+52 s_wsa #window%,pic_address,outfile$
+53 rechp pic_address
+54 close #window%
+55 enddef
+56 rem Functions that convert `csize` parameters to pixels.
+57 rem Author: Marcos Cruz (programandala.net), 2017
+58 deffn csize_width_pixels%(width%)
+59 sel on width%
+60 =0:ret 6
+61 =1:ret 8
+62 =2:ret 12
+63 =3:ret 16
+64 endsel
+65 enddef
+66 deffn csize_height_pixels%(height%)
+67 ret height%*10+10
+68 enddef
+69 rem Functions that convert ISO 8859-1 characters and strings to lowercase.
+70 rem Author: Marcos Cruz (programandala.net), 2017
+71 deffn iso_lower%(char%)
+72 sel on char%
+73 =65 to 90,192 to 214,216 to 222:ret char%+32
+74 =remainder:ret char%
+75 endsel
+76 enddef
+77 deffn iso_lower$(text$)
+78 loc i%,lower_text$
+79 let lower_text$=text$
+80 for i%=1 to len(lower_text$)
+81 let lower_text$(i%)=chr$(iso_lower%(code(text$(i%))))
+82 endfor i%
+83 ret lower_text$
+84 enddef
+85 deffn iso_lower_1$(text$)
+86 ret iso_lower$(text$(1))&text$(2 to)
+87 enddef
+88 rem Functions that convert ISO 8859-1 characters and strings to uppercase.
+89 rem Author: Marcos Cruz (programandala.net), 2017
+90 deffn iso_upper%(char%)
+91 sel on char%
+92 =97 to 122,224 to 246,248 to 254:ret char%-32
+93 =remainder:ret char%
+94 endsel
+95 enddef
+96 deffn iso_upper$(text$)
+97 loc i%,upper_text$
+98 let upper_text$=text$
+99 for i%=1 to len(upper_text$)
+100 let upper_text$(i%)=chr$(iso_upper%(code(text$(i%))))
+101 endfor i%
+102 ret upper_text$
+103 enddef
+104 deffn iso_upper_1$(text$)
+105 ret iso_upper$(text$(1))&text$(2 to)
+106 enddef
+107 rem PIC format tools.
+108 rem Author: Marcos Cruz (programandala.net), 2017
+109 deffn pic_size%(file$,width%,height%)
+110 loc channel%
+111 let channel%=fopen(file$)
+112 if channel%>-1
+113 wget #channel%\2,width%,height%
+114 close #channel%
+115 endif
+116 ret channel%*(channel%<0)
+117 enddef
+118 deffn pic_width%(file$)
+119 loc channel%,width%
+120 let channel%=fopen(file$)
+121 if channel%>-1
+122 wget #channel%\2,width%
+123 close #channel%
+124 ret width%
+125 else
+126 ret channel%
+127 endif
+128 enddef
+129 deffn pic_height%(file$)
+130 loc channel%,height%
+131 let channel%=fopen(file$)
+132 if channel%>-1
+133 wget #channel%\4,height%
+134 close #channel%
+135 ret height%
+136 else
+137 ret channel%
+138 endif
+139 enddef
+140 defproc load_pic(file$,x%,y%)
+141 loc pic_address,width%,height%,ior%,pw%
+142 let ior%=pic_size%(file$,width%,height%)
+143 if not ior%
+144 let pw%=fopen("scr_")
+145 window #pw%,width%,height%,x%,y%
+146 let pic_address=l_wsa(file$)
+147 wsars #pw%,pic_address,
+148 close #pw%
+149 endif
+150 enddef
+151 defproc load_pic_win(channel%,file$,x%,y%)
+152 loc pic_address,width%,height%,ior%,pw%,px%,py%
+153 let ior%=pic_size%(file$,width%,height%)
+154 let px%=win_xmin%(channel%)+x%
+155 let py%=win_ymin%(channel%)+y%
+156 if not ior%
+157 let pw%=fopen("scr_")
+158 window #pw%,width%,height%,px%,py%
+159 let pic_address=l_wsa(file$)
+160 wsars #pw%,pic_address,
+161 close #pw%
+162 endif
+163 enddef
+164 defproc load_pic_win_cc(channel%,file$)
+165 loc width%,height%,ior%,pw%,px%,py%
+166 let ior%=pic_size%(file$,width%,height%)
+167 if not ior%
+168 let px%=win_xmin%(channel%)+(win_width%(channel%)-width%) div 2
+169 let py%=win_ymin%(channel%)+(win_height%(channel%)-height%) div 2
+170 let pw%=fopen("scr_")
+171 window #pw%,width%,height%,px%,py%
+172 let pic_address=l_wsa(file$)
+173 wsars #pw%,pic_address,
+174 close #pw%
+175 endif
+176 enddef
+177 rem Procedure that prints at the center of a window.
+178 rem Authors:
+179 rem Simon n Goodwin, 1991-12
+180 rem Suggested by Dario Leslie
+181 rem Adapted to Sbira by Marcos Cruz (programandala.net), 2017
+182 deffn centre_line%(ch%)
+183 ret win_height%(#ch%) div (win_cursor_height%(#ch%)*2)
+184 enddef
+185 deffn centre_column%(ch%)
+186 ret win_width%(#ch%) div (win_cursor_width%(#ch%)*2)
+187 enddef
+188 defproc print_cc(ch%,text$)
+189 loc fit$
+190 let fit$=text$(to win_columns%(ch%))
+191 at #ch%,centre_line%(ch%),centre_column%(ch%)-(len(fit$) div 2)
+192 print #ch%,fit$
+193 enddef
+194 rem Procedures to print left-justified strings.
+195 rem Author: Marcos Cruz (programandala.net), 2017
+196 let paragraph_separation% = 0
+197 let paragraph_indentation% = 2
+198 defproc print_l(channel%,text$)
+199 local first%,last%
+200 let first%=1
+201 for last%=1 to len(text$)
+202 if text$(last%)=" "
+203 print #channel%,!text$(first% to last%-1);
+204 let first%=last%+1
+205 endif
+206 next
+207 print #channel%,!text$(first% to);
+208 endfor last%
+209 enddef
+210 defproc paragraph(channel%)
+211 loc i%
+212 for i%=1 to paragraph_separation%:print #channel%
+213 print #channel%,fill$(" ",paragraph_indentation%);
+214 enddef
+215 defproc end_paragraph(channel%)
+216 print #channel%
+217 enddef
+218 defproc print_l_paragraph(channel%,text$)
+219 paragraph #channel%
+220 print_l #channel%,text$
+221 end_paragraph #channel%
+222 enddef
+223 rem Functions to trim strings.
+224 rem Author: Marcos Cruz (programandala.net), 2017
+225 deffn trim_right$(txt$)
+226 loc last%
+227 rep trim
+228 let last%=len(txt$)
+229 if not last%:exit trim
+230 if txt$(last%)=" "
+231 let txt$=txt$(1 to last%-1)
+232 else
+233 exit trim
+234 endif
+235 endrep trim
+236 ret txt$
+237 enddef
+238 deffn trim_left$(txt$)
+239 rep trim
+240 if not len(txt$):exit trim
+241 if txt$(1)=" ":let txt$=txt$(2 to):else exit trim
+242 endrep trim
+243 ret txt$
+244 enddef
+245 deffn trim$(txt$)
+246 ret trim_right$(trim_left$(txt$))
+247 enddef
+248 rem Functions that return window channel information.
+249 rem Authors:
+250 rem Simon n Goodwin, 1988
+251 rem Adapted to Sbira by Marcos Cruz (programandala.net), 2017
+252 deffn win_base(chan%)
+253 ret chan_l(chan%,50)
+254 enddef
+255 deffn win_ink%(chan%)
+256 ret chan_b%(chan%,70)
+257 enddef
+258 deffn win_paper%(chan%)
+259 ret chan_b%(chan%,68)
+260 enddef
+261 deffn win_width%(chan%)
+262 ret chan_w%(chan%,28)
+263 enddef
+264 deffn win_height%(chan%)
+265 ret chan_w%(chan%,30)
+266 enddef
+267 deffn win_xpos%(chan%)
+268 ret chan_w%(chan%,34)
+269 enddef
+270 deffn win_ypos%(chan%)
+271 ret chan_w%(chan%,36)
+272 enddef
+273 deffn win_xmin%(chan%)
+274 ret chan_w%(chan%,24)
+275 enddef
+276 deffn win_ymin%(chan%)
+277 ret chan_w%(chan%,26)
+278 enddef
+279 deffn win_cursor_height%(chan%)
+280 ret chan_w%(chan%,40)
+281 enddef
+282 deffn win_cursor_width%(chan%)
+283 ret chan_w%(chan%,38)
+284 enddef
+285 deffn win_attr%(chan%)
+286 ret chan_b%(chan%,66)
+287 enddef
+288 deffn win_font1(chan%)
+289 ret chan_l(chan%,42)
+290 enddef
+291 deffn win_font2(chan%)
+292 ret chan_l(chan%,46)
+293 enddef
+294 deffn win_csize_width%(chan%)
+295 select on (chan_b%(#chan%,66) && %1100000)
+296 =%0000000:ret 0
+297 =%0100000:ret 1
+298 =%1000000:ret 2
+299 endsel
+300 enddef
+301 deffn win_csize_height%
+302 ret (chan_b%(#chan%,66) && 16)<>0
+303 enddef
+304 deffn win_line%(chan%)
+305 ret win_ypos%(chan%)/win_cursor_height%(chan%)
+306 enddef
+307 deffn win_column%(chan%)
+308 ret win_xpos%(chan%)/win_cursor_width%(chan%)
+309 enddef
+310 deffn win_lines%(chan%)
+311 ret win_height%(chan%)/win_cursor_height%(chan%)
+312 enddef
+313 deffn win_columns%(chan%)
+314 ret win_width%(chan%)/win_cursor_width%(chan%)
+315 enddef
+316 rem Procedure that simulates the ZX Spectrum's 'beep' command.
+317 rem Author: Marcos Cruz (programandala.net), 2017
+318 defproc zx_beep(duration,tone%)
+319 loc pitch%
+320 repeat zx_beep_busy:if not beeping:exit zx_beep_busy
+321 let pitch%=tone%+zx_beep_middle_c_offset%
+322 if pitch%>=0 and pitch%<=zx_beep_last_pitch%:beep zx_beep_tempo*duration*1000000/72,ql_pitch%(pitch%)
+323 enddef
+324 defproc init_zx_beep
+325 loc i%,middle_c_pitch%
+326 let zx_beep_tempo=2.1
+327 let middle_c_pitch%=33
+328 restore 342
+329 zx_beep_last_pitch%=0
+330 rep count_data
+331 read i%
+332 if i%=-1:exit count_data
+333 let zx_beep_last_pitch%=zx_beep_last_pitch%+1
+334 endrep count_data
+335 dim ql_pitch%(zx_beep_last_pitch%)
+336 restore 342
+337 for i%=0 to zx_beep_last_pitch%
+338 read ql_pitch%(i%)
+339 if ql_pitch%(i%)=middle_c_pitch%:let zx_beep_middle_c_offset%=i%
+340 endfor i%
+341 enddef
+342 data 000
+343 data 001
+344 data 002
+345 data 003
+346 data 004
+347 data 005
+348 data 006
+349 data 007
+350 data 008
+351 data 009
+352 data 010
+353 data 011
+354 data 012
+355 data 014
+356 data 015
+357 data 017
+358 data 019
+359 data 020
+360 data 022
+361 data 024
+362 data 026
+363 data 028
+364 data 031
+365 data 033
+366 data 036
+367 data 039
+368 data 041
+369 data 045
+370 data 048
+371 data 051
+372 data 055
+373 data 059
+374 data 063
+375 data 067
+376 data 072
+377 data 077
+378 data 082
+379 data 088
+380 data 093
+381 data 100
+382 data 106
+383 data 113
+384 data 121
+385 data 128
+386 data 137
+387 data 145
+388 data 155
+389 data 164
+390 data 175
+391 data 186
+392 data 198
+393 data 210
+394 data 223
+395 data 237
+396 data 252
+397 data -1
+398 let sss=1
+399 defproc ritimba
+400 loc i%
+401 init_once
+402 rep
+403 init_data
+404 splash_screen
+405 credits
+406 welcome
+407 rep game
+408 new_month
+409 audience
+410 plot
+411 assassination
+412 if not alive%:exit game
+413 war
+414 if not alive% or escape%:exit game
+415 plot
+416 police_report
+417 decision
+418 treasury_report
+419 plot
+420 police_report
+421 news
+422 rebellion
+423 if not alive% or escape%:exit game
+424 endrep game
+425 the_end
+426 endrep
+427 enddef
+428 ritimba
+429 defproc credits
+430 wipe black%,white%,blue%
+431 at #ow%,1,0
+432 print_l_paragraph #ow%,"Ritimba "&version$
+433 print_l_paragraph #ow%,"Por: Marcos Cruz (programandala.net), 2011, 2012, 2015, 2016, 2017."
+434 print_l_paragraph #ow%,"Una versión en SBASIC para SMSQ/E del «Dictator» de Don Priestley para ZX Spectrum (1983)."
+435 key_press
+436 enddef
+437 defproc splash_screen
+438 wipe black%,bright_white%,black%
+439 center #ow%,5,"RITIMBA"
+440 national_flag
+441 national_anthem
+442 enddef
+443 defproc national_flag
+444 loc i%,flag_width%,flag_height%,flag_x%,flag_y%,stars_width%,stars_height%,stars_x%,stars_y%,stars_row$,bar_colour%
+445 let flag_width%=22
+446 let flag_height%=12
+447 let flag_x%=center_for%(flag_width%)
+448 let flag_y%=8
+449 let stars_width%=4
+450 let stars_height%=4
+451 let stars_row$=fill$("*",stars_width%)
+452 let stars_x%=center_for%(stars_width%)
+453 let stars_y%=flag_y%+(flag_height%-stars_height%)/2
+454 let bar_colour%=green%
+455 for i%=flag_y% to flag_y%+flag_height%-1
+456 at #ow%,i%,flag_x%
+457 paper #ow%,bar_colour%
+458 print #ow%,"     ";
+459 paper #ow%,blue%
+460 print #ow%,"            ";
+461 paper #ow%,bar_colour%
+462 print #ow%,"     "
+463 if bar_colour%=green%
+464 let bar_colour%=red%
+465 else
+466 let bar_colour%=green%
+467 endif
+468 endfor i%
+469 paper #ow%,blue%
+470 ink #ow%,yellow%
+471 for i%=stars_y% to stars_y%+stars_height%-1:at #ow%,i%,stars_x%:print #ow%,stars_row$
+472 enddef
+473 defproc national_anthem
+474 loc times%,note%,pitch%,tune$
+475 let tune$="KPKKMKIHK`KMRPOMOP"
+476 for times%=1 to 2
+477 for note%=1 to len(tune$)
+478 if len(inkey$(#iw%)):exit times%
+479 let pitch%=code(tune$(note%))-80
+480 if pitch%=16
+481 beep
+482 pause 20
+483 else
+484 zx_beep .5,pitch%
+485 endif
+486 endfor note%
+487 beep
+488 pause 30
+489 endfor times%
+490 enddef
+491 defproc welcome
+492 wipe white%,black%,blue%
+493 paper #ow%,cyan%
+494 center #ow%,1,"Bienvenido al cargo"
+495 paper #ow%,white%
+496 if first_president%
+497 print_l_paragraph #ow%,"Su excelencia es el primer presidente de nuestra amada patria Ritimba."
+498 paragraph #ow%
+499 print_l #ow%,"Confiamos en su excelencia..."
+500 else
+501 paragraph #ow%
+502 print_l #ow%,"El anterior presidente de nuestra amada patria Ritimba obtuvo una puntuación de "&score%&"."
+503 if record% and (record%>score%)
+504 print_l #ow%,"Y el que hasta la fecha ha sido el mejor presidente obtuvo una puntuación de "&record%&"."
+505 endif
+506 end_paragraph #ow%
+507 paragraph #ow%
+508 print_l #ow%,"Deseamos que su excelencia logre hacerlo mucho mejor..."
+509 endif
+510 print_l #ow%,"por el bien de todos."
+511 end_paragraph #ow%
+512 print_l_paragraph #ow%,"Para empezar, su excelencia podrá leer un informe de la hacienda pública y otro de la policía secreta."
+513 key_press
+514 treasury_report
+515 ordinary_police_report
+516 enddef
+517 deffn first_president%
+518 ret not (score%+record%)
+519 enddef
+520 defproc new_month
+521 let low%=rnd(2 to 4)
+522 let rebellion_strength%=rnd(10 to 12)
+523 let months%=months%+1
+524 wipe yellow%,black%,yellow%
+525 at #ow%,10,12
+526 paper #ow%,cyan%
+527 ink #ow%,black%
+528 print #ow%,"MES  ";
+529 paper #ow%,bright_white%
+530 print #ow%,months%
+531 pause 50
+532 plot
+533 if money<=0
+534 bankruptcy
+535 else
+536 let money=money-monthly_payment
+537 endif
+538 enddef
+539 defproc plot
+540 loc main_group%,ally_group%
+541 if months%<=2 or months%<pc%:ret
+542 for main_group%=1 to main_groups%:let plan%(main_group%)=none%:let ally%(main_group%)=none%
+543 for main_group%=1 to main_groups%
+544 if popularity%(main_group%)<=low%
+545 for ally_group%=1 to local_groups%
+546 if not(main_group%=ally_group% or popularity%(ally_group%)>low%)
+547 if power%(ally_group%)+power%(main_group%)>=rebellion_strength%
+548 let plan%(main_group%)=rebellion%
+549 let ally%(main_group%)=ally_group%
+550 exit ally_group%
+551 endif
+552 endif
+553 next ally_group%
+554 let plan%(main_group%)=assassination%
+555 endfor ally_group%
+556 endif
+557 endfor main_group%
+558 enddef
+559 defproc assassination
+560 loc group%
+561 let group%=rnd(1 to main_groups%)
+562 if plan%(group%)=assassination%:try_assassination
+563 enddef
+564 defproc try_assassination
+565 wipe black%,white%,black%
+566 center #ow%,8,"INTENTO DE MAGNICIDIO"
+567 center #ow%,10,"por un "&member$(group%)
+568 pause 50
+569 cls #ow%
+570 shoot_dead_sfx
+571 pause 50
+572 if all_groups_plan_assassination% or not secret_police_is_effective%
+573 successful_assassination
+574 else
+575 failed_assassination
+576 endif
+577 key_press
+578 enddef
+579 defproc failed_assassination
+580 wipe white%,black%,black%
+581 paper #ow%,white%
+582 ink #ow%,black%
+583 print_cc #ow%,"Intento fallido."
+584 enddef
+585 defproc successful_assassination
+586 wipe black%,white%,black%
+587 print_cc #ow%,"El asesino ha logrado su objetivo."
+588 zx_beep 3,-40
+589 let alive%=0
+590 enddef
+591 deffn all_groups_plan_assassination%
+592 return plan%(army%)=assassination% and plan%(peasants%)=assassination% and plan%(landowners%)=assassination%
+593 enddef
+594 deffn secret_police_is_effective%
+595 ret popularity%(police%)>low% or power%(police%)>low% or rnd(0 to 1)
+596 enddef
+597 defproc audience
+598 loc petition%,soliciting_group%,decision%
+599 prepare_audience
+600 rep
+601 rep
+602 expose_petition soliciting_group%
+603 let decision%=decision_option%
+604 sel on decision%
+605 =0,1
+606 exit
+607 =2
+608 advice petition%
+609 endsel
+610 endrep
+611 if decision%=0
+612 reject petition%
+613 exit
+614 else
+615 if affordable%(petition%)
+616 take_decision petition%
+617 exit
+618 else
+619 cls #ow%
+620 print_l_paragraph #ow%,"No hay suficientes fondos para adoptar esta decisión."
+621 print_l_paragraph #ow%,"La respuesta de su excelencia debe ser no."
+622 key_press
+623 endif
+624 endif
+625 endrep
+626 enddef
+627 defproc expose_petition
+628 wipe yellow%,black%,yellow%
+629 paper #ow%,green%
+630 at #ow%,5,0
+631 cls #ow%,1
+632 paper #ow%,white%
+633 ink #ow%,black%
+634 center #ow%,3,"AUDIENCIA"
+635 display_audience_icons soliciting_group%
+636 paper #ow%,yellow%
+637 ink #ow%,black%
+638 center #ow%,10,"Petición "&genitive_name$(soliciting_group%)&":"
+639 paper #ow%,bright_yellow%
+640 clear_lines #ow%,14,15
+641 print_l #ow%,"¿Está su excelencia conforme con "&iso_lower_1$(issue$(petition%))&"?"
+642 cls #ow%,4
+643 enddef
+644 defproc display_audience_icons(group%)
+645 loc icons%,x%,y%,last_x%,icon_image$,icon_width%
+646 let icons%=4
+647 let icon_image$=icon_file$(icon$(group%))
+648 let icon_width%=pic_width%(icon_image$)
+649 at #ow%,6,0
+650 let y%=win_ypos%(#ow%)
+651 let last_x%=ow_width%-ow_border_x_width%-icon_width%
+652 for x%=0 to last_x% step last_x% div (icons%-1)
+653 load_pic_win #ow%,icon_image$,x%,y%
+654 endfor
+655 enddef
+656 defproc prepare_audience
+657 if not petitions_left%
+658 restore_petitions
+659 endif
+660 rep choose_petition
+661 let petition%=rnd(1 to petitions%)
+662 if not is_decision_taken%(petition%)
+663 exit choose_petition
+664 endif
+665 endrep choose_petition
+666 mark_decision_taken petition%
+667 let soliciting_group%=int((petition%-1)/groups%)+1
+668 enddef
+669 deffn petitions_left%
+670 loc i%,count%
+671 for i%=1 to petitions%:let count%=count%+not is_decision_taken%(i%)
+672 ret count%
+673 enddef
+674 defproc reject(petitition%)
+675 loc new_popularity%
+676 let new_popularity%=popularity%(soliciting_group%)-decision_popularity_effect%(petition%,soliciting_group%)
+677 let popularity%(soliciting_group%)=maximum%(new_popularity%,0)
+678 cls #ow%
+679 enddef
+680 defproc decision
+681 loc section%,chosen_decision%
+682 rep choose_decision
+683 let section%=decision_section%
+684 if section%=0
+685 exit choose_decision
+686 endif
+687 let chosen_decision%=decision%(section%)
+688 sel on chosen_decision%
+689 =0
+690 next choose_decision
+691 =37
+692 transfer
+693 if transferred_money
+694 exit choose_decision
+695 endif
+696 =38
+697 ask_for_loan russia%
+698 exit choose_decision
+699 =39
+700 ask_for_loan usa%
+701 exit choose_decision
+702 =remainder
+703 advice chosen_decision%
+704 if affordable%(chosen_decision%)
+705 cls #ow%
+706 paper #ow%,white%
+707 print_l #ow%,"¿"&issue$(chosen_decision%)&"?"
+708 if yes_key%
+709 if chosen_decision%=35
+710 let strength%=strength%+2
+711 take_decision chosen_decision%
+712 exit choose_decision
+713 else
+714 take_only_once_decision chosen_decision%
+715 exit choose_decision
+716 endif
+717 endif
+718 else
+719 pause 200
+720 endif
+721 next choose_decision
+722 endsel
+723 endrep choose_decision
+724 enddef
+725 deffn decision_section%
+726 loc i%,col%,digit$,zero%,key$,valid_keys$,prompt$
+727 let zero%=code("0")
+728 wipe red%,yellow%,blue%
+729 print #ow%,fill$("*",columns%*ow_lines%)
+730 paper #ow%,bright_blue%
+731 ink #ow%,bright_white%
+732 center #ow%,3,"DECISIÓN PRESIDENCIAL"
+733 paper #ow%,yellow%
+734 ink #ow%,black%
+735 let col%=center_for%(3+section_max_len%)
+736 for i%=1 to decision_sections%
+737 decision_item
+738 endfor
+739 let prompt$=prompt$&"..."
+740 key$=get_key_prompt$(prompt$)
+741 if key$ instr valid_keys$
+742 ret key$
+743 else
+744 ret 0
+745 endif
+746 enddef
+747 defproc decision_item
+748 at #ow%,8+i%*2,col%
+749 print #ow%,i%;". ";decision_section$(i%)
+750 let digit$=chr$(i%+zero%)
+751 let valid_keys$=valid_keys$&digit$
+752 let prompt$=prompt$&digit$&" | "
+753 enddef
+754 deffn decision%(section%)
+755 loc i%,option%,options$,key$,prompt$
+756 cls #ow%
+757 at #ow%,(20-((last_decision%(section%)-first_decision%(section%))*3))*.5,0
+758 for i%=first_decision%(section%) to last_decision%(section%)
+759 if is_decision_taken%(i%)
+760 ink #ow%,white%
+761 else
+762 ink #ow%,black%
+763 let options$=options$&decision_index%(i%)
+764 let prompt$=prompt$&if$(len(prompt$)," | ","")&decision_index%(i%)
+765 endif
+766 item #ow%,decision_index%(i%),issue$(i%)&"."
+767 print #ow%
+768 endfor i%
+769 if len(options$)
+770 let key$=get_key_prompt$(prompt$&" | ...")
+771 if key$ instr options$
+772 let option%=first_decision%(section%)+key$-1
+773 else
+774 let option%=0
+775 endif
+776 else
+777 print_l_paragraph #ow%,"Esta sección está agotada."
+778 key_press
+779 let option%=0
+780 endif
+781 ret option%
+782 enddef
+783 deffn decision_index%(i%)
+784 ret i%-first_decision%(section%)+1
+785 enddef
+786 defproc take_only_once_decision(decision%)
+787 mark_decision_taken decision%
+788 take_decision decision%
+789 enddef
+790 defproc take_decision(decision%)
+791 loc group%,new_popularity%,new_power%
+792 for group%=1 to groups%
+793 let new_popularity%=popularity%(group%)+decision_popularity_effect%(decision%,group%)
+794 let popularity%(group%)=in_range%(new_popularity%,0,9)
+795 endfor group%
+796 for group%=1 to local_groups%
+797 let new_power%=power%(group%)+decision_power_effect%(decision%,group%)
+798 let power%(group%)=in_range%(new_power%,0,9)
+799 endfor group%
+800 let money=money+decision_cost
+801 let monthly_payment=maximum(monthly_payment-decision_monthly_cost,0)
+802 enddef
+803 deffn in_range%(x%,min%,max%)
+804 return maximum%(minimum%(x%,max%),min%)
+805 enddef
+806 defproc advice(decision%)
+807 loc i%,variation%,variations%,datum_col%,paragraph_separation_backup%,deny_effect%
+808 let datum_col%=29
+809 wipe yellow%,black%,yellow%
+810 print_l #ow%,"Consecuencias de "&iso_lower_1$(issue$(decision%))&":"
+811 end_paragraph #ow%
+812 advice_section "La popularidad del presidente"
+813 let variations%=0
+814 for i%=1 to groups%
+815 let variation%=decision_popularity_effect%(decision%,i%)
+816 let variations%=variations%+abs(variation%)
+817 if variation%
+818 print #ow%,"-Entre ";plural_name$(i%);to datum_col%;"+"(1 to variation%>0);variation%;
+819 if soliciting_group%=i% and decision%<25
+820 print #ow%,"*"
+821 let deny_effect%=-variation%
+822 else
+823 print #ow%
+824 endif
+825 endif
+826 endfor i%
+827 if not variations%:print #ow%,"Ningún cambio."
+828 if deny_effect%
+829 csize #ow%,csize_width%-1,csize_height%
+830 print_l_paragraph #ow%,"(*) "&deny_effect%&" si la petición es rechazada."
+831 csize #ow%,csize_width%,csize_height%
+832 endif
+833 advice_section "La fuerza de los grupos"
+834 let variations%=0
+835 for i%=1 to local_groups%
+836 let variation%=decision_power_effect%(decision%,i%)
+837 let variations%=variations%+abs(variation%)
+838 if variation%
+839 print #ow%,"-";iso_upper_1$(name$(i%));to datum_col%;"+"(1 to variation%>0);variation%
+840 endif
+841 endfor i%
+842 if not variations%:print #ow%,"Ningún cambio."
+843 advice_section "La hacienda pública"
+844 let paragraph_separation_backup%=paragraph_separation%
+845 let paragraph_separation%=0
+846 decision_treasury_report decision%
+847 let paragraph_separation%=paragraph_separation_backup%
+848 key_press
+849 cls #ow%
+850 enddef
+851 defproc advice_section(title$)
+852 under #ow%,1
+853 print #ow%,\title$
+854 under #ow%,0
+855 enddef
+856 defproc police_report
+857 loc fee%
+858 let fee%=1
+859 wipe black%,white%,black%
+860 display_police_icon
+861 if money<=0 or popularity%(police%)<=low% or power%(police%)<=low%
+862 police_report_not_available
+863 else
+864 center #ow%,6,"¿Informe de la policía secreta?"
+865 center #ow%,12,"(Cuesta "&money$(fee%)&")"
+866 if yes_key%
+867 let money=money-fee%
+868 ordinary_police_report
+869 endif
+870 endif
+871 enddef
+872 defproc display_police_icon
+873 loc icon$,x%
+874 let icon$=datad$&"img_police_icon_pic"
+875 let x%=(win_width%(ow%)-pic_width%(icon$)) div 2
+876 load_pic_win #ow%,icon$,x%,0
+877 enddef
+878 defproc ordinary_police_report
+879 wipe black%,white%,black%
+880 print #ow%,"MES ";months%
+881 ink #ow%,blue%
+882 at #ow%,3,0
+883 cls #ow%,1
+884 police_report_data "INFORME DE LA POLICÍA SECRETA",""
+885 enddef
+886 defproc final_police_report
+887 wipe black%,white%,black%
+888 police_report_data "INFORME FINAL","DE LA POLICÍA SECRETA"
+889 enddef
+890 defproc police_report_data(title$,title_continued$)
+891 loc group%,line%,title_line%,header_line%,data_line%,group_col%,plan_col%,popularity_col%,strength_col%,title_continued%
+892 let title_continued%=len(title_continued$)>0
+893 let title_line%=2-title_continued%
+894 let header_line%=title_line%+2+title_continued%
+895 let data_line%=header_line%+2
+896 let group_col%=0
+897 let plan_col%=10
+898 let ally_col%=14
+899 let popularity_col%=17
+900 let strength_col%=24
+901 paper #ow%,black%
+902 ink #ow%,white%
+903 under #ow%,1
+904 center #ow%,title_line%,title$
+905 if title_continued%
+906 center #ow%,title_line%+1,title_continued$
+907 endif
+908 under #ow%,0
+909 paper #ow%,black%
+910 ink #ow%,white%
+911 at #ow%,header_line%,group_col%
+912 csize #ow%,0,csize_height%
+913 print #ow%,"Grupo"
+914 restore_csize
+915 at #ow%,header_line%,plan_col%
+916 csize #ow%,0,csize_height%
+917 print #ow%,"Prepara"
+918 restore_csize
+919 at #ow%,header_line%,ally_col%
+920 csize #ow%,0,csize_height%
+921 print #ow%,"Aliado"
+922 restore_csize
+923 at #ow%,header_line%,popularity_col%
+924 csize #ow%,0,csize_height%
+925 print #ow%,"Popularidad"
+926 restore_csize
+927 at #ow%,header_line%,strength_col%
+928 csize #ow%,0,csize_height%
+929 print #ow%,"Fuerza"
+930 restore_csize
+931 for group%=1 to groups%
+932 let line%=data_line%+group%-1
+933 paper #ow%,bright_white%
+934 ink #ow%,black%
+935 at #ow%,line%,group_col%
+936 print #ow%,group%
+937 paper #ow%,yellow%
+938 at #ow%,line%,group_col%+1
+939 csize #ow%,csize_width%-2,csize_height%
+940 print #ow%,short_name$(group%);fill$(" ",max_short_name_len%-len(short_name$(group%)))
+941 restore_csize
+942 if is_main_group%(group%)
+943 at #ow%,line%,plan_col%
+944 csize #ow%,0,csize_height%
+945 paper #ow%,black%
+946 ink #ow%,red%
+947 sel on plan%(group%)
+948 =rebellion%
+949 print #ow%,"Rebelión"
+950 restore_csize
+951 at #ow%,line%,ally_col%
+952 paper #ow%,white%
+953 ink #ow%,black%
+954 print #ow%,ally%(group%)
+955 =assassination%
+956 print #ow%,"Magnicidio"
+957 endsel
+958 restore_csize
+959 endif
+960 if popularity%(group%)
+961 paper #ow%,green%
+962 ink #ow%,white%
+963 at #ow%,line%,popularity_col%
+964 csize #ow%,csize_width%-1,csize_height%
+965 print #ow%,"123456789"(to popularity%(group%))
+966 restore_csize
+967 endif
+968 if is_local_group%(group%)
+969 paper #ow%,red%
+970 ink #ow%,white%
+971 at #ow%,line%,strength_col%
+972 csize #ow%,csize_width%-1,csize_height%
+973 print #ow%,"123456789"(to power%(group%))
+974 restore_csize
+975 endif
+976 endfor group%
+977 paper #ow%,black%
+978 ink #ow%,white%
+979 paragraph #ow%
+980 print_l #ow%,"La fuerza de su excelencia es "&strength%&"."
+981 end_paragraph #ow%
+982 paragraph #ow%
+983 print_l #ow%,"La fuerza necesaria para una rebelión es "&rebellion_strength%&"."
+984 key_press
+985 enddef
+986 deffn is_main_group%(a_group%)
+987 return a_group%<=main_groups%
+988 enddef
+989 deffn is_local_group%(a_group%)
+990 return a_group%<=local_groups%
+991 enddef
+992 defproc police_report_not_available
+993 display_police_icon
+994 center #ow%,6,"INFORME DE LA POLICÍA SECRETA"
+995 ink #ow%,bright_white%
+996 center #ow%,8,"NO DISPONIBLE"
+997 ink #ow%,white%
+998 at #ow%,11,0
+999 if popularity%(police%)<=low%
+1000 print_l_paragraph #ow%,"La popularidad de su excelencia entre la policía es "&popularity%(police%)&"."
+1001 endif
+1002 if power%(police%)<=low%
+1003 print_l_paragraph #ow%,"El poder de la policía es "&power%(police%)&"."
+1004 endif
+1005 if money<=0
+1006 print_l_paragraph #ow%,"La hacienda pública no tiene dinero para pagar los informes de la policía."
+1007 endif
+1008 key_press
+1009 enddef
+1010 defproc rebellion
+1011 loc loyal_group%,rebel_group%
+1012 if rebels%
+1013 unavoidable_rebellion
+1014 endif
+1015 enddef
+1016 defproc unavoidable_rebellion
+1017 rebellion_alarm
+1018 if want_to_escape%
+1019 escape
+1020 else
+1021 fight
+1022 endif
+1023 enddef
+1024 deffn want_to_escape%
+1025 loc yes%
+1026 wipe yellow%,black%,yellow%
+1027 at #ow%,ow_lines% div 2,0
+1028 paper #ow%,bright_yellow%
+1029 cls #ow%,3
+1030 print_l #ow%,"¿Desea su excelencia intentar escapar del país?"
+1031 cls #ow%,4
+1032 let yes%=yes_key%
+1033 paper #ow%,yellow%
+1034 cls #ow%
+1035 ret yes%
+1036 enddef
+1037 deffn rebels%
+1038 loc i%
+1039 for i%=1 to main_groups%
+1040 let rebel_group%=rnd(1 to main_groups%)
+1041 if plan%(rebel_group%)=rebellion%:exit i%
+1042 next i%
+1043 let rebel_group%=0
+1044 endfor i%
+1045 ret rebel_group%
+1046 enddef
+1047 defproc fight
+1048 ask_for_help
+1049 rebellion_report
+1050 rebellion_starts
+1051 if rebels_are_stronger%
+1052 the_rebellion_wins
+1053 else
+1054 the_rebellion_is_defeated
+1055 endif
+1056 enddef
+1057 defproc rebellion_starts
+1058 wipe white%,black%,white%
+1059 print_cc #ow%,"La rebelión ha comenzado"
+1060 war_sfx
+1061 enddef
+1062 deffn rebels_are_stronger%
+1063 ret not(rebels_strength%<=strength%+power%(loyal_group%)+rnd(-1 to 1))
+1064 enddef
+1065 defproc rebellion_alarm
+1066 local i%
+1067 wipe red%,black%,red%
+1068 ink #ow%,white%
+1069 print_cc #ow%,"REBELIÓN"
+1070 for i%=1 to 5:zx_beep .5,20:zx_beep .5,10
+1071 enddef
+1072 defproc rebellion_report
+1073 cls #ow%
+1074 at #ow%,8,0
+1075 print_l_paragraph #ow%,"La fuerza de su excelencia es "&strength%&"."
+1076 if loyal_group%
+1077 print_l_paragraph #ow%,"La fuerza de "&name$(loyal_group%)&" es "&power%(loyal_group%)&"."
+1078 endif
+1079 print_l_paragraph #ow%,"La fuerza de los rebeldes es "&rebels_strength%&"."
+1080 key_press
+1081 enddef
+1082 defproc ask_for_help
+1083 local i%,loyal_groups$,k$,group_keys_prompt$
+1084 pause 150
+1085 cls #ow%
+1086 let rebels_strength%=power%(rebel_group%)+power%(ally%(rebel_group%))
+1087 at #ow%,5,0
+1088 print_l_paragraph #ow%,"Se han unido "&name$(rebel_group%)&" y "&name$(ally%(rebel_group%))&"."
+1089 print_l_paragraph #ow%,"Su fuerza conjunta es "&rebels_strength%&"."
+1090 print_l_paragraph #ow%,"¿A quién va a pedir ayuda su excelencia?"
+1091 for i%=1 to local_groups%
+1092 if popularity%(i%)>low%
+1093 print #ow%,to 6;i%;" ";name$(i%)
+1094 let loyal_groups$=loyal_groups$&i%
+1095 let group_keys_prompt$=group_keys_prompt$&i%&" "
+1096 endif
+1097 endfor i%
+1098 let group_keys_prompt$=trim_right$(group_keys_prompt$)
+1099 if len(loyal_groups$)
+1100 rep
+1101 let k$=get_key_prompt$("["&group_keys_prompt$&"]")
+1102 if k$ instr loyal_groups$
+1103 let loyal_group%=k$
+1104 exit
+1105 endif
+1106 endrep
+1107 else
+1108 cls #ow%
+1109 print_cc #ow%,"¡Su excelencia está solo!"
+1110 key_press
+1111 endif
+1112 enddef
+1113 defproc escape
+1114 if got_helicopter%
+1115 if the_helicopter_works%
+1116 escape_by_helicopter
+1117 else
+1118 the_helicopter_does_not_work
+1119 escape_on_foot
+1120 endif
+1121 else
+1122 escape_on_foot
+1123 endif
+1124 enddef
+1125 deffn the_helicopter_works%
+1126 ret rnd(0 to 2)
+1127 enddef
+1128 defproc escape_by_helicopter
+1129 print_cc #ow%,"El helicóptero despega..."
+1130 sound "helicopterleaving"
+1131 let escape%=1
+1132 enddef
+1133 defproc the_helicopter_does_not_work
+1134 print_cc #ow%,"¡El helicóptero no funciona!"
+1135 sound "helicopterapproach"
+1136 pause 150
+1137 enddef
+1138 defproc escape_on_foot
+1139 at #ow%,centre_line%(#ow%),0
+1140 print_l_paragraph #ow%,"Su excelencia se ve obligado a atravesar el monte a pie hacia Leftoto..."
+1141 sound "junglesteps"
+1142 pause 50
+1143 if not int((rnd*((power%(guerrilla%)/3)+.4)))
+1144 do_escape_on_foot
+1145 else
+1146 the_guerrilla_catchs_you
+1147 endif
+1148 enddef
+1149 defproc do_escape_on_foot
+1150 cls #ow%
+1151 pause 50
+1152 at #ow%,ow_lines% div 2,0
+1153 print_l_paragraph #ow%,"Milagrosamente, la guerrilla no logra atraparlo."
+1154 let escape%=1
+1155 enddef
+1156 defproc the_guerrilla_catchs_you
+1157 wipe black%,white%,black%
+1158 pause 50
+1159 at #ow%,ow_lines% div 2,0
+1160 paragraph #ow%
+1161 print_l #ow%,"Por desgracia, la guerrilla lo encuentra antes de que llegue a la frontera..."
+1162 pause 150
+1163 shoot_dead_sfx
+1164 pause 50
+1165 print_l #ow%,"y lo ejecuta."
+1166 end_paragraph #ow%
+1167 let alive%=0
+1168 enddef
+1169 defproc the_rebellion_wins
+1170 loc line%
+1171 let line%=(ow_lines% div 2)-1
+1172 wipe black%,white%,black%
+1173 center #ow%,line%,"Su excelencia es capturado"
+1174 center #ow%,line%+1,"por los rebeldes..."
+1175 pause 150
+1176 execution_sfx
+1177 pause 50
+1178 center #ow%,line%+2,"y ejecutado."
+1179 let alive%=0
+1180 enddef
+1181 defproc the_rebellion_is_defeated
+1182 local i%
+1183 wipe white%,black%,white%
+1184 celebration
+1185 paper #ow%,bright_white%
+1186 center #ow%,10,"¡La rebelión ha sido sofocada!"
+1187 at #ow%,12,0
+1188 print_l #ow%,"¿Ordena su excelencia castigar a los rebeldes?"
+1189 cls #ow%,4
+1190 if yes_key%
+1191 punish_the_rebels
+1192 endif
+1193 let power%(loyal_group%)=9
+1194 let pc%=months%+2
+1195 plot
+1196 police_report
+1197 enddef
+1198 defproc celebration
+1199 loc i%
+1200 at #ow%,0,0
+1201 for i%=0 to ow_lines%-1
+1202 at #ow%,i%,0
+1203 paper #ow%,rnd(1 to 14)
+1204 cls #ow%,3
+1205 endfor i%
+1206 enddef
+1207 defproc punish_the_rebels
+1208 local i%
+1209 for i%=1 to rnd(2 to 3)
+1210 execution_sfx
+1211 pause 50
+1212 endfor i%
+1213 let popularity%(rebel_group%)=0
+1214 let power%(rebel_group%)=0
+1215 let popularity%(ally%(rebel_group%))=0
+1216 let power%(ally%(rebel_group%))=0
+1217 enddef
+1218 defproc treasury_report
+1219 wipe white%,green%,green%
+1220 print #ow%,fill$("$",columns%*ow_lines%)
+1221 display_treasury_graph
+1222 paper #ow%,bright_white%
+1223 ink #ow%,black%
+1224 center #ow%,8,"INFORME DE LA HACIENDA PÚBLICA"
+1225 treasury_report_data
+1226 enddef
+1227 defproc display_treasury_graph
+1228 loc icons%,x%,y%,first_x%,last_x%,icon_image$,icon_width%
+1229 let icons%=8
+1230 let icon_image$=icon_file$("dollar")
+1231 let icon_width%=pic_width%(icon_image$)
+1232 at #ow%,2,1
+1233 let y%=win_ypos%(#ow%)
+1234 let first_x%=win_xpos%(#ow%) div 2
+1235 let last_x%=ow_width%-ow_border_x_width%-icon_width%-first_x%
+1236 for x%=first_x% to last_x% step (last_x%-first_x%) div (icons%-1)
+1237 load_pic_win #ow%,icon_image$,x%,y%
+1238 endfor
+1239 enddef
+1240 deffn money$(amount)
+1241 loc digit%,amount$,formatted$,digits%
+1242 let amount$=trim_left$(idec$(abs(amount)*1000,8,0))
+1243 let digits%=len(amount$)
+1244 for digit%=1 to digits%
+1245 let formatted$=amount$(digits%-digit%+1)&formatted$
+1246 if not(digit% mod 3) and digit%<>digits%
+1247 let formatted$=nbsp$&formatted$
+1248 endif
+1249 endfor digit%
+1250 if amount<0
+1251 let formatted$="-"&formatted$
+1252 endif
+1253 ret formatted$&" "&currency$
+1254 enddef
+1255 defproc treasury_report_data
+1256 loc amount$
+1257 paper #ow%,bright_blue%
+1258 ink #ow%,bright_white%
+1259 at #ow%,12,1
+1260 print #ow%,"Saldo:";
+1261 if money<0
+1262 ink #ow%,bright_red%
+1263 endif
+1264 print_amount ow%,money
+1265 ink #ow%,bright_white%
+1266 at #ow%,14,1
+1267 print #ow%,"Gasto mensual:";
+1268 print_amount #ow%,monthly_payment
+1269 at #ow%,16,1
+1270 print #ow%,"En Suiza:";
+1271 print_amount #ow%,money_in_switzerland
+1272 key_press
+1273 enddef
+1274 defproc print_amount(channel%,amount)
+1275 loc amount$
+1276 let amount$=money$(amount)
+1277 print #channel%,to columns%-1-len(amount$);amount$
+1278 enddef
+1279 defproc bankruptcy
+1280 cls #ow%
+1281 at #ow%,5,0
+1282 print_l_paragraph #ow%,"La hacienda pública está en bancarrota."
+1283 at #ow%,9,0
+1284 print_l_paragraph #ow%,"La popularidad de su excelencia entre el ejército y la policía secreta caerán."
+1285 print_l_paragraph #ow%,"El poder de la policía y el propio poder de su excelencia se reducirán también."
+1286 let popularity%(army%)=popularity%(army%)-(popularity%(army%)>0)
+1287 let popularity%(police%)=popularity%(police%)-(popularity%(police%)>0)
+1288 let power%(police%)=power%(police%)-(power%(police)>0)
+1289 let strength%=strength%-(strength%>0)
+1290 key_press
+1291 plot
+1292 police_report
+1293 enddef
+1294 defproc decision_treasury_report(decision%)
+1295 loc printout$
+1296 paper #ow%,yellow%
+1297 ink #ow%,black%
+1298 let decision_cost=10*decision_cost%(decision%)
+1299 let decision_monthly_cost=decision_monthly_cost%(decision%)
+1300 let printout$="Esta decisión"
+1301 if not decision_cost and not decision_monthly_cost
+1302 let printout$=printout$&" no costaría dinero."
+1303 paragraph #ow%
+1304 print_l #ow%,printout$
+1305 else
+1306 if decision_cost
+1307 if decision_cost>0
+1308 let printout$=printout$&" aportaría "
+1309 else
+1310 let printout$=printout$&" costaría "
+1311 endif
+1312 let printout$=printout$&money$(abs(decision_cost))
+1313 endif
+1314 if decision_cost and decision_monthly_cost:let printout$=printout$&" y"
+1315 if decision_monthly_cost
+1316 if decision_monthly_cost<0
+1317 let printout$=printout$&" aumentaría"
+1318 else
+1319 let printout$=printout$&" reduciría"
+1320 endif
+1321 let printout$=printout$&" los gastos mensuales en "&money$(abs(decision_monthly_cost))
+1322 endif
+1323 paragraph #ow%
+1324 print_l #ow%,printout$&"."
+1325 if money+decision_cost>0:ret
+1326 if not((decision_cost<0 or decision_monthly_cost<0) and (money+decision_cost<0 or money+decision_monthly_cost<0)):ret
+1327 paragraph #ow%
+1328 print_l #ow%,"La hacienda pública no dispone del dinero necesario."
+1329 if not is_decision_taken%(38):paragraph #ow%
+1330 print_l #ow%,"Quizá los rusos pueden ayudar."
+1331 if not is_decision_taken%(39):paragraph #ow%
+1332 print_l #ow%,"Los useños son un pueblo generoso"
+1333 endif
+1334 enddef
+1335 deffn affordable%(decision%)
+1336 let decision_cost=10*decision_cost%(decision%)
+1337 let decision_monthly_cost=decision_monthly_cost%(decision%)
+1338 if not decision_cost and not decision_monthly_cost
+1339 ret 1
+1340 endif
+1341 if money+decision_cost>0:ret 1
+1342 ret (decision_cost<0 or decision_monthly_cost<0) and (money+decision_cost<0 or money+decision_monthly_cost<0)
+1343 enddef
+1344 defproc ask_for_loan(country%)
+1345 loc loan,answer$,answer_line%
+1346 let answer_line%=center_for%(ow_lines%)
+1347 wipe black%,bright_white%,black%
+1348 print_l_paragraph #ow%,"La solicitud de préstamo ha sido cursada y solo cabe aguardar pacientemente la respuesta."
+1349 pause 100
+1350 if country%=usa%
+1351 load_pic_win_cc #ow%,datad$&"img_usa_flag_pic"
+1352 if sss
+1353 sound "usa"
+1354 else
+1355 tune "2m1j3f3j3m4r1 2v1t3r3j3l4m"
+1356 endif
+1357 else
+1358 load_pic_win_cc #ow%,datad$&"img_ussr_flag_pic"
+1359 if sss
+1360 sound "ussr"
+1361 else
+1362 tune "2g2d3i4d2 2g2d3i4d"
+1363 endif
+1364 endif
+1365 if months%<rnd(3 to 7)
+1366 let answer$="opinan que es demasiado pronto para conceder ayudas ecónomicas."
+1367 else
+1368 if is_decision_taken%(decision%)
+1369 let answer$="te deniegan un nuevo préstamo"
+1370 else
+1371 if popularity%(country%)<=low%
+1372 let answer$="dicen que no, sin ninguna explicación"
+1373 else
+1374 let loan=popularity%(country%)*30+rnd(0 to 199)
+1375 let answer$="conceden un préstamo de "&money$(loan)
+1376 let money=money+loan
+1377 mark_decision_taken decision%
+1378 endif
+1379 endif
+1380 endif
+1381 cls #ow%
+1382 pause 50
+1383 at #ow%,answer_line%,0
+1384 print_l_paragraph #ow%,iso_upper_1$(plural_name$(country%))&" "&answer$&"."
+1385 key_press
+1386 enddef
+1387 defproc transfer
+1388 let transferred_money=0
+1389 cls #ow%
+1390 center #ow%,1,"TRANSFERENCIA"
+1391 center #ow%,2,"A LA CUENTA EN SUIZA"
+1392 if money>0
+1393 do_transfer
+1394 if not transferred_money
+1395 ret
+1396 endif
+1397 else
+1398 print_l_paragraph #ow%,"No hay fondos. La transferencia no puede realizarse."
+1399 endif
+1400 key_press
+1401 enddef
+1402 defproc do_transfer
+1403 loc i%,valid_options$,prompt$,key$
+1404 at #ow%,4,0
+1405 print_l_paragraph #ow%,"¿Qué cantidad de dinero desea su excelencia transferir desde la hacienda pública a su cuenta personal en Suiza?"
+1406 print #ow%
+1407 for i%=1 to transfer_divisors%
+1408 transfer_option i%
+1409 endfor
+1410 let key$=get_key_prompt$(prompt$&" | ...")
+1411 if key$ instr valid_options$
+1412 let transferred_money=money div key$
+1413 let money_in_switzerland=money_in_switzerland+transferred_money
+1414 let money=money-transferred_money
+1415 at #ow%,3,0
+1416 cls #ow%,2
+1417 at #ow%,4,0
+1418 print_l_paragraph #ow%,money$(transferred_money)&" han sido transferidos a la cuenta personal de su excelencia en Suiza."
+1419 endif
+1420 enddef
+1421 defproc transfer_option(divisor%)
+1422 loc amount%,amount$
+1423 let amount%=money div divisor%
+1424 if valid_transfer%(amount%,divisor%)
+1425 amount$=money$(amount%)
+1426 print #ow%,divisor%;". ";divisor$(divisor%);" ";fill$(".",columns%-5-len(divisor$(divisor%))-len(amount$));to columns%-len(amount$);amount$
+1427 let valid_options$=valid_options$&divisor%
+1428 let prompt$=prompt$&if$(divisor%<>1," | ","")&divisor%
+1429 endif
+1430 enddef
+1431 deffn valid_transfer%(amount%,part%)
+1432 if part%=1
+1433 ret 1
+1434 else
+1435 ret amount%>0 and amount%<(money div (part%-1))
+1436 endif
+1437 enddef
+1438 defproc news
+1439 if not rnd(0 to 2):newsflash
+1440 enddef
+1441 defproc newsflash
+1442 loc event%
+1443 let event%=new_event%
+1444 wipe white%,black%,white%
+1445 newsflash_title 10
+1446 newsflash_contents event%
+1447 take_only_once_decision event%
+1448 key_press
+1449 plot
+1450 police_report
+1451 enddef
+1452 defproc newsflash_contents(event%)
+1453 paper #ow%,bright_white%
+1454 ink #ow%,black%
+1455 at #ow%,14,0
+1456 cls #ow%,3
+1457 print_l #ow%,issue$(event%)&"."
+1458 cls #ow%,4
+1459 enddef
+1460 defproc newsflash_title(flashes%)
+1461 loc i%,grad_y%
+1462 let grad_y% = 1
+1463 for i%=1 to flashes%
+1464 if i% mod 2
+1465 paper #ow%,white%
+1466 ink #ow%,black%
+1467 else
+1468 paper #ow%,black%
+1469 ink #ow%,white%
+1470 endif
+1471 center #ow%,10,"NOTICIA DE ÚLTIMA HORA"
+1472 beep 10000,6,17,-1,grad_y%
+1473 let grad_y% = -grad_y%
+1474 pause 25
+1475 endfor i%
+1476 enddef
+1477 deffn new_event%
+1478 loc i%,event%
+1479 let event%=rnd(first_event% to last_event%)
+1480 for i%=1 to events%
+1481 if not is_decision_taken%(event%)
+1482 exit i%
+1483 endif
+1484 let event%=event%+1
+1485 if event%>last_event%
+1486 let event%=first_event%
+1487 endif
+1488 endfor i%
+1489 ret event%
+1490 enddef
+1491 defproc war
+1492 if risk_of_war%
+1493 possible_war
+1494 endif
+1495 enddef
+1496 deffn risk_of_war%
+1497 ret popularity%(leftoto%)<=low%and power%(leftoto%)>=low%
+1498 enddef
+1499 defproc possible_war
+1500 if not rnd(0 to 3)
+1501 actual_war
+1502 else
+1503 threat_of_war
+1504 endif
+1505 key_press
+1506 enddef
+1507 defproc threat_of_war
+1508 loc i%
+1509 wipe black%,white%,cyan%
+1510 at #ow%,6,0
+1511 print_l_paragraph #ow%,"Su excelencia amenaza a Leftoto con la guerra."
+1512 at #ow%,10,0
+1513 print_l_paragraph #ow%,"La popularidad de su excelencia crece en Ritimba."
+1514 for i%=1 to main_groups%,police%
+1515 increase_popularity i%
+1516 endfor i%
+1517 enddef
+1518 defproc increase_popularity(group%)
+1519 local current_popularity%
+1520 let current_popularity%=popularity%(group%)
+1521 let popularity%(group%)=current_popularity%+(current_popularity%<9)
+1522 enddef
+1523 defproc actual_war
+1524 loc ritimba_strength%,leftoto_strength%
+1525 wipe red%,black%,black%
+1526 center #ow%,8,"¡Leftoto invade Ritimba!"
+1527 let ritimba_strength%=ritimba_current_strength%
+1528 at #ow%,12,0
+1529 print_l_paragraph #ow%,"La fuerza de Ritimba es "&ritimba_strength%&"."
+1530 let leftoto_strength%=leftoto_current_strength%
+1531 at #ow%,14,0
+1532 print_l_paragraph #ow%,"La fuerza de Leftoto es "&leftoto_strength%&"."
+1533 at #ow%,16,0
+1534 print_l_paragraph #ow%,"Una corta y decisiva guerra."
+1535 war_sfx
+1536 if ritimba_wins%
+1537 ritimba_wins
+1538 else
+1539 leftoto_wins
+1540 endif
+1541 enddef
+1542 deffn ritimba_wins%
+1543 ret (leftoto_strength%+rnd(-1 to 1))<ritimba_strength%
+1544 enddef
+1545 deffn ritimba_current_strength%
+1546 loc i%,ritimba_strength%
+1547 for i%=1 to main_groups%,police%
+1548 if popularity%(i%)>low%:let ritimba_strength%=ritimba_strength%+power%(i%)
+1549 endfor i%
+1550 ret ritimba_strength%+strength%
+1551 enddef
+1552 deffn leftoto_current_strength%
+1553 loc i%,leftoto_strength%
+1554 for i%=1 to local_groups%
+1555 if popularity%(i%)<=low%:let leftoto_strength%=leftoto_strength%+power%(i%)
+1556 endfor i%
+1557 ret leftoto_strength%
+1558 enddef
+1559 defproc ritimba_wins
+1560 zx_border black%
+1561 cls #ow%
+1562 center #ow%,12,"Leftoto ha sido derrotado":
+1563 let power%(leftoto%)=0
+1564 enddef
+1565 defproc leftoto_wins
+1566 wipe black%,white%,black%
+1567 center #ow%,7,"Victoria de Leftoto"
+1568 if have_helicopter% and rnd(0 to 2)
+1569 at #ow%,10,0
+1570 print_l_paragraph #ow%,"Su excelencia logra escapar en helicóptero."
+1571 let escape%=1
+1572 else
+1573 if have_helicopter%
+1574 at #ow%,10,0
+1575 print_l_paragraph #ow%,"Su excelencia intenta escapar en helicóptero, pero el motor sufre una avería."
+1576 pause 80
+1577 endif
+1578 at #ow%,12,0
+1579 paragraph #ow%
+1580 print_l #ow%,"Su excelencia es acusado de ser un enemigo del pueblo y, tras un juicio sumarísimo,"
+1581 pause 50
+1582 execution_sfx
+1583 pause 50
+1584 print_l #ow%,"ejecutado."
+1585 end_paragraph #ow%
+1586 let alive%=0
+1587 endif
+1588 enddef
+1589 deffn have_helicopter%
+1590 ret is_decision_taken%(36)
+1591 enddef
+1592 defproc the_end
+1593 if alive%
+1594 pause 100
+1595 else
+1596 pause 50
+1597 tune "4d3d1d3d3g1f2f1d2d1d5d"
+1598 endif
+1599 score_report
+1600 enddef
+1601 defproc score_report
+1602 loc i%,popularity_bonus%,time_bonus%,money_bonus%,alive_bonus%,bonus_col%
+1603 let bonus_col%=28
+1604 let score%=0
+1605 wipe yellow%,black%,cyan%
+1606 center #ow%,1,"PUNTUACIÓN"
+1607 let popularity_bonus%=0
+1608 for i%=1 to groups%:let popularity_bonus%=popularity_bonus%+popularity%(i%)
+1609 print #ow%,\"Popularidad final:";to bonus_col%;
+1610 print_using #ow%,"####",popularity_bonus%
+1611 let score%=score%+popularity_bonus%
+1612 time_bonus%=months%*3
+1613 print #ow%,\"Por ";months%;" mes";"es"(to 2*(months%<>1));" en el poder:"to bonus_col%;
+1614 print_using #ow%,"####",time_bonus%
+1615 let score%=score%+time_bonus%
+1616 if alive%
+1617 let alive_bonus%=alive%*10
+1618 print #ow%,\"Por seguir con vida:";to bonus_col%;
+1619 print_using #ow%,"####",alive_bonus%
+1620 let score%=score%+alive_bonus%
+1621 if money_in_switzerland
+1622 let money_bonus%=money_in_switzerland div 10
+1623 print #ow%,\"Por los «ahorros» en Suiza"\"(";money$(money_in_switzerland);"):";to bonus_col%;
+1624 print_using #ow%,"####",money_bonus%
+1625 let score%=score%+money_bonus%
+1626 endif
+1627 endif
+1628 print #ow%,\to bonus_col%;"----"
+1629 print #ow%,\"Total:";to bonus_col%;
+1630 paper #ow%,bright_yellow%
+1631 print_using #ow%,"####",score%
+1632 paper #ow%,yellow%
+1633 if score%>record%
+1634 let record%=score%
+1635 print_l_paragraph #ow%,"Sin duda estará usted satisfecho, pues es la mayor puntuación obtenida hasta hoy por un presidente de Ritimba."
+1636 else
+1637 print_l_paragraph #ow%,"La mayor puntuación sigue siendo "&record%&"."
+1638 endif
+1639 key_press
+1640 final_police_report
+1641 enddef
+1642 defproc key_prompt(prompt$,colour%)
+1643 paper #iw%,colour%
+1644 ink #iw%,contrast_colour%(colour%)
+1645 cls #iw%
+1646 center #iw%,1,prompt$
+1647 cursen_home #iw%
+1648 enddef
+1649 deffn get_key_prompt$(prompt$)
+1650 rep dont_press_now
+1651 if inkey$(#iw%)="":exit dont_press_now
+1652 endrep dont_press_now
+1653 rep press_now
+1654 key_prompt prompt$,prompt_colour_1%
+1655 let key$=inkey$(#iw%,50)
+1656 if key$<>"":exit press_now
+1657 zx_beep .01,30
+1658 key_prompt prompt$,prompt_colour_2%
+1659 let key$=inkey$(#iw%,50)
+1660 if key$<>"":exit press_now
+1661 zx_beep .01,20
+1662 endrep press_now
+1663 paper #iw%,prompt_colour_1%
+1664 curdis #iw%
+1665 ret key$
+1666 enddef
+1667 deffn get_key$
+1668 ret get_key_prompt$("...")
+1669 enddef
+1670 deffn yes_key%
+1671 loc key$,yes%
+1672 repeat
+1673 let key$ = get_key_prompt$('Sí | No')
+1674 if key$ instr "NSns"
+1675 exit
+1676 endif
+1677 endrep
+1678 let yes%=(key$=="s")
+1679 cls #iw%
+1680 zx_beep .25,10+40*yes%
+1681 ret yes%
+1682 enddef
+1683 defproc key_press
+1684 loc key$
+1685 let key$=get_key$
+1686 enddef
+1687 deffn decision_option%
+1688 loc key$,decision%
+1689 repeat
+1690 let key$ = get_key_prompt$('Sí  |  No  |  Consejo')
+1691 if key$ instr "CNScns"
+1692 exit
+1693 endif
+1694 endrep
+1695 let decision%=(key$ instr "NnSsCc") div 2
+1696 cls #iw%
+1697 zx_beep .25,10+40*decision%
+1698 ret decision%
+1699 enddef
+1700 defproc mark_decision_taken(decision%)
+1701 let issue_data$(decision%,1)="*"
+1702 enddef
+1703 defproc restore_petitions
+1704 loc i%
+1705 for i%=1 to petitions%:let issue_data$(i%,1)="N"
+1706 enddef
+1707 defproc restore_decisions
+1708 loc i%
+1709 for i%=1 to issues%:let issue_data$(i%,1)="N"
+1710 enddef
+1711 deffn is_decision_taken%(decision%)
+1712 ret issue_data$(decision%,1)="*"
+1713 enddef
+1714 deffn got_helicopter%
+1715 ret is_decision_taken%(36)
+1716 enddef
+1717 deffn decision_cost%(decision%)
+1718 ret code(issue_data$(decision%,2))-code("M")
+1719 enddef
+1720 deffn decision_monthly_cost%(decision%)
+1721 ret code(issue_data$(decision%,3))-code("M")
+1722 enddef
+1723 deffn decision_popularity_effect%(decision%,group%)
+1724 ret code(issue_data$(decision%,group%+3))-code("M")
+1725 enddef
+1726 deffn decision_power_effect%(decision%,group%)
+1727 ret code(issue_data$(decision%,group%+11))-code("M")
+1728 enddef
+1729 defproc init_data
+1730 loc x$
+1731 let issue_max_len%=70
+1732 dim issue$(issues%,issue_max_len%),issue_data$(issues%,17)
+1733 let max_short_name_len%=17
+1734 dim popularity%(groups%),power%(groups%),plan%(groups%),ally%(groups%),name$(groups%,18),short_name$(groups%,max_short_name_len%),plural_name$(groups%,21),genitive_name$(groups%,21),member$(groups%,15)
+1735 restore 1779
+1736 for i%=1 to issues%:
+1737 read issue_data$(i%),x$
+1738 if len(x$)>issue_max_len%
+1739 print "ERROR: issue name too long:"\x$
+1740 stop
+1741 else
+1742 let issue$(i%)=x$
+1743 endif
+1744 endfor i%
+1745 restore 1828
+1746 for i%=1 to groups%
+1747 read popularity%(i%),power%(i%),plan%(i%),ally%(i%),name$(i%),short_name$(i%),plural_name$(i%),genitive_name$(i%),member$(i%)
+1748 endfor i%
+1749 dim icon$(main_groups%,10)
+1750 restore 1836
+1751 for i%=1 to main_groups%
+1752 read icon$(i%)
+1753 endfor i%
+1754 let decision_sections%=5
+1755 let section_max_len%=21
+1756 dim decision_section$(decision_sections%,section_max_len%),first_decision%(decision_sections%),last_decision%(decision_sections%)
+1757 restore 1839
+1758 for i%=1 to decision_sections%
+1759 read decision_section$(i%),first_decision%(i%),last_decision%(i%)
+1760 endfor
+1761 restore_decisions
+1762 let transfer_divisors%=5
+1763 dim divisor$(transfer_divisors%,9)
+1764 restore 1844
+1765 for i%=1 to transfer_divisors%
+1766 read divisor$(i%)
+1767 endfor
+1768 let money=1000
+1769 let transferred_money=0
+1770 let escape%=0
+1771 let monthly_payment=60
+1772 let strength%=4
+1773 let money_in_switzerland=0
+1774 let alive%=1
+1775 let months%=0
+1776 let pc%=0
+1777 let rebellion_strength%=10
+1778 enddef
+1779 data "NMHQJLMMMMMPKLMMM","Instaurar el servicio militar obligatorio"
+1780 data "NMMPMJMMMMMNMLMMM","Requisar tierras para construir un polígono de tiro"
+1781 data "NCMPLNMLMLMNMNIMM","Atacar las bases de la guerrilla"
+1782 data "NEMPLMMIMLMNMNKMM","Atacar la base de la guerrilla en Leftoto"
+1783 data "NMMQONMMIMMNMNMMJ","Destituir al jefe de la policía secreta"
+1784 data "NMMPMMMLMIOMMMMMM","Echar a los militares rusos"
+1785 data "NMDQMLMMMMMOLLLMM","Aumentar la paga de las tropas"
+1786 data "NAMQLLMLLMMPLLKLM","Comprar más armas y municiones"
+1787 data "NMMLONMMMMMLMMLMM","Poner freno a los abusos del ejército"
+1788 data "NMMMQIMNMMMMOLMMM","Aumentar el salario mínimo"
+1789 data "NMPNQOMMIMMNNNNMJ","Acabar con la policía secreta"
+1790 data "NMMMPKMKMMMMOKMMM","Detener la inmigración de Leftoto"
+1791 data "NCELQKMOLNMMNLLMM","Poner escuela gratis para todos"
+1792 data "NMMMQJMNLNMMPJMML","Legalizar los sindicatos"
+1793 data "NMMLQKMNLMMMOLLMM","Liberar a su líder encarcelado"
+1794 data "NMSMPLMMMMMMMMLMM","Iniciar una lotería pública"
+1795 data "NMMKMPMMMMMLMMMMM","Prohibir el uso militar de sus tierras"
+1796 data "NMMMIQMLMLMMKONMM","Bajar el salario mínimo"
+1797 data "NWHMMPMNMOIMMNMMM","Nacionalizar las empresas useñas"
+1798 data "NMRMMPMJMLMMNOMLM","Tasar las importaciones de leftoto"
+1799 data "NMQNNPMMIMMNMNNMK","Cortar los gastos de la policía secreta"
+1800 data "NMHMMQMMMMMMMOMMM","Bajar el impuesto sobre la tierra"
+1801 data "NMMKLPMMMMMLLNNMM","Ceder tropa para labrar tierra"
+1802 data "NACNNPMJMONMMPMKM","Construir un sistema de riego"
+1803 data "NMMQLLMMLMMNMMLML","Nombrar ministro al jefe del ejército"
+1804 data "NLILQNMOMNMMMMLMM","Construir hospitales para los trabajadores"
+1805 data "NMMLKQMMLLMLLOMML","Dar poderes a los terratenientes"
+1806 data "NRMKMMMQMKNLMMLPM","Vender armas useñas a Leftoto"
+1807 data "NYMMMLMLMKPMMMMMM","Vender derechos a empresas useñas"
+1808 data "NMWKMMMMMPJMMMMNM","Alquilar a Rusia una base naval"
+1809 data "NMENPPMMMMMLMMLMM","Bajar los impuestos"
+1810 data "NEMPPPMMMMMMMMLMM","Hacer una campaña de imagen presidencial"
+1811 data "NMUPPPMMDMMONNNMD","Reducir el poder de la policía secreta"
+1812 data "NMGJJJMMUMMLLLLMU","Aumentar el poder de la policía secreta"
+1813 data "NIMKLLMMLMMKMMMML","Aumentar el número de guardaespaldas"
+1814 data "NAMIIJMMKMMMMMMMM","Comprar un helicóptero para una posible huida del país"
+1815 data "NMMMMMMMMMMMMMMMM","Hacer una transferencia a la cuenta presidencial en Suiza"
+1816 data "NMMMMMMMMMMMMMMMM","Solicitar un préstamo a los rusos"
+1817 data "NMMMMMMMMMMMMMMMM","Solicitar un préstamo a los useños"
+1818 data "NZMNNPMGMKMMMMMMM","Nacionalizar las empresas de Leftoto"
+1819 data "NHMPMMMJMLMRMMKKL","Comprar armas para el ejército"
+1820 data "NMMMPLMMLMMMRLPML","Legalizar las asociaciones campesinas"
+1821 data "NMMLLPMMLMMLLRLML","Permitir que los terratenientes tengan ejércitos privados"
+1822 data "NMMMMMMMIMMMMMQMI","Los archivos de la policía secreta han sido robados"
+1823 data "NMMMMMMMMMMLMMVMM","Cuba está entrenando a la guerrilla"
+1824 data "NMMMMMMMMMMIMMOMN","Un barracón del ejército ha explotado"
+1825 data "NMMMMMMMMMMMMJMKM","El precio de los plátanos ha caído un 98%"
+1826 data "NMMMMMMMMMMMMOMIM","El jefe del estado mayor del ejército se ha fugado a Leftoto"
+1827 data "NMMMMMMMMMMMILKMM","Se ha declarado una epidemia entre los campesinos"
+1828 data 7,6,none%,none%,"el ejército","ejército","los militares","del ejército","militar"
+1829 data 7,6,none%,none%,"los campesinos","campesinos","los campesinos","de los campesinos","campesino"
+1830 data 7,6,none%,none%,"los terratenientes","terratenientes","los terratenientes","de los terratenientes","terrateniente"
+1831 data 0,6,none%,none%,"la guerrilla","guerrilla","los guerrilleros","de la guerrilla","guerrillero"
+1832 data 7,6,none%,none%,"Leftoto","leftotanos","los leftotanos","de Leftoto","leftotano"
+1833 data 7,6,none%,none%,"la policía secreta","policía secreta","los policías secretos","de la policía secreta","policía secreto"
+1834 data 7,0,none%,none%,"Rusia","rusos","los rusos","de Rusia","ruso"
+1835 data 7,0,none%,none%,"Usa","useños","los useños","de Usa","useño"
+1836 data "army"
+1837 data "peasants"
+1838 data "landowners"
+1839 data "Complacer a un grupo ",25,30
+1840 data "Complacer a todos    ",31,33
+1841 data "Aumentar los ingresos",38,40
+1842 data "Fortalecer a un grupo",41,43
+1843 data "Asuntos privados     ",34,37
+1844 data "Todo"
+1845 data "La mitad"
+1846 data "Un tercio"
+1847 data "Un cuarto"
+1848 data "Un quinto"
+1849 defproc zx_border(colour%)
+1850 border #ow%,ow_border_width%,colour%
+1851 paper #bw%,colour%
+1852 cls #bw%
+1853 enddef
+1854 defproc war_sfx
+1855 sel on rnd(0 to 1)
+1856 =0:sound "war"
+1857 =1:sound "gunbattle"
+1858 endsel
+1859 enddef
+1860 defproc execution_sfx
+1861 sel on rnd(0 to 2)
+1862 =0:sound "star9mm":sound "9mmgunshot"
+1863 =1:sound "p90gunfire"
+1864 =2:sound "p90machinegunfire"
+1865 endsel
+1866 enddef
+1867 defproc shoot_dead_sfx
+1868 sel on rnd(0 to 3)
+1869 =0:sound "9mmgunshot"
+1870 =1:sound "p90gunfire"
+1871 =2:sound "p90machinegunfire"
+1872 =3:sound "shotgunmossberg"
+1873 endsel
+1874 enddef
+1875 defproc sound(basefile$)
+1876 if sss
+1877 soundfile datad$&"snd_"&basefile$&".ub"
+1878 repeat
+1879 if not jva_sounding
+1880 exit
+1881 endif
+1882 endrep
+1883 endif
+1884 enddef
+1885 defproc tune(score$)
+1886 loc note%
+1887 for note%=1 to len(score$) step 2
+1888 if score$(note%+1)=" "
+1889 pause code(score$(note%))/4
+1890 else
+1891 zx_beep (code(score$(note%))-code("0"))/6,code(score$(note%+1))-code("i")
+1892 endif
+1893 endfor note%
+1894 enddef
+1895 deffn if$(flag%,true$,false$)
+1896 if flag%:ret true$:else:ret false$
+1897 enddef
+1898 defproc wipe(paper_colour%,ink_colour%,border_colour%)
+1899 paper #ow%,paper_colour%
+1900 ink #ow%,ink_colour%
+1901 zx_border border_colour%
+1902 cls #ow%
+1903 paper #iw%,border_colour%
+1904 cls #iw%
+1905 let prompt_colour_1%=border_colour%
+1906 let prompt_colour_2%=paper_colour%
+1907 if prompt_colour_1%=prompt_colour_2%
+1908 let prompt_colour_2%=contrast_colour%(prompt_colour_1%)
+1909 endif
+1910 zx_beep .1,40
+1911 enddef
+1912 deffn center_for%(width_in_chars%)
+1913 ret (columns%-width_in_chars%) div 2
+1914 enddef
+1915 defproc center(channel%,line%,text$)
+1916 loc length%,i%,first_part$,first_part_length%
+1917 let length%=len(text$)
+1918 if length%>columns%
+1919 for i%=columns%+1 to 1 step -1
+1920 if text$(i%)=" "
+1921 let first_part$=trim$(text$(to i%-1))
+1922 let first_part_length%=len(first_part$)
+1923 at #channel%,line%,center_for%(first_part_length%)
+1924 center channel%,line%+1,text$(i%+1 to)
+1925 exit i%
+1926 endif
+1927 next i%
+1928 at #channel%,line%,0
+1929 print_l #channel%,text$
+1930 endfor i%
+1931 else
+1932 at #channel%,line%,center_for%(length%)
+1933 print #channel%,text$
+1934 endif
+1935 enddef
+1936 defproc restore_csize
+1937 csize #ow%,csize_width%,csize_height%
+1938 enddef
+1939 defproc item(channel%,item%,item$)
+1940 loc indentation%,width%,len%,first_char%,last_char%
+1941 let len%=len(item$)
+1942 print #channel%,item%&". ";
+1943 let indentation%=win_column%(channel%)
+1944 let width%=win_columns%(channel%)-indentation%
+1945 let first_char%=1
+1946 let last_char%=minimum%(first_char%+width%,len%)
+1947 rep
+1948 if item$(last_char%)=" "
+1949 print #channel%,item$(first_char% to last_char%-1)
+1950 let first_char%=last_char%+1
+1951 let last_char%=minimum%(first_char%+width%,len%)
+1952 print #channel%,to indentation%;
+1953 else
+1954 if (last_char%-first_char%+1)<=width% and last_char%=len%
+1955 print #channel%,item$(first_char% to last_char%);
+1956 exit
+1957 else
+1958 let last_char%=last_char%-1
+1959 endif
+1960 endif
+1961 endrep
+1962 print #channel%
+1963 enddef
+1964 deffn contrast_colour%(colour%)
+1965 sel on colour%
+1966 =black%,blue%,brigth_blue%,red%,brigth_red%,purple%,brigth_purple%:ret white%
+1967 =remainder:ret black%
+1968 endsel
+1969 enddef
+1970 defproc cursen_home(channel%)
+1971 loc line%
+1972 sel on channel%
+1973 =iw%:line%=iw_lines%-1
+1974 =ow%:line%=ow_lines%-1
+1975 endsel
+1976 cursen #channel%
+1977 at #channel%,line%,columns%-1
+1978 enddef
+1979 deffn ow_line_y(line%)
+1980 ret char_height_pixels%*line%
+1981 enddef
+1982 deffn column_x%(column%)
+1983 ret char_width_pixels%*column%
+1984 enddef
+1985 defproc fonts(font_address)
+1986 char_use #iw%,font_address,0
+1987 char_use #ow%,font_address,0
+1988 enddef
+1989 defproc iso_font
+1990 fonts font_address
+1991 enddef
+1992 defproc ql_font
+1993 fonts 0
+1994 enddef
+1995 deffn icon_file$(icon_id$)
+1996 ret datad$&"img_"&icon_id$&"_icon_pic"
+1997 enddef
+1998 defproc clear_lines(channel%,first_line%,last_line%)
+1999 loc i%
+2000 for i%=last_line% to first_line% step -1
+2001 at #channel%,i%,0
+2002 cls #channel%,3
+2003 endfor
+2004 enddef
+2005 defproc init_font
+2006 let font$="iso8859-1_font"
+2007 font_length=flen(\font$)
+2008 font_address=alchp(font_length)
+2009 lbytes font$,font_address
+2010 iso_font
+2011 enddef
+2012 defproc init_windows
+2013 loc lines%
+2014 let columns%=32
+2015 let lines%=26
+2016 let csize_width%=3
+2017 let csize_height%=1
+2018 let char_width_pixels%=csize_width_pixels%(csize_width%)
+2019 let char_height_pixels%=csize_height_pixels%(csize_height%)
+2020 let iw%=fopen("con_")
+2021 let ow%=fopen("scr_")
+2022 let bw%=fopen("con_")
+2023 let iw_lines%=3
+2024 let ow_lines%=lines%-iw_lines%
+2025 let ow_border_width%=char_width_pixels%
+2026 csize #iw%,csize_width%,csize_height%
+2027 csize #ow%,csize_width%,csize_height%
+2028 let ow_border_x_width%=ow_border_width%*4
+2029 let ow_border_y_width%=ow_border_width%*2
+2030 let ow_width%=columns%*char_width_pixels%+ow_border_x_width%
+2031 let iw_width%=columns%*char_width_pixels%
+2032 let bw_width%=ow_width%
+2033 let ow_height%=ow_lines%*char_height_pixels%+ow_border_y_width%
+2034 let iw_height%=iw_lines%*char_height_pixels%
+2035 let bw_height%=iw_height%+ow_border_width%
+2036 if windows_do_not_fit%
+2037 init_font
+2038 print_l #ow%,"Error fatal:"
+2039 print_l #ow%,"La resolución de pantalla es insuficiente."
+2040 print_l #ow%,"Este programa necesita una resolución mínima de "&ow_width%&"x"&(ow_height%+iw_height%)&"."
+2041 stop
+2042 endif
+2043 let ow_x%=(scr_xlim-ow_width%)/2
+2044 let ow_y%=(scr_ylim-ow_height%-iw_height%)/2
+2045 let iw_x%=(scr_xlim-iw_width%)/2
+2046 let iw_y%=ow_y%+ow_height%
+2047 let bw_x%=ow_x%
+2048 let bw_y%=iw_y%
+2049 window #ow%,ow_width%,ow_height%,ow_x%,ow_y%
+2050 window #iw%,iw_width%,iw_height%,iw_x%,iw_y%
+2051 window #bw%,bw_width%,bw_height%,bw_x%,bw_y%
+2052 let blank_line$=fill$(" ",columns%)
+2053 enddef
+2054 deffn windows_do_not_fit%
+2055 ret ow_width%>scr_xlim or (ow_height%+maximum%(iw_heigth%,bw_height%))>scr_ylim
+2056 enddef
+2057 defproc init_screen
+2058 colour_pal
+2059 palette_8 blue%,$0000D7
+2060 palette_8 red%,$D70000
+2061 palette_8 purple%,$D700D7
+2062 palette_8 green%,$00C000
+2063 palette_8 cyan%,$00D7D7,
+2064 palette_8 yellow%,$C0C000
+2065 palette_8 white%,$D7D7D7
+2066 let paragraph_separation%=1
+2067 let paragraph_indentation%=0
+2068 enddef
+2069 defproc init_once
+2070 randomise
+2071 init_constants
+2072 init_screen
+2073 init_windows
+2074 init_font
+2075 init_zx_beep
+2076 let score%=0
+2077 let record%=0
+2078 enddef
+2079 defproc init_constants
+2080 let black%=0
+2081 let bright_white%=1
+2082 let bright_red%=2
+2083 let bright_green%=3
+2084 let bright_blue%=4
+2085 let bright_purple%=5
+2086 let bright_yellow%=6
+2087 let bright_cyan%=7
+2088 let blue%=8
+2089 let red%=9
+2090 let purple%=10
+2091 let green%=11
+2092 let cyan%=12
+2093 let yellow%=13
+2094 let white%=14
+2095 let issues%=49
+2096 let petitions%=24
+2097 let groups%=8
+2098 let main_groups%=3
+2099 let local_groups%=6
+2100 let nbsp$=chr$(160)
+2101 let currency$="RTD"
+2102 let army%=1
+2103 let peasants%=2
+2104 let landowners%=3
+2105 let guerrilla%=4
+2106 let leftoto%=5
+2107 let police%=6
+2108 let russia%=7
+2109 let usa%=8
+2110 let none%=-1
+2111 let rebellion%=1
+2112 let assassination%=2
+2113 let first_event%=44
+2114 let last_event%=49
+2115 let events%=last_event%-first_event%+1
+2116 enddef
+2117 defproc debug_(message$)
+2118 if 1
+2119 print #ow%,message$
+2120 pause
+2121 endif
+2122 enddef
+2123 defproc finish
+2124 close
+2125 ql_font
+2126 rechp font_address
+2127 enddef
+2128 defproc advices
+2129 loc i%
+2130 for i%=1 to first_event%-1
+2131 advice i%
+2132 endfor
+2133 enddef
+2134 defproc bmps_to_pic
+2135 loc d$
+2136 let d$=datad$&"img_"
+2137 bmp_to_pic d$&"usa_flag.bmp",d$&"usa_flag_pic"
+2138 bmp_to_pic d$&"ussr_flag.bmp",d$&"ussr_flag_pic"
+2139 enddef
+2140 defproc lp(x%,y%)
+2141 load_pic datad$&"img_army_icon_pic",x%,y%
+2142 enddef
+2143 defproc lpw(x%,y%)
+2144 load_pic_win #ow%,datad$&"img_army_icon_pic",x%,y%
+2145 enddef
+2146 defproc checkw
+2147 loc i%
+2148 for i%=0 to 10
+2149 at #ow%,i%,i%
+2150 print #ow%,win_xpos%(#ow%);",",win_ypos%(#ow%)
+2151 endfor
+2152 enddef
+2153 defproc ci
+2154 paper #ow%,yellow%
+2155 ink #ow%,black%
+2156 cls
+2157 cls #ow%
+2158 item #ow%,1,"En un lugar de La Mancha, de cuyo nombre no quiero acordarme, no ha mucho que vivía un hidalgo."
+2159 enddef
+2160 defproc item_v0(channel%,item%,item$)
+2161 loc indentation%,width%,len%,first_char%,last_char%
+2162 let len%=len(item$)
+2163 print #channel%,item%&". ";
+2164 let indentation%=win_column%(channel%)
+2165 let width%=win_columns%(channel%)-indentation%
+2166 let first_char%=1
+2167 let last_char%=minimum%(first_char%+width%,len%)
+2168 rep
+2169 if (last_char%-first_char%+1)<=width% and last_char%=len%
+2170 print #channel%,item$(first_char% to last_char%);
+2171 exit
+2172 else
+2173 if item$(last_char%)=" "
+2174 print #channel%,item$(first_char% to last_char%-1)
+2175 let first_char%=last_char%+1
+2176 let last_char%=minimum%(first_char%+width%,len%)
+2177 print #channel%,to indentation%;
+2178 else
+2179 let last_char%=last_char%-1
+2180 endif
+2181 endif
+2182 endrep
+2183 print #channel%
+2184 enddef
+2185 defproc item_v1(channel%,item%,item$)
+2186 loc indentation%,width%,len%,first_char%,last_char%
+2187 let len%=len(item$)
+2188 print #channel%,item%&". ";
+2189 let indentation%=win_column%(channel%)
+2190 let width%=win_columns%(channel%)-indentation%
+2191 let first_char%=1
+2192 let last_char%=minimum%(first_char%+width%,len%)
+2193 rep
+2194 if item$(last_char%)=" "
+2195 print #channel%,item$(first_char% to last_char%-1)
+2196 let first_char%=last_char%+1
+2197 let last_char%=minimum%(first_char%+width%,len%)
+2198 print #channel%,to indentation%;
+2199 else
+2200 if (last_char%-first_char%+1)<=width% and last_char%=len%
+2201 print #channel%,item$(first_char% to last_char%);
+2202 exit
+2203 else
+2204 let last_char%=last_char%-1
+2205 endif
+2206 endif
+2207 endrep
+2208 print #channel%
+2209 enddef
+2210 defproc item_v2(channel%,item%,item$)
+2211 loc indentation%,width%,len%,first_char%,last_char%
+2212 let len%=len(item$)
+2213 print #channel%,item%&". ";
+2214 let indentation%=win_column%(channel%)
+2215 let width%=win_columns%(channel%)-indentation%
+2216 let first_char%=1
+2217 let last_char%=minimum%(first_char%+width%,len%)
+2218 rep
+2219 if item$(last_char%)=" "
+2220 print #channel%,item$(first_char% to last_char%-1)
+2221 let first_char%=last_char%+1
+2222 let last_char%=minimum%(first_char%+width%,len%)
+2223 print #channel%,to indentation%;
+2224 next
+2225 else
+2226 if (last_char%-first_char%+1)<=width% and last_char%=len%
+2227 print #channel%,item$(first_char% to last_char%);
+2228 exit
+2229 else
+2230 let last_char%=last_char%-1
+2231 endif
+2232 endif
+2233 endrep
+2234 print #channel%
+2235 enddef
+2236 defproc item_v3(channel%,item%,item$)
+2237 loc indentation%,width%,len%,first_char%,last_char%
+2238 let len%=len(item$):print #channel%,item%&". ";:let indentation%=win_column%(channel%):let width%=win_columns%(channel%)-indentation%:let first_char%=1:let last_char%=minimum%(first_char%+width%,len%)
+2239 rep
+2240 if item$(last_char%)=" "
+2241 print #channel%,item$(first_char% to last_char%-1):let first_char%=last_char%+1:let last_char%=minimum%(first_char%+width%,len%):print #channel%,to indentation%;:next
+2242 else
+2243 if (last_char%-first_char%+1)<=width% and last_char%=len%
+2244 print #channel%,item$(first_char% to last_char%);:exit
+2245 else
+2246 let last_char%=last_char%-1
+2247 endif
+2248 endif
+2249 endrep
+2250 print #channel%
+2251 enddef
+2252 defproc bi(times%)
+2253 loc t,i%,txt$
+2254 let txt$="En un lugar de la Mancha, de cuyo nombre no quiero acordarme, no ha mucho tiempo que vivía un hidalgo de los de lanza en astillero, adarga antigua, rocín flaco y galgo corredor. Una olla de algo más vaca que carnero, salpicón las más noches, duelos y quebrantos los sábados, lantejas los viernes, algún palomino de añadidura los domingos, consumían las tres partes de su hacienda. El resto della concluían sayo de velarte, calzas de velludo para las fiestas, con sus pantuflos de lo mesmo, y los días de entresemana se honraba con su vellorí de lo más fino. Tenía en su casa una ama que pasaba de los cuarenta, y una sobrina que no llegaba a los veinte, y un mozo de campo y plaza, que así ensillaba el rocín como tomaba la podadera. Frisaba la edad de nuestro hidalgo con los cincuenta años; era de complexión recia, seco de carnes, enjuto de rostro, gran madrugador y amigo de la caza. Quieren decir que tenía el sobrenombre de Quijada, o Quesada, que en esto hay alguna diferencia en los autores que deste caso escriben; aunque, por conjeturas verosímiles, se deja entender que se llamaba Quejana. Pero esto importa poco a nuestro cuento; basta que en la narración dél no se salga un punto de la verdad. Es, pues, de saber que este sobredicho hidalgo, los ratos que estaba ocioso, que eran los más del año, se daba a leer libros de caballerías, con tanta afición y gusto, que olvidó casi de todo punto el ejercicio de la caza, y aun la administración de su hacienda. Y llegó a tanto su curiosidad y desatino en esto, que vendió muchas hanegas de tierra de sembradura para comprar libros de caballerías en que leer, y así, llevó a su casa todos cuantos pudo haber dellos; y de todos, ningunos le parecían tan bien como los que compuso el famoso Feliciano de Silva, porque la claridad de su prosa y aquellas entricadas razones suyas le parecían de perlas, y más cuando llegaba a leer aquellos requiebros y cartas de desafíos, donde en muchas partes hallaba escrito: La razón de la sinrazón que a mi razón se hace, de tal manera mi razón enflaquece, que con razón me quejo de la vuestra fermosura. Y también cuando leía: ...los altos cielos que de vuestra divinidad divinamente con las estrellas os fortifican, y os hacen merecedora del merecimiento que merece la vuestra grandeza."
+2255 cls
+2256 let t=date:for i%=1 to times%:at 0,0:item_v0 0,1,txt$
+2257 print "v0: ";date-t;" seconds"
+2258 let t=date:for i%=1 to times%:at 0,0:item_v1 0,1,txt$
+2259 print \"v1: ";date-t;" seconds"
+2260 let t=date:for i%=1 to times%:at 0,0:item_v2 0,1,txt$
+2261 print \\"v2: ";date-t;" seconds"
+2262 let t=date:for i%=1 to times%:at 0,0:item_v3 0,1,txt$
+2263 print \\\"v3: ";date-t;" seconds"
+2264 enddef
+2265 defproc s(basefile$)
+2266 soundfile datad$&"snd_"&basefile$&".ub"
+2267 enddef
+2268 defproc s2(basefile$)
+2269 soundfile2  datad$&"snd_"&basefile$&".ub"
+2270 enddef
+
